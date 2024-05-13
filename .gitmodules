@@ -8,8 +8,8 @@
 	path = config/nvim
 	url = https://github.com/NvChad/NvChad
 [submodule "config/vim"]
-	path = config/nvim
+	path = config/vim
 	url = https://github.com/amix/vimrc
-[submodule "config/vim"]
-	path = config/nvim
+[submodule "config/fzf-git"]
+	path = config/fzf-git
 	url = https://github.com/junegunn/fzf-git.sh
