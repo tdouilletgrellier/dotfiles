@@ -1,9 +1,9 @@
 # Global Git Configuration
 
 [user]
-	name = Alicia Sykes
-	email = alicia@omg.lol
-	username = lissy93
+	name = Thomas Douillet-Grellier
+	email = thomas.douillet-grellier@edf.fr
+	username = f66379
 [init]
 	defaultBranch = master
 [pull]
@@ -12,7 +12,7 @@
 	editor = nvim
 	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
 	pager = delta
-	excludesfile = /Users/alicia/.config/.gitignore_global
+	excludesfile = ~/.config/.gitignore_global
 	autocrlf = false
 	symlinks = true
 [web]
@@ -59,9 +59,12 @@
 	minus-empty-line-marker-style = normal normal
 	plus-empty-line-marker-style = normal normal
 	line-numbers-right-format = "{np:^4}│ "
-# [github]
-	# user = lissy93
+[github]
+	user = tdouilletgrellier
 	# token = token
+[gitlab]
+	user = tdouilletgrellier
+	# token = token	
 [gitflow "prefix"]
 	versiontag = v
 [sequence]
@@ -270,15 +273,22 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Users/alicia/Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
-[remote "origin"]
-	url = https://github.com/Homebrew/brew
-	fetch = +refs/heads/*:refs/remotes/origin/*
-[homebrew]
-	analyticsmessage = true
-	caskanalyticsmessage = true
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true    # use n and N to move between diff sections
+    side-by-side = true
+[merge]
+    conflictstyle = diff3
+[diff]
+    colorMoved = default
+[credential]
+	helper = store
+[http "https://codev-tuleap.cea.fr"] 
+        proxy = http://vip-users.proxy.edf.fr:3131
+[http "https://github.com"] 
+        proxy = http://vip-users.proxy.edf.fr:3131 
+[http "https://gitlab.pleiade.edf.fr"] 
+        proxy = "" 
+[credential "https://gitlab.com/manta-project/manta.git"]
+	helper = store        	

@@ -1,0 +1,27 @@
+{
+	"bootstrapped": true,
+	"http_proxy": "http://vip-users.proxy.edf.fr:3131/",
+	"https_proxy": "http://vip-users.proxy.edf.fr:3131/",
+	"installed_packages":
+	[
+		"A File Icon",
+
+		"Agila Theme",
+		"CMake",
+		"Dank Neon",
+		"Dark Neon Color Scheme",
+		"DiffTabs",
+		"Fortran",
+		"ModernFortran",
+		"Neon Color Scheme",
+		"Package Control",
+		"PackageSync",
+		"sublimelint",
+		"SublimeLinter",
+		"Terminus",
+		"Theme - Tech49",
+	],
+	"in_process_packages":
+	[
+	],
+}

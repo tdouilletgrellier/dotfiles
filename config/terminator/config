@@ -1,0 +1,26 @@
+[global_config]
+  title_hide_sizetext = True
+  title_use_system_font = False
+  title_font = Hack Nerd Font Bold 9
+[keybindings]
+  toggle_zoom = <Primary><Shift>m
+[profiles]
+  [[default]]
+    background_darkness = 0.95
+    background_type = transparent
+    cursor_color = "#aaaaaa"
+    font = Hack Nerd Font 10
+    foreground_color = "#00ff00"
+    scrollback_lines = 10000
+    palette = "#000000:#cd0000:#00cd00:#cdcd00:#12488b:#cd00cd:#00cdcd:#faebd7:#404040:#ff0000:#00ff00:#ffff00:#2a7bde:#ff00ff:#00ffff:#ffffff"
+    use_system_font = False
+    bold_is_bright = True
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+[plugins]

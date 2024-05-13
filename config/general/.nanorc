@@ -1,0 +1,115 @@
+#####################
+# Behavior Settings #
+#####################
+
+# Make new lines contain the same amount of whitespace as line above.
+unset autoindent
+
+# Use a tab size of n columns. The value of n must be greater than 0.
+# The default value is 8.
+set tabsize 4
+
+# Convert typed tabs to spaces.
+set tabstospaces
+set trimblanks
+
+# Do not convert files from DOS/Mac format.
+unset noconvert
+
+# Add newlines to the ends of files.
+set nonewlines
+
+# Make the Home key smarter. When Home is pressed anywhere but at the very
+# beginning of non-whitespace characters on a line, the cursor will jump to that
+# beginning (either forwards or backwards). If the cursor is already at that
+# position, it will jump to the true beginning of the line.
+set smarthome
+
+set atblanks
+set autoindent
+set backup
+set backupdir "/home/f66379/Documents/Nano_Backups/"
+set boldtext
+set constantshow
+set cutfromcursor
+set indicator
+#set magic
+#set minibar
+#set mouse
+set showcursor
+set softwrap
+set speller "aspell -x -c"
+set trimblanks
+set whitespace "»·"
+set zap
+set multibuffer
+
+####################
+# Display Settings #
+####################
+
+# Constantly display the cursor position in the status bar.
+# Constantly display the cursor position in the status bar. This overrides the option quickblank.
+set constantshow
+
+# Display line numbers to the left of the text area.
+set linenumbers
+
+# Use the blank line below the titlebar as extra editing space.
+set morespace
+
+# Use smooth scrolling by default.
+set smooth
+
+# Disable soft line wrapping for easier viewing of very long lines.
+unset softwrap
+
+#######################
+# Syntax Highlighting #
+#######################
+
+set titlecolor bold,lightwhite,blue
+#set promptcolor lightwhite,lightblack
+set statuscolor bold,lightwhite,green
+set errorcolor bold,lightwhite,red
+#set spotlightcolor black,lime
+set selectedcolor lightwhite,magenta
+set stripecolor ,yellow
+set scrollercolor cyan
+set numbercolor cyan
+set keycolor cyan
+set functioncolor green
+
+include "/usr/share/nano/*.nanorc"
+
+#bind ^Q exit all
+#bind ^S savefile main
+#bind ^W writeout main
+#bind ^O insert main
+#bind ^H help all
+#bind ^H exit help
+#bind ^F whereis all
+#bind ^G findnext all
+#bind ^B wherewas all
+#bind ^D findprevious all
+#bind ^R replace main
+#bind ^X cut main
+#bind ^C copy main
+#bind ^V paste all
+#bind ^P location main
+#bind ^E execute main
+#bind ^A mark main
+#unbind ^K main
+#unbind ^U all
+#unbind ^N main
+#unbind ^Y all
+#unbind M-J main
+#unbind M-T main
+#bind ^T gotoline main
+#bind ^T gotodir browser
+#bind ^T cutrestoffile execute
+#bind ^L linter execute
+#bind M-U undo main
+#bind M-R redo main
+#bind ^Z undo main
+#bind ^Y redo main

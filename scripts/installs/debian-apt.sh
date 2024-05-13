@@ -21,6 +21,7 @@ debian_apps=(
   'neovim'        # Text editor
   'ranger'        # Directory browser
   'tmux'          # Term multiplexer
+  'terminator'    # Terminal emulator
   'wget'          # Download files
 
   # CLI Power Basics
@@ -31,6 +32,7 @@ debian_apps=(
   'diff-so-fancy' # Readable file compares (better diff)
   'duf'           # Get info on mounted disks (better df)
   'exa'           # Listing files with info (better ls)
+  'fd-find'           # Fuzzy file finder and filtering
   'fzf'           # Fuzzy file finder and filtering
   'hyperfine'     # Benchmarking for arbitrary commands
   'just'          # Powerful command runner (better make)
@@ -49,7 +51,10 @@ debian_apps=(
   'zoxide'        # Auto-learning navigation (better cd)
 
   # Languages, compilers, runtimes, etc
-  'golang'
+  'gcc'
+  'gfortran'
+  'python'
+  'paraview'
 
   # Security Utilities
   'clamav'        # Open source virus scanning suite
