@@ -14,6 +14,7 @@
     ~/.bashrc: config/general/.bashrc
     ~/.bash_aliases: config/general/.bash_aliases
     ~/.bash_logout: config/general/.bash_logout
+    ~/.profile: config/general/.profile
 
     ~/.vimrc: config/general/.vimrc
     ~/.vim_runtime: config/vim
