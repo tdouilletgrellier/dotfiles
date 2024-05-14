@@ -23,6 +23,7 @@ debian_apps=(
   'tmux'          # Term multiplexer
   'terminator'    # Terminal emulator
   'wget'          # Download files
+  'wmctrl'          # Download files
 
   # CLI Power Basics
   'aria2'         # Resuming download util (better wget)
@@ -67,6 +68,7 @@ debian_apps=(
 
   # Monitoring, management and stats
   'btop'          # Live system resource monitoring
+  'bpytop'        # Live system resource monitoring
   'bmon'          # Bandwidth utilization monitor
   'ctop'          # Container metrics and monitoring
   'gping'         # Interactive ping tool, with graph

@@ -1,0 +1,17 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- clean: ['~']
+
+- link:
+    ~/.gitconfig: config/general/.gitconfig
+    ~/.gitignore_global: config/general/.gitignore_global
+    ~/.curlrc: config/general/.curlrc
+    ~/.wgetrc: config/general/.wgetrc
+    # ~/bin:
+    #     path: bin/
+    #     create: true
+
+
