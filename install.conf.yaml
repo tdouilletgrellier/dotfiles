@@ -10,6 +10,12 @@
     ~/.gitignore_global: config/general/.gitignore_global
     ~/.curlrc: config/general/.curlrc
     ~/.wgetrc: config/general/.wgetrc
+    ~/.nanorc: config/general/.nanorc
+
+    ~/.vimrc: config/general/.vimrc
+    ~/.vim_runtime: config/vim
+
+    # ~/.config/nvim: config/nvim
     # ~/bin:
     #     path: bin/
     #     create: true
