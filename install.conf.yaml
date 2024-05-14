@@ -11,6 +11,9 @@
     ~/.curlrc: config/general/.curlrc
     ~/.wgetrc: config/general/.wgetrc
     ~/.nanorc: config/general/.nanorc
+    ~/.bashrc: config/general/.bashrc
+    ~/.bash_aliases: config/general/.bash_aliases
+    ~/.bash_logout: config/general/.bash_logout
 
     ~/.vimrc: config/general/.vimrc
     ~/.vim_runtime: config/vim

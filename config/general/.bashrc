@@ -162,7 +162,7 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --border="rounded" --border-label="" --preview-window="border-rounded" --prompt="> "
   --marker=">" --pointer="◆" --separator="─" --scrollbar="│"'
 
-source ~/fzf-git.sh/fzf-git.sh
+source ~/dotfiles/config/fzf-git/fzf-git.sh
 
 _fzf_git_fzf() {
   fzf-tmux --ansi -p80%,60% -- \
