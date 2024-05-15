@@ -2,6 +2,9 @@
 # Either run execute the script directly,
 # Or source it in .zshrc, and start with $ matrix
 
+# Clear terminal when CTRL+C
+trap '{ clear; exit 1; }' INT
+
 matrix () {
   local lines=$(tput lines)
   cols=$(tput cols)
