@@ -26,6 +26,9 @@
     # ~/.config/nvim: config/nvim
 
     ~/.config/terminator/config: config/terminator/config
+
+    ~/.config/sublime-text: config/sublime-text
+
     ~/bin:
         path: utils/
         create: true
