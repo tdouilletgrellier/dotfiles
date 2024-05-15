@@ -7,7 +7,9 @@ dotbot/*
 config/zsh/.zcompcache/*
 config/zsh/*/*.zwc
 config/zsh/.zsh_sessions/*
-config/sublime-text/Local/*.*
+config/sublime-text/Local/
+config/sublime-text/Trash/
+config/sublime-text/Log/
 
 # Linux
 *~
