@@ -212,7 +212,8 @@ fi
 
 function _exit()              # Function to run upon exit of shell.
 {
-    echo -e "${BRed}Hasta la vista, baby${NC}"
+    #echo -e "${BRed}Hasta la vista, baby${NC}"
+    echo -e "${BRed}So long Space Cowboy...${NC}"
 }
 trap _exit EXIT
 

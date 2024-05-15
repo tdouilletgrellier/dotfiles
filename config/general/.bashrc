@@ -333,6 +333,7 @@ function load_intel(){
 
 export PATH='/home/f66379/CASTEM2022/bin':$PATH #GENERATED-BY-IZPACK-CAST3M22
 export PATH='/opt/cmake/bin':$PATH #GENERATED-BY-IZPACK-CAST3M22
+export PATH='/opt/tmux/':$PATH #GENERATED-BY-IZPACK-CAST3M22
 #export LC_ALL=en_US.UTF-8
 # Adapted from https://unix.stackexchange.com/a/113768/347104
 #if [ -n "$PS1" ] && [ -z "$TMUX" ]; then
