@@ -1,11 +1,11 @@
 [global_config]
   dbus = False
+  handle_size = 0
   window_state = fullscreen
   tab_position = hidden
   title_hide_sizetext = True
   title_use_system_font = False
   title_font = Hack Nerd Font Bold 9
-  handle_size = 0
 [keybindings]
   toggle_zoom = <Primary><Shift>m
 [profiles]
