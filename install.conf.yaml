@@ -24,7 +24,7 @@
 
     ~/.tmux/plugins/tpm: lib/tpm    
 
-    ~/.config/nvim: config/nvim
+    ~/.config/nvim: config/NvChad
 
     ~/.config/terminator/config: config/terminator/config
 
