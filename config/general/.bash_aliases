@@ -483,10 +483,10 @@ eval "$(zoxide init bash)"
 
 # Issues with zoxide and tmux
 if [ -z "${TMUX}" ]; then
-        echo "not in tmux"    
+        # echo "not in tmux"    
         cd() { z "$@"; ll; }               # Always list directory contents upon 'cd'
 else
-        echo "in tmux"    
+        # echo "in tmux"    
         cd() { builtin cd "$@"; ll; }               # Always list directory contents upon 'cd'
 fi
 alias sublime_text='/opt/sublime_text/sublime_text'
