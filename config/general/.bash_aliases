@@ -480,9 +480,15 @@ alias path='echo -e ${PATH//:/\\n}'         # path:         Echo all executable 
 
 
 eval "$(zoxide init bash)"
-# cd() { builtin cd "$@"; ll; }               # Always list directory contents upon 'cd'
-cd() { z "$@"; ll; }               # Always list directory contents upon 'cd'
 
+# Issues with zoxide and tmux
+if [ -z "${TMUX}" ]; then
+        echo "not in tmux"    
+        cd() { z "$@"; ll; }               # Always list directory contents upon 'cd'
+else
+        echo "in tmux"    
+        cd() { builtin cd "$@"; ll; }               # Always list directory contents upon 'cd'
+fi
 alias sublime_text='/opt/sublime_text/sublime_text'
 alias salome_meca_2022='scibian-nvidia /home/f66379/containers/salome_meca-edf-2022.1.0-1-20221225-scibian-9'
 alias nvim='/opt/nvim/bin/nvim'
