@@ -12,6 +12,7 @@
     ~/.wgetrc: config/general/.wgetrc
     ~/.nanorc: config/general/.nanorc
     ~/.bashrc: config/general/.bashrc
+    ~/.htoprc: config/general/.htoprc
     ~/.bash_aliases: config/general/.bash_aliases
     ~/.bash_logout: config/general/.bash_logout
     ~/.profile: config/general/.profile
