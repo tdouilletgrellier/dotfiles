@@ -4,8 +4,8 @@
 [submodule "lib/tpm"]
 	path = lib/tpm
 	url = https://github.com/tmux-plugins/tpm.git
-[submodule "config/nvim"]
-	path = config/nvim
+[submodule "config/NvChad"]
+	path = config/NvChad
 	url = https://github.com/NvChad/starter
 [submodule "config/vim"]
 	path = config/vim
