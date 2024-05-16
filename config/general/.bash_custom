@@ -119,7 +119,7 @@ function welcome_today () {
   echo -e "$COLOR_S$(date '+🗓️  Date: %A, %B %d, %Y at %H:%M')"
 
   # Print local weather
-  curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
+  proxy && curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
   echo -e "${RESET}"
 
   # Print IP address (quite slow so commented)
@@ -134,7 +134,7 @@ function welcome_today () {
 # Putting it all together
 function welcome() {
   welcome_greeting
-  welcome_sysinfo
+  # welcome_sysinfo
   welcome_today
 }
 #-------------------------------------------------------------
@@ -224,10 +224,10 @@ fi
 if [[ -f "/opt/sublime_text/sublime_text" ]]; then
 alias sublime_text='/opt/sublime_text/sublime_text'
 fi
-alias weather="proxy && curl wttr.in"
+alias weather="proxy && curl wttr.in/?F"
 alias c='clear'                             # c:            Clear terminal display
 alias which='type -all'                     # which:        Find executables
-if cmd-exists --strict eza; then
+if cmd-exists eza; then
 alias ld="eza -lD"
 alias lf="eza -lf --color=always | grep -v /"
 alias lh="eza -dl .* --group-directories-first"
