@@ -63,6 +63,7 @@ alias fk='fuck'
 
 #-------------------------------------------------------------
 # cd with immediate ll afterwards
+if cmd-exists --strict zoxide; then
 eval "$(zoxide init bash)"
 # Issues with zoxide and tmux
 if [ -z "${TMUX}" ]; then
@@ -70,6 +71,9 @@ if [ -z "${TMUX}" ]; then
         cd() { z "$@"; ll; }               # Always list directory contents upon 'cd'
 else
         # echo "in tmux"    
+        cd() { builtin cd "$@"; ll; }               # Always list directory contents upon 'cd'
+fi
+else
         cd() { builtin cd "$@"; ll; }               # Always list directory contents upon 'cd'
 fi
 #-------------------------------------------------------------
