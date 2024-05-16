@@ -7,6 +7,10 @@
   title_use_system_font = False
   title_font = Hack Nerd Font Bold 9
 [keybindings]
+  go_up = <Primary>Up
+  go_down = <Primary>Down
+  go_left = <Primary>Left
+  go_right = <Primary>Right
   toggle_zoom = <Primary><Shift>m
 [profiles]
   [[default]]
