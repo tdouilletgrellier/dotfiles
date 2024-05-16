@@ -8,7 +8,6 @@ debian_apps=(
   'tmux'          # Term multiplexer
   'terminator'    # Terminal emulator
   'wget'          # Download files
-  'wmctrl'          # Download files
 
   # CLI Power Basics
   'aria2'         # Resuming download util (better wget)
@@ -38,6 +37,7 @@ debian_apps=(
   'zoxide'        # Auto-learning navigation (better cd)
   'delta'         # git-delta
   'lazygit'       # lazygit
+  'wmctrl'        # Window management  
   
 
   # Languages, compilers, runtimes, etc
@@ -344,4 +344,9 @@ _fzf_git_fzf() {
     --bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
 }
 fi
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Sync with cronos to back up my data
+#rsync -ravP ~/Documents/ f66379@cronos.hpc.edf.fr:/home/f66379/f66379/
 #-------------------------------------------------------------
