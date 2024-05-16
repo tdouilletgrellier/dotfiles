@@ -16,6 +16,7 @@ debian_apps=(
   'broot'         # Interactive directory navigation
   'ctags'         # Indexing of file info + headers
   'diff-so-fancy' # Readable file compares (better diff)
+  'grc'           # Colorized lots basic CLI tools
   'duf'           # Get info on mounted disks (better df)
   'eza'           # Listing files with info (better ls)
   'fd-find'       # Fuzzy file finder and filtering

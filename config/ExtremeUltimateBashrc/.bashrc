@@ -756,6 +756,9 @@ _SKIP_PROMPT_POWERLINE=false
 # Determine our kernel name
 _KERNEL_NAME="$(expr substr $(uname -s) 1 5)"
 
+# No alias diff to gui tools
+_SKIP_DIFF_GUI_TOOLS_ALIAS=true
+
 #######################################################
 # Add Common Binary Directories to Path
 #######################################################
@@ -6821,18 +6824,20 @@ if [[ -n "${XDG_CURRENT_DESKTOP}" ]]; then
 	fi
 
 	# If a gui diff/merge application is installed, use that instead
-	for _DIFF_APP_GUI in \
-		meld \
-		kompare \
-		kdiff3 \
-		xxdiff
-	do
-		if cmd-exists --strict ${_DIFF_APP_GUI}; then
-			alias diff="${_DIFF_APP_GUI}"
-			export DIFFPROG="${_DIFF_APP_GUI}"
-			break
-		fi
-	done
+	if [[ $_SKIP_DIFF_GUI_TOOLS_ALIAS = false ]]; then
+		for _DIFF_APP_GUI in \
+			meld \
+			kompare \
+			kdiff3 \
+			xxdiff
+		do
+			if cmd-exists --strict ${_DIFF_APP_GUI}; then
+				alias diff="${_DIFF_APP_GUI}"
+				export DIFFPROG="${_DIFF_APP_GUI}"
+				break
+			fi
+		done
+	fi
 
 	# Switch over to UI starting in the current directory
 	if cmd-exists --strict exo-open; then
