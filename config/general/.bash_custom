@@ -186,25 +186,25 @@ trap _exit EXIT
 
 #-------------------------------------------------------------
 # Welcome message
-if cmd-exists --strict toilet; then
-BRed='\e[1;31m'         # Red
-NC="\e[m"               # Color Reset
-clear && printf '\e[3J'
-# if [ -x toilet ]; then  
-echo -e '\e[1;32m'
-toilet -Wf big ${USER} --filter border --export utf8
-echo -e '\e[m'
-echo -e "${BRed}$(date '+%A %d %B %Y -- %Hh%M' | toilet -f term -F border)${NC}\n"
-else
 clear && printf '\e[3J'
 welcome
-fi
+# # Old Welcome message
+# if cmd-exists --strict toilet; then
+# BRed='\e[1;31m'         # Red
+# NC="\e[m"               # Color Reset
+# clear && printf '\e[3J'
+# echo -e '\e[1;32m'
+# toilet -Wf big ${USER} --filter border --export utf8
+# echo -e '\e[m'
+# echo -e "${BRed}$(date '+%A %d %B %Y -- %Hh%M' | toilet -f term -F border)${NC}\n"
+# else
+# clear && printf '\e[3J'
+# welcome
 # fi
+# Fortune message
 if cmd-exists --strict lolcat; then
 if [ -x /usr/games/fortune ]; then
-# if [ -x lolcat ]; then     
     /usr/games/fortune -s | lolcat     # Makes our day a bit more fun.... :-)
-# fi
 fi
 fi
 #-------------------------------------------------------------
