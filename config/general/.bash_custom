@@ -210,13 +210,13 @@ eval "$(zoxide init bash)"
 # Issues with zoxide and tmux
 if [ -z "${TMUX}" ]; then
         # echo "not in tmux"    
-        cd() { z "$@"; ll; }               # Always list directory contents upon 'cd'
+        cd() { z "$@"; ls; }               # Always list directory contents upon 'cd'
 else
         # echo "in tmux"    
-        cd() { builtin cd "$@"; ll; }               # Always list directory contents upon 'cd'
+        cd() { builtin cd "$@"; ls; }               # Always list directory contents upon 'cd'
 fi
 else
-        cd() { builtin cd "$@"; ll; }               # Always list directory contents upon 'cd'
+        cd() { builtin cd "$@"; ls; }               # Always list directory contents upon 'cd'
 fi
 #-------------------------------------------------------------
 
@@ -298,6 +298,11 @@ export HOSTFILE=$HOME/.hosts    # Put a list of remote hosts in ~/.hosts
 #-------------------------------------------------------------
 # Bat theme
 export BAT_THEME=DarkNeon
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Default editor in ranger
+export SELECTED_EDITOR=$EDITOR
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
