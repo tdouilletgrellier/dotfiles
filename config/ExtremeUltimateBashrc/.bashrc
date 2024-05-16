@@ -739,7 +739,7 @@ _SKIP_PROMPT_BASH_POWERLINE=false
 # Sexy Bash Prompt (supports git, 256 color)
 # Link: https://github.com/twolfson/sexy-bash-prompt
 # Install: (cd /tmp && ([[ -d sexy-bash-prompt ]] || git clone --depth 1 --config core.autocrlf=false https://github.com/twolfson/sexy-bash-prompt) && cd sexy-bash-prompt && make install)
-_SKIP_PROMPT_SEXY_BASH_PROMPT=false
+_SKIP_PROMPT_SEXY_BASH_PROMPT=true
 
 # Liquid Prompt (adaptive prompt with low color and no glyphs)
 # Link: https://github.com/nojhan/liquidprompt
@@ -7306,11 +7306,13 @@ function _pwd() {
 export PROMPT_COMMAND=''
 
 # Set the prompt
+# Extra line for clarity
+export PS1="________________________________________________________________________________\n"
 # If using Git Bash or Cygwin...
 if [[ "$_KERNEL_NAME" = "MINGW" ]] || [[ "$_KERNEL_NAME" = "CYGWI" ]]; then
 
 	# Prompt using faster and less intensive functions on Git Bash
-	export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %d} \[\033[0;36m\]\A \[\033[0;33m\]\w\[\033[0;31m\]\`_fast_git_ps1\`\[\033[0m\]\n\\$ "
+	export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %d} \[\033[0;36m\]\A \[\033[0;33m\]\w\[\033[0;31m\]\`_fast_git_ps1\`\[\033[0m\]\n\\$ "
 
 else # Standard default prompt
 
@@ -7329,21 +7331,22 @@ else # Standard default prompt
 	if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 		if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 			# Remote SSH with short path (1 line)
-			export PS1="\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
 		else
 			# Remote SSH with full path (2 lines)
-			export PS1="\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
 		fi
 	else # Otherwise, only show the name
 		if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 			# Local with short path (1 line)
-			export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
 		else
 			# Local with full path (2 lines)
-			export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
 		fi
 	fi
 fi
+PS1=${PS1}"\n| =>\[\033[0m\] "
 
 #######################################################
 # Attempt to find and load some of the top installed prompts
