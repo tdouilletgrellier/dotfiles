@@ -193,7 +193,7 @@ function cmd-exists() {
 }
 
 # Loop a list of common editors and check if installed
-_EDITORS=("micro" "ne" "helix" "tilde" "nano" "nvim" "vim" "emacs" "vi" "ed")
+_EDITORS=("micro" "ne" "helix" "tilde" "nvim" "vim" "nano" "emacs" "vi" "ed")
 for EDITOR in "${_EDITORS[@]}"; do
 	if cmd-exists $EDITOR &>/dev/null; then
 
@@ -640,7 +640,7 @@ _SKIP_GRC=false
 # Choose your preferred picker to use with menus
 # You can choose any picker like fzy, sk, fzf, peco, percol, pick, icepick,
 # selecta, sentaku, zf, or even dmenu, rofi, or wofi UI pickers
-_PREFERRED_PICKER=
+_PREFERRED_PICKER=fzf
 
 # If set to true, will not source bash completion scripts
 _SCRIPT_BASH_COMPLETION=false
@@ -7595,6 +7595,7 @@ if [[ $_SKIP_TERMINOLOGY_TTY = false ]] && cmd-exists --strict terminology; then
 # konsole -e 'tmux new-session -A -s main'
 # xfce4-terminal -e 'tmux new-session -A -s main'
 # gnome-terminal -e 'tmux new-session -A -s main'
+# terminator -e 'tmux new-session -A -s main'
 # kitty sh -c "tmux new-session -A -s main"
 # terminology --exec "tmux new-session -A -s main"
 # guake -e tmux

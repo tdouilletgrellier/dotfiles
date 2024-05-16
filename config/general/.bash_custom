@@ -228,8 +228,10 @@ alias weather="proxy && curl wttr.in/?F"
 alias c='clear'                             # c:            Clear terminal display
 alias which='type -all'                     # which:        Find executables
 if cmd-exists eza; then
-alias ld="eza -lD"
-alias lf="eza -lf --color=always | grep -v /"
+unalias ldir
+alias ldir="eza -lD"
+unalias lfile
+alias lfile="eza -lf --color=always | grep -v /"
 fi
 if cmd-exists --strict nvim; then
   alias {v,vi,vim}='nvim'
