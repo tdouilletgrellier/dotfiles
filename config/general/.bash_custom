@@ -235,6 +235,18 @@ alias ll="eza -al --group-directories-first"
 alias ls="eza -alf --color=always --sort=size | grep -v /"
 alias lt="eza -al --sort=modified"
 fi
+if cmd-exists --strict nvim; then
+  alias {v,vi,vim}='nvim'
+  alias svi='sudo nvim'
+  alias vis='nvim "+set si"'
+elif cmd-exists --strict vim; then
+  alias {v,vi}='vim'
+  alias svi='sudo vim'
+  alias vis='vim "+set si"'
+elif cmd-exists --strict vi; then
+  alias v='vi'
+  alias svi='sudo vi'
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
