@@ -1,6 +1,6 @@
 
-Lissy93/Dotfiles - Lib
-----------------------
+Lib
+---
 
 This directory contains dependencies which are managed as git sub-modules.
 
@@ -10,5 +10,3 @@ If no files are present, run: git submodule update --recursive --remote
 Sub-modules:
 * dotbot    A dotfile management system, for symlinking
 * tpm       Tmux plugin manager
-
-Source: https://github.com/Lissy93/dotfiles/tree/master/lib
