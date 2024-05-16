@@ -156,16 +156,20 @@ fi
 
 #-------------------------------------------------------------
 # Custom aliases
+if [[ -f "/opt/sublime_text/sublime_text" ]]; then
 alias sublime_text='/opt/sublime_text/sublime_text'
+fi
 alias weather="proxy && curl wttr.in"
 alias c='clear'                             # c:            Clear terminal display
 alias which='type -all'                     # which:        Find executables
+if cmd-exists --strict eza; then
 alias ld="eza -lD"
 alias lf="eza -lf --color=always | grep -v /"
 alias lh="eza -dl .* --group-directories-first"
 alias ll="eza -al --group-directories-first"
 alias ls="eza -alf --color=always --sort=size | grep -v /"
 alias lt="eza -al --sort=modified"
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
