@@ -7331,18 +7331,18 @@ else # Standard default prompt
 	if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 		if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 			# Remote SSH with short path (1 line)
-			export PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]\[\033[0m\] "
 		else
 			# Remote SSH with full path (2 lines)
-			export PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]\[\033[0m\] "
 		fi
 	else # Otherwise, only show the name
 		if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 			# Local with short path (1 line)
-			export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]\[\033[0m\] "
 		else
 			# Local with full path (2 lines)
-			export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]\[\033[0m\] "
 		fi
 	fi
 fi

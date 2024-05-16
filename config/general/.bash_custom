@@ -98,7 +98,7 @@ function welcome_greeting () {
 function welcome_sysinfo () {
   if hash neofetch 2>/dev/null; then
     neofetch --shell_version off \
-      --disable kernel distro shell resolution de wm wm_theme theme icons term packages \
+      --disable kernel distro shell resolution de wm wm_theme theme icons term packages gpu \
       --backend off \
       --colors 4 8 4 4 8 6 \
       --color_blocks off \
@@ -122,13 +122,13 @@ function welcome_today () {
   curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
   echo -e "${RESET}"
 
-  # Print IP address
-  if hash ip 2>/dev/null; then
-    ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-    ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
-    echo -e "${COLOR_S}🌐 IP: $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
-    echo -e "${RESET}\n"
-  fi
+  # Print IP address (quite slow so commented)
+  # if hash ip 2>/dev/null; then
+  #   ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+  #   ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
+  #   echo -e "${COLOR_S}🌐 IP: $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
+  #   echo -e "${RESET}\n"
+  # fi
 }
 
 # Putting it all together
