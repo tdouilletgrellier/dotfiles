@@ -110,7 +110,7 @@ function welcome_sysinfo () {
 # Print todays info: Date, IP, weather, etc
 function welcome_today () {
   timeout=0.5
-  echo -e "\033[1;34mToday\n------"
+  #echo -e "\033[1;34mToday\n------"
 
   # Print last login in the format: "Last Login: Day Month Date HH:MM on tty"
   last_login=$(last | grep "^$USER " | head -1 | awk '{print "⏲️  Last Login: "$4" "$5" "$6" "$7" on "$2}')
@@ -255,7 +255,11 @@ NC="\e[m"
 function _exit()              # Function to run upon exit of shell.
 {
     #echo -e "${BRed}Hasta la vista, baby${NC}"
+    echo -e '\e[m'
     echo -e "${BRed}So long Space Cowboy...${NC}"
+    echo -e '\e[m'
+    echo -e "$BRed$(sparkbars)${NC}"
+    echo -e '\e[m'
 }
 trap _exit EXIT
 #-------------------------------------------------------------
@@ -280,8 +284,14 @@ welcome
 # Fortune message
 if cmd-exists --strict lolcat; then
 if [ -x /usr/games/fortune ]; then
+    echo -e '\e[m'
     /usr/games/fortune -s | lolcat     # Makes our day a bit more fun.... :-)
+    echo -e '\e[m'
+    sparkbars | lolcat
 fi
+else
+    echo -e '\e[m'
+    echo -e "$COLOR_S$(sparkbars)${NC}"
 fi
 #-------------------------------------------------------------
 
