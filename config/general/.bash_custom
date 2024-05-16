@@ -1,0 +1,126 @@
+#-------------------------------------------------------------
+# License file for something (what ?)
+export LM_LICENSE_FILE=27000@noeyyr5y.noe.edf.fr
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# EDF Proxy
+function proxy(){
+     export http_proxy='http://vip-users.proxy.edf.fr:3131/'
+     export https_proxy='http://vip-users.proxy.edf.fr:3131/'
+     export HTTP_PROXY='http://vip-users.proxy.edf.fr:3131/'
+     export HTTPS_PROXY='http://vip-users.proxy.edf.fr:3131/'
+     export no_proxy='localhost,127.0.0.1,.edf.fr,.edf.com'
+     curl --silent --proxy-negotiate --user : http://www.gstatic.com/generate_204
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# EDF Load Intel
+function load_intel(){
+
+    if [ $(which ifort) ]; then
+        echo "Intel local installation is loaded..."
+        echo $(which ifort)
+        echo $(which icc)
+    elif [ -d /projets/europlexus ]; then
+        module load ifort/2018.1.038 icc/2018.1.038 mkl/2018.1.038 impi/2018.1.038
+    elif [ -d /software/restricted ]; then
+        module load intel/2020
+    elif [ $INTEL_INSTALL_DIR ]; then
+        module use --append $(find $INTEL_INSTALL_DIR -name modulefiles)
+        module load icc mkl mpi
+    elif [ -d /opt/intel ]; then
+        module use --append $(find /opt/intel -name modulefiles)
+        module load icc mkl mpi
+    else
+        echo "Intel compilation and runtime are only available on the calculation clusters"
+        echo "Please use the gnu version..."
+        return 4
+    fi
+    return 0
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Fuck
+function fuck () {
+    TF_PYTHONIOENCODING=$PYTHONIOENCODING;
+    export TF_SHELL=bash;
+    export TF_ALIAS=fuck;
+    export TF_SHELL_ALIASES=$(alias);
+    export TF_HISTORY=$(fc -ln -10);
+    export PYTHONIOENCODING=utf-8;
+    TF_CMD=$(
+        thefuck THEFUCK_ARGUMENT_PLACEHOLDER "$@"
+    ) && eval "$TF_CMD";
+    unset TF_HISTORY;
+    export PYTHONIOENCODING=$TF_PYTHONIOENCODING;
+    history -s $TF_CMD;
+}
+alias fk='fuck'
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# cd with immediate ll afterwards
+eval "$(zoxide init bash)"
+# Issues with zoxide and tmux
+if [ -z "${TMUX}" ]; then
+        # echo "not in tmux"    
+        cd() { z "$@"; ll; }               # Always list directory contents upon 'cd'
+else
+        # echo "in tmux"    
+        cd() { builtin cd "$@"; ll; }               # Always list directory contents upon 'cd'
+fi
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Custom aliases
+alias sublime_text='/opt/sublime_text/sublime_text'
+alias weather="proxy && curl wttr.in"
+alias c='clear'                             # c:            Clear terminal display
+alias which='type -all'                     # which:        Find executables
+alias ld="eza -lD"
+alias lf="eza -lf --color=always | grep -v /"
+alias lh="eza -dl .* --group-directories-first"
+alias ll="eza -al --group-directories-first"
+alias ls="eza -alf --color=always --sort=size | grep -v /"
+alias lt="eza -al --sort=modified"
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Fonction _exit
+function _exit()              # Function to run upon exit of shell.
+{
+    #echo -e "${BRed}Hasta la vista, baby${NC}"
+    echo -e "${BRed}So long Space Cowboy...${NC}"
+}
+trap _exit EXIT
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Welcome message
+BRed='\e[1;31m'         # Red
+NC="\e[m"               # Color Reset
+clear && printf '\e[3J'
+if [ -x toilet ]; then  
+echo -e '\e[1;32m'
+toilet -Wf big ${USER} --filter border --export utf8
+echo -e '\e[m'
+echo -e "${BRed}$(date '+%A %d %B %Y -- %Hh%M' | toilet -f term -F border)${NC}\n"
+fi
+if [ -x /usr/games/fortune ]; then
+if [ -x lolcat ]; then     
+    /usr/games/fortune -s | lolcat     # Makes our day a bit more fun.... :-)
+fi
+fi
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Some formatting
+export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
+export HISTIGNORE="&:bg:fg:ll:h"
+export HISTTIMEFORMAT="$(echo -e ${BCyan})[%d/%m %H:%M:%S]$(echo -e ${NC}) "
+export HISTCONTROL=ignoredups
+export HOSTFILE=$HOME/.hosts    # Put a list of remote hosts in ~/.hosts
+#-------------------------------------------------------------

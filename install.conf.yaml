@@ -11,10 +11,22 @@
     ~/.curlrc: config/general/.curlrc
     ~/.wgetrc: config/general/.wgetrc
     ~/.nanorc: config/general/.nanorc
-    ~/.bashrc: config/general/.bashrc
     ~/.htoprc: config/general/.htoprc
-    ~/.bash_aliases: config/general/.bash_aliases
-    ~/.bash_logout: config/general/.bash_logout
+    
+    # ExtremeUltimateBashrc
+    ~/.bashrc: config/ExtremeUltimateBashrc/.bashrc
+    ~/.bash_help: config/ExtremeUltimateBashrc/.bashrc_help
+    # ~/.bash_prompt: config/ExtremeUltimateBashrc/.bashrc_prompt
+    ~/.bash_prompt: config/general/.bash_prompt
+
+    # # UltimateBashrc/
+    # ~/.bashrc: config/UltimateBashrc/.bashrc
+
+    # #My Bashrc
+    # ~/.bashrc: config/general/.bashrc
+    ~/.bash_aliases: config/general/.bash_custom
+    # ~/.bash_logout: config/general/.bash_logout    
+    
     ~/.profile: config/general/.profile
 
     ~/.vimrc: config/general/.vimrc

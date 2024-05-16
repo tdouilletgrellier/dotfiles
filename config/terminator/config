@@ -1,7 +1,8 @@
 [global_config]
   dbus = False
   handle_size = 0
-  window_state = fullscreen
+  window_state = maximise 
+  borderless = False 
   tab_position = hidden
   title_hide_sizetext = True
   title_use_system_font = False
