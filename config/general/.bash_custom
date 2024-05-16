@@ -103,16 +103,16 @@ trap _exit EXIT
 BRed='\e[1;31m'         # Red
 NC="\e[m"               # Color Reset
 clear && printf '\e[3J'
-if [ -x toilet ]; then  
+# if [ -x toilet ]; then  
 echo -e '\e[1;32m'
 toilet -Wf big ${USER} --filter border --export utf8
 echo -e '\e[m'
 echo -e "${BRed}$(date '+%A %d %B %Y -- %Hh%M' | toilet -f term -F border)${NC}\n"
-fi
+# fi
 if [ -x /usr/games/fortune ]; then
-if [ -x lolcat ]; then     
+# if [ -x lolcat ]; then     
     /usr/games/fortune -s | lolcat     # Makes our day a bit more fun.... :-)
-fi
+# fi
 fi
 #-------------------------------------------------------------
 
@@ -123,4 +123,125 @@ export HISTIGNORE="&:bg:fg:ll:h"
 export HISTTIMEFORMAT="$(echo -e ${BCyan})[%d/%m %H:%M:%S]$(echo -e ${NC}) "
 export HISTCONTROL=ignoredups
 export HOSTFILE=$HOME/.hosts    # Put a list of remote hosts in ~/.hosts
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+# Bat theme
+export BAT_THEME=DarkNeon
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Fzf config
+export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
+# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# export FZF_ALT_C_COMMAND="fdfind --type=d --hidden --exclude .git"
+# --- setup fzf theme ---
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+  --color=fg:#26ff00,fg+:#2fff00,bg:#000000,bg+:#000000
+  --color=hl:#0080ff,hl+:#00bfff,info:#afaf87,marker:#e2d705
+  --color=prompt:#d60000,spinner:#8000ff,pointer:#8000ff,header:#87afaf
+  --color=border:#262626,label:#aeaeae,query:#d9d9d9
+  --border="rounded" --border-label="" --preview-window="border-rounded" --prompt="> "
+  --marker=">" --pointer="◆" --separator="─" --scrollbar="│"'
+#-------------------------------------------------------------  
+
+#-------------------------------------------------------------
+# Fzf+fdfind
+# Use fd (https://github.com/sharkdp/fd) for listing path candidates.
+_fzf_compgen_path() {
+  fdfind --hidden --exclude .git . "$1"
+}
+_fzf_compgen_dir() {
+  fdfind --type=d --hidden --exclude .git . "$1"
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Fzf-git
+source ~/dotfiles/config/fzf-git/fzf-git.sh
+_fzf_git_fzf() {
+  fzf-tmux --ansi -p80%,60% -- \
+    --layout=reverse --multi --height=50% --min-height=20 --border \
+    --border-label-pos=2 \
+    --color='header:italic:underline,label:blue' \
+    --preview-window='right,50%,border-left' \
+    --bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Welcome message 
+# Formatting variables
+COLOR_P='\033[1;36m'
+COLOR_S='\033[0;36m'
+RESET='\033[0m'
+
+# Print time-based personalized message, using figlet & lolcat if availible
+function welcome_greeting () {
+  h=$(date +%H)
+  h=$((10#$h))
+  if [ $h -lt 4 ] || [ $h -gt 22 ];
+    then greeting="Good Night"
+  elif [ $h -lt 12 ];
+    then greeting="Good morning"
+  elif [ $h -lt 18 ];
+    then greeting="Good afternoon"
+  elif [ $h -lt 22 ];
+    then greeting="Good evening"
+  else
+    greeting="Hello"
+  fi
+  WELCOME_MSG="$greeting $USER!"
+  if hash lolcat 2>/dev/null && hash figlet 2>/dev/null; then
+    echo "${WELCOME_MSG}" | figlet | lolcat
+  else
+    echo -e "$COLOR_P${WELCOME_MSG}${RESET}\n"
+  fi
+}
+
+
+# Print system information with neofetch, if it's installed
+function welcome_sysinfo () {
+  if hash neofetch 2>/dev/null; then
+    neofetch --shell_version off \
+      --disable kernel distro shell resolution de wm wm_theme theme icons term packages \
+      --backend off \
+      --colors 4 8 4 4 8 6 \
+      --color_blocks off \
+      --memory_display info
+  fi
+}
+
+# Print todays info: Date, IP, weather, etc
+function welcome_today () {
+  timeout=0.5
+  echo -e "\033[1;34mToday\n------"
+
+  # Print last login in the format: "Last Login: Day Month Date HH:MM on tty"
+  last_login=$(last | grep "^$USER " | head -1 | awk '{print "⏲️  Last Login: "$4" "$5" "$6" "$7" on "$2}')
+  echo -e "${COLOR_S}${last_login}"
+
+  # Print date time
+  echo -e "$COLOR_S$(date '+🗓️  Date: %A, %B %d, %Y at %H:%M')"
+
+  # Print local weather
+  curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
+  echo -e "${RESET}"
+
+  # Print IP address
+  if hash ip 2>/dev/null; then
+    ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+    ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
+    echo -e "${COLOR_S}🌐 IP: $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
+    echo -e "${RESET}\n"
+  fi
+}
+
+# Putting it all together
+function welcome() {
+  welcome_greeting
+  welcome_sysinfo
+  welcome_today
+}
 #-------------------------------------------------------------

@@ -564,7 +564,7 @@ _SKIP_HELP_KEYBIND=true
 # Link: https://github.com/KittyKatt/screenFetch
 # Link: https://github.com/deater/linux_logo
 # Link: https://github.com/dylanaraps/pfetch
-_SKIP_SYSTEM_INFO=false
+_SKIP_SYSTEM_INFO=true
 
 # If not skipped, shows pending updates (only in Arch, Manjaro, and Ubuntu)
 # WARNING: This check for updates takes several seconds so the default is true
