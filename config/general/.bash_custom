@@ -190,6 +190,7 @@ toilet -Wf big ${USER} --filter border --export utf8
 echo -e '\e[m'
 echo -e "${BRed}$(date '+%A %d %B %Y -- %Hh%M' | toilet -f term -F border)${NC}\n"
 else
+clear && printf '\e[3J'
 welcome
 fi
 # fi
