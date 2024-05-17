@@ -21,46 +21,31 @@
 
     #nano    
     ~/.nanorc: config/general/.nanorc
-    # ~/.nanorc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_nanorc
 
     #screen
-    ~/.screenrc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_screenrc
+    ~/.screenrc: config/ExtremeUltimateBashrc/support/_screenrc
 
     #readline
-    ~/.inputrc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_inputrc
-
-    #trueline
-    # ~/trueline_def.sh: config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/trueline_def
-    # ~/trueline.sh: config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/trueline_config
-    # ~/trueline.sh: config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/trueline_def
+    ~/.inputrc: config/ExtremeUltimateBashrc/support/_inputrc
 
     #Bash
-    ########### ExtremeUltimateBashrc
-    ~/.bashrc: config/ExtremeUltimateBashrc/.bashrc
-    ~/.bashrc_help: config/ExtremeUltimateBashrc/.bashrc_help
-    # ~/.bash_prompt: config/ExtremeUltimateBashrc/.bashrc_prompt
-    ~/.bash_prompt: config/general/.bash_prompt
-    ########### UltimateBashrc/
-    # ~/.bashrc: config/UltimateBashrc/.bashrc
-    ########### My Bashrc
-    # ~/.bashrc: config/general/.bashrc
-    ~/.bash_aliases: config/general/.bash_custom
-    # ~/.bash_logout: config/general/.bash_logout    
+    ~/.bashrc: config/general/.bashrc
+    ~/.bashrc_help: config/general/.bashrc_help
+    ~/.bashrc_prompt: config/general/.bashrc_prompt #OG Prompt from ExtremeUltimateBashrc
+    ~/.bash_aliases: config/general/.bash_aliases
     
     #profile
     ~/.profile: config/general/.profile
 
-    #profile
-    ~/.zshrc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_zshrc 
+    #zsh
+    ~/.zshrc: config/ExtremeUltimateBashrc/support/_zshrc 
 
     #vimrc
-    # ~/.vimrc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_vimrc
     ~/.vimrc: config/general/.vimrc
     ~/.vim_runtime: config/vim
 
     #tmux
-    # ~/.tmux.conf: config/tmux/.tmux.conf
-    ~/.tmux.conf: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_tmux.conf
+    ~/.tmux.conf: config/tmux/.tmux.conf
     ~/.tmux/plugins/tpm: lib/tpm    
 
     #nvim
