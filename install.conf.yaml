@@ -17,10 +17,12 @@
     ~/.wgetrc: config/general/.wgetrc
 
     #htop
-    ~/.htoprc: config/general/.htoprc
+    ~/.config/htop/htoprc: config/general/.htoprc
 
     #nano    
     ~/.nanorc: config/general/.nanorc
+    ~/.config/nano/nano-syntax-highlighting: config/nano-syntax-highlighting
+    ~/.config/nano/nano-syntax-highlighting/epx.nanorc: config/general/epx.nanorc
 
     #screen
     ~/.screenrc: config/ExtremeUltimateBashrc/support/_screenrc
@@ -52,7 +54,7 @@
     ~/.config/nvim: config/NvChad
 
     #bash-completion
-    ~//usr/share/bash-completion: config/bash-completion
+    ~/.config/bash-completion: config/bash-completion
 
     #fzf-tab-completion
     ~/fzf-tab-completion: config/fzf-tab-completion

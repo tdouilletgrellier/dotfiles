@@ -48,50 +48,22 @@ unset softwrap
 # Syntax Highlighting #
 #######################
 
-include /usr/share/nano/css.nanorc
-include /usr/share/nano/debian.nanorc
-include /usr/share/nano/ocaml.nanorc
-include /usr/share/nano/changelog.nanorc
-include /usr/share/nano/mgp.nanorc
-include /usr/share/nano/mutt.nanorc
-include /usr/share/nano/python.nanorc
-include /usr/share/nano/json.nanorc
-include /usr/share/nano/html.nanorc
-include /usr/share/nano/objc.nanorc
-include /usr/share/nano/javascript.nanorc
-include /usr/share/nano/nanorc.nanorc
-include /usr/share/nano/spec.nanorc
-include /home/f66379/fortran_improved.nanorc
-include /usr/share/nano/tcl.nanorc
-include /usr/share/nano/php.nanorc
-include /usr/share/nano/gentoo.nanorc
-include /usr/share/nano/makefile.nanorc
-include /usr/share/nano/xml.nanorc
-include /usr/share/nano/c.nanorc
-include /usr/share/nano/pov.nanorc
-include /usr/share/nano/lua.nanorc
-include /usr/share/nano/elisp.nanorc
-include /usr/share/nano/groff.nanorc
-include /usr/share/nano/tex.nanorc
-include /usr/share/nano/guile.nanorc
-include /usr/share/nano/nftables.nanorc
-include /usr/share/nano/cmake.nanorc
-include /usr/share/nano/texinfo.nanorc
-include /usr/share/nano/awk.nanorc
-include /usr/share/nano/default.nanorc
-include /usr/share/nano/sh.nanorc
-include /usr/share/nano/asm.nanorc
-include /usr/share/nano/go.nanorc
-include /usr/share/nano/man.nanorc
-include /usr/share/nano/ruby.nanorc
-include /usr/share/nano/java.nanorc
-include /usr/share/nano/po.nanorc
-include /usr/share/nano/patch.nanorc
-include /usr/share/nano/autoconf.nanorc
-include /usr/share/nano/postgresql.nanorc
-include /usr/share/nano/rust.nanorc
-include /usr/share/nano/perl.nanorc
+set titlecolor blue
+#set promptcolor white,black
+set statuscolor green
+#set errorcolor red # cronos ok
+#set spotlightcolor black,lime
+#set selectedcolor magenta # cronos ok
+#set stripecolor yellow
+#set scrollercolor cyan
+set numbercolor cyan
+set keycolor cyan
+set functioncolor green
 
+#include "/usr/share/nano/*.nanorc"
+include "~/.config/nano/nano-syntax-highlighting/*.nanorc"
+include "/usr/share/nano/makefile.nanorc"
+include "/usr/share/nano/nanorc.nanorc"
 
 #####  Keybindings Cheatsheet  #####
 ## ^-Q   quit
@@ -135,16 +107,16 @@ bind M-Z  suspend       main
 unbind ^Y all
 bind ^Z   undo         main
 bind ^Y   redo          main
-bind ^C   copy          main
-bind ^V   paste         main
+#bind ^C   copy          main
+#bind ^V   paste         main
 bind ^X   cut           main
-bind ^K   zap           main
-bind ^H   chopwordleft  all
+#bind ^K   zap           main
+#bind ^H   chopwordleft  all
 bind M-/  comment       main
 bind ^Space complete    main
 
-bind M-C  location      main
-bind ^E   wherewas      all
+#bind M-C  location      main
+#bind ^E   wherewas      all # cronos ok
 bind M-E  findprevious  all
 bind ^R   replace       main
 bind ^_   gotoline      main
@@ -161,9 +133,9 @@ bind ^F   pagedown      all  # vim-like support
 #bind F3   prevanchor    main
 
 bind M-1    help         all   # fix ^G been used
-bind Sh-M-C constantshow main  # fix M-C been used
-bind Sh-M-F formatter    main  # fix M-F and M-B might be used
-bind Sh-M-B linter       main
+#bind Sh-M-C constantshow main  # fix M-C been used
+#bind Sh-M-F formatter    main  # fix M-F and M-B might be used
+#bind Sh-M-B linter       main
 unbind ^J               main  # for those who rarely use justify
 unbind M-J              main  # for those who rarely use justify
 bind ^F     whereis      all

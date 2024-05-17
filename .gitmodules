@@ -16,3 +16,6 @@
 [submodule "config/bash-completion"]
 	path = config/bash-completion
 	url = https://github.com/scop/bash-completion
+[submodule "config/nano-syntax-highlighting"]
+	path = config/nano-syntax-highlighting
+	url = https://github.com/galenguyer/nano-syntax-highlighting.git
