@@ -12,8 +12,3 @@ color brightblue "!.*"
 color brightblue "\*.*"
 color brightred "%.\w*"
 color brightyellow "="
-
-
-
-## Trailing spaces
-color ,brightmagenta "[[:space:]]+$"
