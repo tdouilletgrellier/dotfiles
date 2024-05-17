@@ -59,8 +59,8 @@
     ~/.vim_runtime: config/vim
 
     #tmux
-    ~/.tmux.conf: config/tmux/.tmux.conf
-    # ~/.tmux.conf: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_tmux.conf
+    # ~/.tmux.conf: config/tmux/.tmux.conf
+    ~/.tmux.conf: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_tmux.conf
     ~/.tmux/plugins/tpm: lib/tpm    
 
     #nvim

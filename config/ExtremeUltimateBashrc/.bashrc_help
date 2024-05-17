@@ -662,6 +662,7 @@
 [1;33mb[1;30m - [0;34mBreak off pane to it's own window[0;0m
 [1;33mz[1;30m - [0;34mToggle zoom a window (great for copy)[0;0m
 [0;0m
+[1;33mSHIFT-Arrows[1;30m - [0;34mMove between[0;0m
 [1;33mq[1;30m - [0;34mShow pane numbers[0;0m
 [1;33mq 0-9[1;30m - [0;34mSelect pane by number[0;0m
 [1;33mx[1;30m - [0;34mClose current pane [0;36m(or use CTRL-D)[0;0m
