@@ -13,3 +13,6 @@
 [submodule "config/NvChad"]
 	path = config/NvChad
 	url = https://github.com/NvChad/starter
+[submodule "config/bash-completion"]
+	path = config/bash-completion
+	url = https://github.com/scop/bash-completion
