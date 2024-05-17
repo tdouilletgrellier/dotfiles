@@ -66,6 +66,15 @@
     #nvim
     ~/.config/nvim: config/NvChad
 
+    #bash-completion
+    ~//usr/share/bash-completion: config/bash-completion
+
+    #fzf-tab-completion
+    ~/fzf-tab-completion: config/fzf-tab-completion
+
+    #git-completion
+    ~/git-completion.bash: config/git-completion/git-completion.bash
+
     #terminator
     ~/.config/terminator/config: config/terminator/config
 
