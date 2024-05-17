@@ -80,6 +80,7 @@ set functioncolor green
 
 #include "/usr/share/nano/*.nanorc"
 include "~/.config/nano/nano-syntax-highlighting/*.nanorc"
+include "~/epx.nanorc"
 
 
 #####  Keybindings Cheatsheet  #####

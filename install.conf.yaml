@@ -22,7 +22,7 @@
     #nano    
     ~/.nanorc: config/general/.nanorc
     ~/.config/nano/nano-syntax-highlighting: config/nano-syntax-highlighting
-    ~/.config/nano/nano-syntax-highlighting/epx.nanorc: config/general/epx.nanorc
+    ~/epx.nanorc: config/general/epx.nanorc
 
     #screen
     ~/.screenrc: config/ExtremeUltimateBashrc/support/_screenrc

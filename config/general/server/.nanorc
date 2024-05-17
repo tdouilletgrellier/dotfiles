@@ -64,6 +64,7 @@ set functioncolor green
 include "~/.config/nano/nano-syntax-highlighting/*.nanorc"
 include "/usr/share/nano/makefile.nanorc"
 include "/usr/share/nano/nanorc.nanorc"
+include "~/epx.nanorc"
 
 #####  Keybindings Cheatsheet  #####
 ## ^-Q   quit
