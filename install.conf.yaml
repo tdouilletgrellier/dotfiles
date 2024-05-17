@@ -37,7 +37,7 @@
     #Bash
     ########### ExtremeUltimateBashrc
     ~/.bashrc: config/ExtremeUltimateBashrc/.bashrc
-    ~/.bash_help: config/ExtremeUltimateBashrc/.bashrc_help
+    ~/.bashrc_help: config/ExtremeUltimateBashrc/.bashrc_help
     # ~/.bash_prompt: config/ExtremeUltimateBashrc/.bashrc_prompt
     ~/.bash_prompt: config/general/.bash_prompt
     ########### UltimateBashrc/
