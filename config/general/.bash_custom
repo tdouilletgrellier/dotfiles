@@ -360,3 +360,14 @@ fi
 # Sync with cronos to back up my data
 #rsync -ravP ~/Documents/ f66379@cronos.hpc.edf.fr:/home/f66379/f66379/
 #-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Fancy clear
+# if [[ -f "${HOME}/dotfiles/config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/clear_color_spark" ]]; then
+# source ${HOME}/dotfiles/config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/clear_color_spark
+# fi
+# TTY Terminal colors
+if [[ -f "${HOME}/dotfiles/config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/clear_color_spark/tty_terminal_color_scheme" ]]; then
+source ${HOME}/dotfiles/config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/clear_color_spark/tty_terminal_color_scheme
+fi
+#-------------------------------------------------------------

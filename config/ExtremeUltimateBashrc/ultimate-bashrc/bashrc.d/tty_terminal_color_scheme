@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# TTY Terminal Color Scheme
+# https://terminal.sexy/
+if [ "$TERM" = "linux" ]; then
+	echo -en "\e]P0181818" #black
+	echo -en "\e]P8545454" #darkgrey
+	echo -en "\e]P1FD5F6F" #darkred
+	echo -en "\e]P9FD7688" #red
+	echo -en "\e]P29FD656" #darkgreen
+	echo -en "\e]PA89FF52" #green
+	echo -en "\e]P3F7BE13" #brown
+	echo -en "\e]PBFFD437" #yellow
+	echo -en "\e]P459A1FF" #darkblue
+	echo -en "\e]PC26B3FF" #blue
+	echo -en "\e]P5C891FF" #darkmagenta
+	echo -en "\e]PDE69BFF" #magenta
+	echo -en "\e]P60ED9D2" #darkcyan
+	echo -en "\e]PE0FF5ED" #cyan
+	echo -en "\e]P7CFD8D3" #lightgrey
+	echo -en "\e]PFFFFFFF" #white
+	\clear #for background artifacting
+fi
+unicode_start > /dev/null 2>&1

@@ -1,0 +1,422 @@
+" ==============================================
+"  ▌ ▌▜▘▙▗▌  ▞▀▖   ▐  ▐  ▗            ▛▀▘▗▜
+"  ▚▗▘▐ ▌▘▌  ▚▄ ▞▀▖▜▀ ▜▀ ▄ ▛▀▖▞▀▌▞▀▘  ▙▄ ▄▐ ▞▀▖
+"  ▝▞ ▐ ▌ ▌  ▖ ▌▛▀ ▐ ▖▐ ▖▐ ▌ ▌▚▄▌▝▀▖  ▌  ▐▐ ▛▀
+"   ▘ ▀▘▘ ▘  ▝▀ ▝▀▘ ▀  ▀ ▀▘▘ ▘▗▄▘▀▀   ▘  ▀▘▘▝▀▘
+" ==============================================
+" Optional runtime configuration settings to initialize in Vim when it starts
+
+" Bail out if something that ran earlier, e.g. a system wide vimrc, does not
+" want Vim to use these default values
+if exists('skip_defaults_vim')
+  finish
+endif
+
+" Use Vim settings, rather than Vi settings (much better!)
+" This must be first, because it changes other options as a side effect
+" Avoid side effects when it was already reset
+if &compatible
+  set nocompatible
+endif
+
+" When the +eval feature is missing, the set command above will be skipped
+" Use a trick to reset compatible only when the +eval feature is missing
+silent! while 0
+  set nocompatible
+silent! endwhile
+
+" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+if has('win32')
+  set guioptions-=t
+endif
+
+" Set the leader key to comma instead of backslash
+let mapleader=","
+
+" Turn on syntax highlighting
+syntax on
+
+" Color scheme
+set t_Co=256
+set background=dark
+colorscheme Tomorrow-Night-Eighties
+
+" Faster rendering to speed up display scrolling
+" (can cause problems with some SSH sessions)
+" set ttyfast
+" set lazyredraw
+
+" Auto-indent where new lines inherit the indentation of previous lines
+set autoindent
+set noshiftround
+
+" If you want an indent to correspond to a single tab
+set shiftwidth=4
+
+" The width of a hard tabstop measured in spaces
+" effectively the (maximum) width of an actual tab character
+set tabstop=4
+
+" If tabs are used for indentation
+set softtabstop=0
+set noexpandtab
+
+" If spaces are used instead of tabs
+" set softtabstop=4
+" set expandtab
+" set smarttab
+
+" No swap files or backups
+set viminfo=""
+set nobackup
+set nowritebackup
+set noswapfile
+
+" Allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" Show line numbers by default
+set number
+" set relativenumber
+
+" Increase the undo limit
+set history=1000
+
+" Show the cursor position all the time
+set ruler
+set cursorline
+
+" Hide the mouse cursor while typing
+set mousehide
+
+" Show a few lines of context around the cursor.
+" Note that this makes the text scroll if you mouse-click near the start
+" or end of the window
+set scrolloff=5
+
+" Display incomplete commands
+set showcmd
+
+" Display completion matches in a status line
+set wildmenu
+set wildmode=longest:full
+
+" Time out for key codes
+set ttimeout
+
+" Wait up to 100ms after Esc for special key
+set ttimeoutlen=100
+
+" Show @@@ in the last line if it is truncated.
+set display=truncate
+
+" Do not recognize octal numbers for Ctrl-A and Ctrl-X
+" (most users find it confusing)
+set nrformats-=octal
+
+" CTRL-U in insert mode deletes a lot. Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break
+" Revert with ":iunmap <C-U>"
+inoremap <C-U> <C-G>u<C-U>
+
+" In many terminal emulators the mouse works just fine. By enabling it you
+" can position the cursor, Visually select and scroll with the mouse
+" Only xterm can grab the mouse events when using the shift key, for other
+" terminals use ":", select text and press Esc
+if has('mouse')
+  if &term =~ 'xterm'
+    set mouse=a
+  else
+    set mouse=nvi
+  endif
+endif
+
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made Only define it when not
+" defined already
+" Revert with: ":delcommand DiffOrig"
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+		  \ | wincmd p | diffthis
+endif
+
+if has('langmap') && exists('+langremap')
+  " Prevent langmap option applies to characters that result from a mapping
+  " If set (default), this may break plugins (but it's backward compatible)
+  set nolangremap
+endif
+
+" Helps force plugins to load correctly when it is turned back on below
+filetype off
+
+" Automatic recognition of filetype (for plugins to load correctly)
+filetype plugin indent on
+
+" To use auto completion, press CTRL-x followed by CTRL-o keys
+autocmd FileType php set omnifunc=phpcomplete#CompletePHP
+
+" Security
+set modelines=0
+
+" Don't load things that have potential security risks
+set secure
+
+" Blink cursor on error instead of beeping (grr)
+set visualbell
+
+" Encoding
+set encoding=utf-8
+set fileencoding=utf8
+set fileformats=unix
+
+" Set the spell check language
+setlocal spell spelllang=en
+
+" No spell check by default
+set nospell
+
+" Wrap visually
+set wrap
+
+" Don't cut my words on wrap
+set linebreak
+
+" Auto-completion
+set infercase " Smart case inferring
+set omnifunc=syntaxcomplete#Complete
+
+" Wrap Existing Text at 80 Characters
+set textwidth=80
+
+" Automatic reflow formatting of paragraphs
+map <leader>q gqip
+
+" Move up/down editor lines
+nnoremap j gj
+nnoremap k gk
+
+" Allow hidden buffers
+set hidden
+
+" Last line
+set showmode
+
+" Trim trailing spaces on save
+autocmd BufWritePre * :%s/\s\+$//e
+
+" Searching
+nnoremap / /\v
+vnoremap / /\v
+set hlsearch
+set ignorecase
+set smartcase
+set showmatch
+map <leader><space> :let @/=''<cr> " clear search
+
+" Do incremental searching when it's possible to timeout
+if has('reltime')
+  set incsearch
+endif
+
+" Auto brackets
+inoremap (( ()<Esc>i
+inoremap [[ []<Esc>i
+inoremap {{ {}<Esc>i
+inoremap "" ""<Esc>i
+inoremap '' ''<Esc>i
+inoremap `` ``<Esc>i
+
+" Match brackets (useful for html and markdown)
+set matchpairs+=<:>
+
+" Use % to jump between pairs
+set matchpairs+=<:>
+runtime! macros/matchit.vim
+
+" Show a status line bar
+set laststatus=2
+
+" Custom status bar
+set statusline=
+set statusline+=%#DiffAdd#%{(mode()=='n')?'\ \ NORMAL\ ':''}
+set statusline+=%#Search#%{(mode()=='i')?'\ \ INSERT\ ':''}
+set statusline+=%#DiffDelete#%{(mode()=='r')?'\ \ RPLACE\ ':''}
+set statusline+=%#DiffChange#%{(mode()=='v')?'\ \ VISUAL\ ':''}
+set statusline+=%#Cursor#        " colour
+set statusline+=\ %n\            " buffer number
+set statusline+=%#Visual#        " colour
+set statusline+=%{&paste?'\ PASTE\ ':''}
+set statusline+=%{&spell?'\ SPELL\ ':''}
+set statusline+=%#CursorIM#      " colour
+set statusline+=%w               " preview flag
+set statusline+=%h               " help flag
+set statusline+=%r               " readonly flag
+set statusline+=%m               " modified [+] flag
+set statusline+=%#CursorLine#    " colour
+set statusline+=\ %t\            " short file name
+set statusline+=%=               " right align
+set statusline+=%#CursorLine#    " colour
+set statusline+=\ %{&filetype}\  " file type (%Y and %y are too ugly)
+set statusline+=%#Visual#        " colour
+set statusline+=\ %3l:%-2c\      " line + column
+set statusline+=%#Cursor#        " colour
+set statusline+=\ %3p%%\         " percentage
+set statusline+=%#CursorLine#    " colour
+
+" Whitespace character options
+" set listchars=tab:→\ ,extends:»,precedes:«,nbsp:␣,trail:·,space:·,eol:↲
+" set listchars=tab:..,trail:_,extends:>,precedes:<,nbsp:~
+" set showbreak=\\
+set showbreak=↪\
+set listchars=tab:→\ ,extends:»,precedes:«,nbsp:␣,trail:·,space:·
+
+" Default to show whitespace
+set list
+set formatoptions=tcqrn1
+
+" Use your leader key + l to toggle whitespace display on/off
+map <leader>l :set list!<CR>
+
+" Set the line number, non-text, and whitespace color
+highlight LineNr ctermfg=darkgrey
+highlight NonText ctermfg=darkgrey
+hi Whitespace ctermfg=DarkGray guifg=grey70
+match Whitespace /\s/
+
+" Make comments italic
+let &t_ZH="\e[3m"
+let &t_ZR="\e[23m"
+" highlight Comment cterm=italic gui=italic
+highlight Comment cterm=italic,bold gui=italic,bold
+
+" Highlight strings inside C comments
+" Revert with ":unlet c_comment_strings"
+let c_comment_strings=1
+
+" Fold based on indention levels
+" set foldmethod=indent
+
+" Only fold up to three nested levels
+set foldnestmax=3
+
+" Improve the look of folds
+function! MyFoldText()
+  let line = getline(v:foldstart)
+  let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
+  return v:folddashes . sub
+endfunction
+set foldtext=MyFoldText()
+
+:autocmd VimLeave * call delete('~/.viminfo')
+
+" =========================================================
+"  ▌ ▌▜▘▙▗▌   ▙ ▌   ▐             ▌   ▙▗▌         ▗
+"  ▚▗▘▐ ▌▘▌   ▌▌▌▞▀▖▜▀ ▞▀▖▛▀▖▝▀▖▞▀▌   ▌▘▌▝▀▖▛▀▖▛▀▖▄ ▛▀▖▞▀▌
+"  ▝▞ ▐ ▌ ▌   ▌▝▌▌ ▌▐ ▖▛▀ ▙▄▘▞▀▌▌ ▌   ▌ ▌▞▀▌▙▄▘▙▄▘▐ ▌ ▌▚▄▌
+"   ▘ ▀▘▘ ▘   ▘ ▘▝▀  ▀ ▝▀▘▌  ▝▀▘▝▀▘   ▘ ▘▝▀▘▌  ▌  ▀▘▘ ▘▗▄▘
+" =========================================================
+" Every line below is to make Vim behave more like Notepad
+" Link: http://ftp.twaren.net/vim/runtime/mswin.vim
+" Maintainer: Bram Moolenaar <Bram@vim.org>
+
+" bail out if this isn't wanted (mrsvim.vim uses this).
+if exists("g:skip_loading_mswin") && g:skip_loading_mswin
+  finish
+endif
+
+" set the 'cpoptions' to its Vim default
+if 1	" only do this when compiled with expression evaluation
+  let s:save_cpo = &cpoptions
+endif
+set cpo&vim
+
+" set 'selection', 'selectmode', 'mousemodel' and 'keymodel' for MS-Windows
+behave mswin
+
+" backspace and cursor keys wrap to previous/next line
+set backspace=indent,eol,start whichwrap+=<,>,[,]
+
+" backspace in Visual mode deletes selection
+vnoremap <BS> d
+
+" CTRL-X and SHIFT-Del are Cut
+vnoremap <C-X> "+x
+vnoremap <S-Del> "+x
+
+" CTRL-C and CTRL-Insert are Copy
+vnoremap <C-C> "+y
+vnoremap <C-Insert> "+y
+
+" CTRL-V and SHIFT-Insert are Paste
+map <C-V>		"+gP
+map <S-Insert>		"+gP
+
+cmap <C-V>		<C-R>+
+cmap <S-Insert>		<C-R>+
+
+" Pasting blockwise and linewise selections is not possible in Insert and
+" Visual mode without the +virtualedit feature.  They are pasted as if they
+" were characterwise instead.
+" Uses the paste.vim autoload script.
+
+exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
+exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
+
+imap <S-Insert>		<C-V>
+vmap <S-Insert>		<C-V>
+
+" Use CTRL-Q to do what CTRL-V used to do
+noremap <C-Q>		<C-V>
+
+" Use CTRL-S for saving, also in Insert mode
+noremap <C-S>		:update<CR>
+vnoremap <C-S>		<C-C>:update<CR>
+inoremap <C-S>		<C-O>:update<CR>
+
+" For CTRL-V to work autoselect must be off.
+" On Unix we have two selections, autoselect can be used.
+if !has("unix")
+  set guioptions-=a
+endif
+
+" CTRL-Z is Undo; not in cmdline though
+noremap <C-Z> u
+inoremap <C-Z> <C-O>u
+
+" CTRL-Y is Redo (although not repeat); not in cmdline though
+noremap <C-Y> <C-R>
+inoremap <C-Y> <C-O><C-R>
+
+" Alt-Space is System menu
+if has("gui")
+  noremap <M-Space> :simalt ~<CR>
+  inoremap <M-Space> <C-O>:simalt ~<CR>
+  cnoremap <M-Space> <C-C>:simalt ~<CR>
+endif
+
+" CTRL-A is Select all
+noremap <C-A> gggH<C-O>G
+inoremap <C-A> <C-O>gg<C-O>gH<C-O>G
+cnoremap <C-A> <C-C>gggH<C-O>G
+onoremap <C-A> <C-C>gggH<C-O>G
+snoremap <C-A> <C-C>gggH<C-O>G
+xnoremap <C-A> <C-C>ggVG
+
+" CTRL-Tab is Next window
+noremap <C-Tab> <C-W>w
+inoremap <C-Tab> <C-O><C-W>w
+cnoremap <C-Tab> <C-C><C-W>w
+onoremap <C-Tab> <C-C><C-W>w
+
+" CTRL-F4 is Close window
+noremap <C-F4> <C-W>c
+inoremap <C-F4> <C-O><C-W>c
+cnoremap <C-F4> <C-C><C-W>c
+onoremap <C-F4> <C-C><C-W>c
+
+" restore 'cpoptions'
+set cpo&
+if 1
+  let &cpoptions = s:save_cpo
+  unlet s:save_cpo
+endif

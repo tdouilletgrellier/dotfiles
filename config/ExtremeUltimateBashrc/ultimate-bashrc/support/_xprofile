@@ -1,0 +1,41 @@
+# An xprofile file, ~/.xprofile and /etc/xprofile, allows you to execute
+# commands at the beginning of the X user session - before the window
+# manager is started. The xprofile file is similar in style to xinitrc.
+# https://wiki.archlinux.org/title/Xprofile
+#
+# Syntax: simple "KEY=VAL" pairs on separate lines
+#
+# XDG Base Directory Specification environment variables
+# Keeps any value already set, else sets it to the default
+# value specified in the XDG Base Directory Specification
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_STATE_HOME="$HOME/.local/state"
+export XDG_CACHE_HOME="$HOME/.cache"
+#
+# Bash History
+export HISTFILE="$XDG_STATE_HOME/bash/history"
+#
+# ZSH
+export ZDOTDIR="$HOME/.config/zsh"
+#
+# Set the environment variable for Qt5ct to fix KDE themes
+QT_QPA_PLATFORMTHEME=qt5ct
+#
+# Set the environment variable for kvantum to fix KDE themes
+QT_STYLE_OVERRIDE=kvantum
+#
+# For most Gtk apps, you can install xdg-desktop-portal-kde,
+# then set the environment variable GTK_USE_PORTAL=1. After
+# this, Gtk apps which have opted in to using native dialogs
+# (not all of them have) will start using your native KDE dialog.
+GTK_USE_PORTAL=1
+#
+# Set the default editor
+# Examples: vim, nvim, vi, emacs, nano, micro, pico,
+# or gui apps like kate, geany, vscodium, gedit, notepadqq
+export VISUAL=micro
+export EDITOR=micro
+export SUDO_EDITOR=micro
+export FCEDIT=micro

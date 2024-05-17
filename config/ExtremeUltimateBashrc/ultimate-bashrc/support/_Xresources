@@ -1,0 +1,192 @@
+! ==============================================================================
+! .Xresources Configuration File
+! ------------------------------------------------------------------------------
+! This file customizes the appearance and behavior of X terminal emulators like
+! xterm, UXterm, and URxvt. After making changes to this file, run the command:
+! xrdb -merge ~/.Xresources
+! ==============================================================================
+
+! ------------------------------------------------------------------------------
+! Geometry and Font Settings
+! ------------------------------------------------------------------------------
+
+! Default terminal window size (width x height)
+*geometry: 150x40
+
+! Default font family for terminal text
+*.faceName: "CaskaydiaCove Nerd Font"
+
+! Default font size for terminal text
+*.faceSize: 12
+
+! ------------------------------------------------------------------------------
+! Encoding and Font Rendering
+! ------------------------------------------------------------------------------
+
+! Use UTF-8 encoding for text
+*.utf8: 1
+
+! Enable font anti-aliasing for smoother edges
+Xft.antialias: 1
+
+! Enable font hinting to align fonts to pixel grid
+Xft.hinting: 1
+
+! Sub-pixel order for RGB color font smoothing
+Xft.rgba: rgb
+
+! Use light hinting for font clarity
+Xft.hintstyle: hintslight
+
+! Default LCD filter for font smoothing
+Xft.lcdfilter: lcddefault
+
+! ------------------------------------------------------------------------------
+! Scrolling and Buffer Configuration
+! ------------------------------------------------------------------------------
+
+! Number of lines to save in scrollback buffer
+*.saveLines: 10000
+
+! Enable scrollbar
+*.scrollBar: true
+
+! Position scrollbar on the right
+*.rightScrollBar:true
+
+! Enable jump scrolling
+*.jumpScroll: true
+
+! Allow scrolling in both directions
+*.multiScroll: true
+
+! Prevent auto-scroll on new output
+*.scrollTtyOutput: false
+
+! ------------------------------------------------------------------------------
+! Visual and Sound Feedback
+! ------------------------------------------------------------------------------
+
+! Use a visual bell globally (flash instead of beep)
+*.visualBell: true
+
+! ------------------------------------------------------------------------------
+! XTerm and UXterm Specific Settings
+! ------------------------------------------------------------------------------
+
+! Title displayed in window title bar
+XTerm*.title: Terminal
+
+! Support for wide characters (like Unicode)
+XTerm*.WideChars: 1
+
+! Keep screen content after exit
+XTerm*.VT100*titeInhibit: true
+
+! Security: disallow certain window ops
+XTerm*.disallowedWindowOps: 20,21,SetXProp
+
+! Honor .profile and initialize the shell environment
+XTerm*.loginShell: true
+
+! Show the toolbar
+XTerm*.toolBar: false
+
+! Define word boundaries for double-click selection
+XTerm*.CharClass: 33:48,35:48,37:48,43:48,45-47:48,58:48,64:48,95:48,126:48,161-255:48
+
+! Set terminal type to xterm with color support
+XTerm*.termName: xterm-color
+
+! Enable dynamic changing of colors at runtime
+XTerm*.dynamicColors: true
+
+! Combined Key and mouse bindings for XTerm
+XTerm*.eightBitInput: false  ! Treat Alt key as Meta, not as a prefix for eight-bit characters
+
+! Combined Key and mouse bindings for XTerm
+XTerm*vt100.translations: #override Mod1 <Key>osfCancel: string(0x1b) \n\
+  Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\   ! Copy with Ctrl+Shift+C
+  Ctrl Shift <Key>V: insert-selection(CLIPBOARD) \n\ ! Paste with Ctrl+Shift+V
+  Shift <Key>Home: scroll-forw(10000000000) \n\ ! Jump to start with Shift+Home
+  Shift <Key>End: scroll-back(10000000000) \n\  ! Jump to end with Shift+End
+  Btn1Down: select-start() \n\                  ! Start selection on mouse down
+  Btn1Motion: select-extend() \n\               ! Extend selection with drag
+  Btn1Up: select-end(CLIPBOARD)                 ! Copy selection on mouse up
+
+! ------------------------------------------------------------------------------
+! URxvt Specific Settings
+! ------------------------------------------------------------------------------
+
+! Treat Alt key as Meta instead of the 8th bit prefix
+URxvt*.meta8: false
+
+! Fade level for unfocused URxvt window (0-100)
+URxvt*.fading: 15
+
+! Use visual bell in URxvt (flash instead of beep)
+URxvt*.visualBell: true
+
+! Characters to exclude from word selection
+URxvt*.cutchars: "`\"'&()*,:;<=>?[\\]^{|}$"
+
+! Honor .profile and initialize the shell environment
+URxvt*.loginShell: true
+
+! ------------------------------------------------------------------------------
+! Set Global Colors
+! ------------------------------------------------------------------------------
+
+! Cursor
+*.cursorColor: #00ff00
+
+! Foreground
+*.foreground: #cfd8d3
+
+! Background
+*.background: #181818
+
+! Black
+*.color0:      #545454
+*.color8:      #5d5d5d
+
+! Red
+*.color1:      #fd5f6f
+*.color9:      #fd7688
+
+! Green
+*.color2:      #9fd656
+*.color10:     #89ff52
+
+! Yellow
+*.color3:      #f7be13
+*.color11:     #ffd437
+
+! Blue
+*.color4:      #59a1ff
+*.color12:     #26b3ff
+
+! Magenta
+*.color5:      #c891ff
+*.color13:     #e69bff
+
+! Cyan
+*.color6:      #0ed9d2
+*.color14:     #0ff5ed
+
+! White
+*.color7:      #cfd8d3
+*.color15:     #ffffff
+
+! Use bold style for bold text instead of bright colors
+*.boldMode: false
+
+! Color definition for bold text
+*.colorBDMode: true
+*.colorBD: #cccccc
+
+! Color definition for italic text (uncomment to use)
+!*.colorIT:
+
+! Color definition for underlined text (uncomment to use)
+!*.colorUL:

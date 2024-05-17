@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# If lolcat is installed, show rainbow bars when the screen is cleared
+if [[ -x "$(command -v lolcat)" ]] && [[ "$(command -v tput)" ]]; then
+	alias clear='clear && echo && sparkbars | lolcat && echo'
+fi

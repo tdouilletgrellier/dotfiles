@@ -6,42 +6,73 @@
 - clean: ['~']
 
 - link:
+    #git
     ~/.gitconfig: config/general/.gitconfig
     ~/.gitignore_global: config/general/.gitignore_global
+
+    #curl
     ~/.curlrc: config/general/.curlrc
+
+    #wget
     ~/.wgetrc: config/general/.wgetrc
-    ~/.nanorc: config/general/.nanorc
+
+    #htop
     ~/.htoprc: config/general/.htoprc
-    
-    # ExtremeUltimateBashrc
+
+    #nano    
+    ~/.nanorc: config/general/.nanorc
+    # ~/.nanorc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_nanorc
+
+    #screen
+    ~/.screenrc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_screenrc
+
+    #readline
+    ~/.inputrc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_inputrc
+
+    #trueline
+    # ~/trueline_def.sh: config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/trueline_def
+    # ~/trueline.sh: config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/trueline_config
+    # ~/trueline.sh: config/ExtremeUltimateBashrc/ultimate-bashrc/bashrc.d/trueline_def
+
+    #Bash
+    ########### ExtremeUltimateBashrc
     ~/.bashrc: config/ExtremeUltimateBashrc/.bashrc
     ~/.bash_help: config/ExtremeUltimateBashrc/.bashrc_help
     # ~/.bash_prompt: config/ExtremeUltimateBashrc/.bashrc_prompt
     ~/.bash_prompt: config/general/.bash_prompt
-
-    # # UltimateBashrc/
+    ########### UltimateBashrc/
     # ~/.bashrc: config/UltimateBashrc/.bashrc
-
-    # #My Bashrc
+    ########### My Bashrc
     # ~/.bashrc: config/general/.bashrc
     ~/.bash_aliases: config/general/.bash_custom
     # ~/.bash_logout: config/general/.bash_logout    
     
+    #profile
     ~/.profile: config/general/.profile
 
+    #profile
+    ~/.zshrc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_zshrc 
+
+    #vimrc
+    # ~/.vimrc: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_vimrc
     ~/.vimrc: config/general/.vimrc
     ~/.vim_runtime: config/vim
 
+    #tmux
     ~/.tmux.conf: config/tmux/.tmux.conf
-
+    # ~/.tmux.conf: config/ExtremeUltimateBashrc/ultimate-bashrc/support/_tmux.conf
     ~/.tmux/plugins/tpm: lib/tpm    
 
+    #nvim
     ~/.config/nvim: config/NvChad
 
+    #terminator
     ~/.config/terminator/config: config/terminator/config
 
+    #sublime
     ~/.config/sublime-text: config/sublime-text
 
+    #tools
     ~/bin:
         path: utils/
         create: true

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#######################################################
+# Arch and Manjaro Mirrors Update Alias
+#######################################################
+
+# If the Arch package manager daemon folder exists...
+if [[ -d /etc/pacman.d ]]; then
+
+	# Reflector
+	# Link: https://xyne.dev/projects/reflector/
+	# Install: sudo pacman -S reflector
+	if [[ -x "$(command -v reflector)" ]] && [[ -x "$(command -v yay)" ]]; then
+		alias mirrors_update='sudo reflector --country "United States" --protocol https --sort rate --latest 15 --save /etc/pacman.d/mirrorlist && yay -Syy --aur --devel'
+
+	# Use Manjaro built-in pacman-mirrors
+	# Link: https://linuxhint.com/change-manjaro-mirrors-list/
+	elif [[ -x "$(command -v pacman-mirrors)" ]] && [[ -x "$(command -v pamac)" ]]; then
+
+		#alias mirrors_update="sudo pacman-mirrors --interactive && sudo pacman -Syy"
+		#alias mirrors_update="sudo pacman-mirrors --geoip && sudo pacman -Syy"
+		alias mirrors_update="sudo pacman-mirrors -c United_States && sudo pacman-mirrors --fasttrack 15 && sudo pacman -Syy"
+
+	# Use Arch built-in rankmirrors
+	# Link: https://wiki.archlinux.org/title/Mirrors#Sorting_mirrors
+	# WARNING: Change the country to your own
+	elif [[ -x "$(command -v rankmirrors)" ]]; then
+		alias mirrors_update="sudo \cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup && sudo sh -c \"curl -s 'https://archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on&ip_version=4' | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 15 - > /etc/pacman.d/mirrorlist\" && sudo pacman -Syy"
+	fi
+
+	alias mirrors_edit="sudoedit /etc/pacman.d/mirrorlist && sudo pacman -Syy"
+fi

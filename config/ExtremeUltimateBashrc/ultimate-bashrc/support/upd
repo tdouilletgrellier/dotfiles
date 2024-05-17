@@ -1,0 +1,1071 @@
+#!/usr/bin/env bash
+#############################################################################
+#                 __
+# .--.--.-----.--|  |
+# |  |  |  _  |  _  |
+# |_____|   __|_____|
+#       |__|
+# System update for Arch based systems and distros (e.g. Manjaro, EndeavourOS)
+# Can be executed manually or scheduled as a cron job
+#
+# Features updates for:
+#   - Main Arch system updates (Main Repos)
+#   - Arch User Repository (AUR)
+#   - Flatpak packages (removing unused ones)
+#   - Snap packages
+#   - TLDR pages
+#   - DidYouMean command correction tool
+#   - Local Git repositories
+#   - Git Aliases
+#   - Micro text editor plugins
+#   - Distrobox containers
+#   - Wine
+#   - ClamAV antivirus database
+#   - locate file database
+#   - Firmware updates
+#   - Also shows the Arch Linux news and checks to see if a reboot is needed
+#
+# Usage:
+#   upd [OPTIONAL_PARAMETERS]
+#
+# Optional Parameters:
+#   --confirm, -c   Show confirmation prompt before and after updates
+#   --fast, -f      Fast mode: Only update main repos, AUR, Flatpak, and Snaps
+#   --help, -h      Display this help message
+#   --restart, -r   Automatically reboot the system after updates (if needed)
+#
+# Example:
+#   upd --fast --confirm
+#
+# Dependencies:
+#   - pacman-contrib (REQUIRED and includes checkupdates)
+#     Provides additional tools for Pacman, like checkupdates to safely check for updates
+#     Install: sudo pacman -S pacman-contrib
+#     URL: https://archlinux.org/packages/community/x86_64/pacman-contrib/
+#     More info: https://man.archlinux.org/man/community/pacman-contrib/checkupdates.8.en
+#
+#   - Paru or Yay (AUR helpers)
+#     AUR helpers to easily manage packages from the Arch User Repository
+#     Install Paru: git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si
+#     Install Yay: git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+#     Paru URL: https://github.com/Morganamilo/paru
+#     Yay URL: https://github.com/Jguer/yay
+#
+#   - Powerpill (Optional, for parallel and segmented downloading)
+#     A pacman wrapper for parallel and segmented downloading
+#     Install: sudo pacman -S powerpill
+#     URL: https://archlinux.org/packages/community/any/powerpill/
+#
+#   - Flatpak
+#     Software utility for software deployment and package management
+#     Install: sudo pacman -S flatpak
+#     URL: https://flatpak.org/setup/
+#
+#   - Snap (Default in Ubuntu)
+#     A package management system developed by Canonical for Linux software distribution
+#     Install: yay -S snapd
+#     URL: https://snapcraft.io/docs/installing-snapd
+#
+#   - TLDR pages
+#     A community effort to simplify the man pages with practical examples
+#     Install: sudo pacman -S tldr
+#     URL: https://tldr.sh/
+#
+#   - DidYouMean (dym)
+#     Command correction tool that suggests corrections for mistyped console commands
+#     Install: yay -S dym
+#     URL: https://github.com/pawamoy/dym
+#
+#   - Git
+#     A distributed version control system for tracking changes in source code
+#     Install: sudo pacman -S git
+#     URL: https://git-scm.com/downloads
+#
+#   - Micro text editor
+#     A modern and intuitive terminal-based text editor
+#     Install: sudo pacman -S micro
+#     URL: https://micro-editor.github.io/
+#
+#   - Distrobox
+#     Create and manage Linux containers as an integrated part of your system
+#     Install: yay -S distrobox
+#     URL: https://github.com/89luca89/distrobox
+#
+#   - Wine
+#     A compatibility layer capable of running Windows applications on Linux
+#     Install: sudo pacman -S wine
+#     URL: https://www.winehq.org/download
+#
+#   - ClamAV
+#     An open-source antivirus engine for detecting malicious threats
+#     Install: sudo pacman -S clamav
+#     URL: https://www.clamav.net/
+#
+#   - locate (mlocate)
+#     A tool to quickly search for the location of files on the system
+#     Install: sudo pacman -S mlocate
+#     URL: https://archlinux.org/packages/core/x86_64/mlocate/
+#
+#   - Firmware updates (fwupd)
+#     A populate software package to update firmware use by many large companies
+#     Install: sudo pacman -S fwupd
+#     URL: https://fwupd.org/
+#
+#   - w3m (for Arch Linux news)
+#     A text-based web browser for reading Arch Linux news in the terminal
+#     Install: sudo pacman -S w3m
+#     URL: https://archlinux.org/packages/extra/x86_64/w3m/
+#
+#   - curl (for downloading files)
+#     A command-line tool for transferring data with URL syntax
+#     Install: sudo pacman -S curl
+#     URL: https://curl.se/
+#############################################################################
+
+# -----------------------------------------------------------------------------
+# Check if a command exists
+# -----------------------------------------------------------------------------
+function command_exists() {
+	# Check for the --alias option
+	if [[ "${1}" == "--alias" ]]; then
+		# Look for command or alias
+		if [[ -n "$(command -v ${2})" ]]; then
+			# Command or alias exists
+			return 0
+		else
+			# Command or alias doesn't exist
+			return 1
+		fi
+	else
+		# Default behavior: Look for executable command
+		if [[ -x "$(command -v ${1})" ]]; then
+			# Command exists
+			return 0
+		else
+			# Command doesn't exist
+			return 1
+		fi
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Print a line across the terminal with specified color
+# -----------------------------------------------------------------------------
+function print_line() {
+	local color_code  # Variable to hold the ANSI color code
+
+	# Case statement to select the color based on the function argument
+	case "$1" in
+		grey)    color_code="\033[1;30m";;  # Grey (Light Black)
+		red)     color_code="\033[1;31m";;  # Red
+		green)   color_code="\033[1;32m";;  # Green
+		yellow)  color_code="\033[1;33m";;  # Yellow
+		blue)    color_code="\033[0;34m";;  # Blue
+		magenta) color_code="\033[1;35m";;  # Magenta
+		cyan)    color_code="\033[1;36m";;  # Cyan
+		white)   color_code="\033[1;37m";;  # White
+		*)       color_code="\033[0m";;     # Default to no color
+	esac
+
+	# Print a line the width of the screen using the selected color
+	echo -e -n "${color_code}$(printf '_%.0s' $(seq 1 $(tput cols)))\033[0m\n"
+}
+
+# -----------------------------------------------------------------------------
+# Display the help message
+# -----------------------------------------------------------------------------
+function display_help_message() {
+	# Print out help on the console in color
+	echo -e "\033[1;33m                 __\033[0m"
+	echo -e "\033[1;33m .--.--.-----.--|  |\033[0m"
+	echo -e "\033[1;33m |  |  |  _  |  _  |\033[0m"
+	echo -e "\033[1;33m |_____|   __|_____|\033[0m"
+	echo -e "\033[1;33m       |__|\033[0m"
+	echo -e "\033[1;33mupd Arch Linux Update Bash Script\033[0m"
+	echo -e "\033[36mFeatures:\033[0m"
+	echo -e "  \033[1;34m-\033[0m Arch system updates (main repos)\033[1;90m: requires pacman-contrib\033[0m"
+	echo -e "  \033[1;34m-\033[0m Arch User Repository (AUR)\033[1;90m: requires paru or yay\033[0m"
+	echo -e "  \033[1;34m-\033[0m Flatpak packages (removing unused ones)\033[1;90m: requires flatpak\033[0m"
+	echo -e "  \033[1;34m-\033[0m Snap packages\033[1;90m: requires snap\033[0m"
+	echo -e "  \033[1;34m-\033[0m TLDR pages\033[1;90m: requires tldr\033[0m"
+	echo -e "  \033[1;34m-\033[0m DidYouMean command correction tool\033[1;90m: requires dym\033[0m"
+	echo -e "  \033[1;34m-\033[0m Local Git repositories\033[1;90m: requires git\033[0m"
+	echo -e "  \033[1;34m-\033[0m Git Aliases\033[1;90m: requires git and curl\033[0m"
+	echo -e "  \033[1;34m-\033[0m Micro text editor plugins\033[1;90m: requires micro\033[0m"
+	echo -e "  \033[1;34m-\033[0m Distrobox containers\033[1;90m: requires distrobox\033[0m"
+	echo -e "  \033[1;34m-\033[0m Wine\033[1;90m: requires wine\033[0m"
+	echo -e "  \033[1;34m-\033[0m ClamAV antivirus database\033[1;90m: requires clamav\033[0m"
+	echo -e "  \033[1;34m-\033[0m locate file database\033[1;90m: requires mlocate\033[0m"
+	echo -e "  \033[1;34m-\033[0m Firmware updates\033[1;90m: requires fwupd\033[0m"
+	echo -e "  \033[1;34m-\033[0m Shows the latest Arch Linux update news\033[1;90m: requires w3m\033[0m"
+	echo -e "  \033[1;34m-\033[0m Checks to see if a reboot is needed\033[0m"
+	echo -e "\033[36mUsage:\033[0m"
+	echo -e "  \033[35mupd\033[0m \033[32m[OPTIONAL_PARAMETERS]\033[0m"
+	echo -e "\033[36mOptions:\033[0m"
+	echo -e "  \033[32m--confirm, -c\033[0m  Show confirmation prompts"
+	echo -e "  \033[32m--fast,    -f\033[0m  Only update main repos, AUR, Flatpak, Snap"
+	echo -e "  \033[32m--force,   -e\033[0m  Continue if no main updates"
+	echo -e "  \033[32m--help,    -h\033[0m  Display this help message"
+	echo -e "  \033[32m--reboot,  -r\033[0m  Reboot if required after update"
+}
+
+# -----------------------------------------------------------------------------
+# Ask user if they wish to install updates
+# -----------------------------------------------------------------------------
+function confirm_update_installation() {
+	if [ $_PARAMETER_CONFIRM -eq 1 ]; then
+		# Display the prompt
+		echo -ne "\033[1;33mDo you wish to install these updates? [Y/n]: \033[0m"
+		read -r response
+
+		# Check the response
+		case "$response" in
+			[yY][eE][sS]|[yY]|"")
+				# User confirmed
+				return 0
+				;;
+			*)
+				# User did not confirm
+				return 1
+				;;
+		esac
+	else
+		# Proceed if confirmation is not required
+		return 0
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Prompt the user for fast mode (if --confirm is set)
+# -----------------------------------------------------------------------------
+function prompt_for_fast_mode() {
+	# Check if --confirm is enabled
+	if [ $_PARAMETER_CONFIRM -eq 1 ]; then
+		echo -ne "\033[1;33mWould you like to include additional updates? (Y/n): \033[0m"
+		read -r response
+
+		# Check the response
+		case "$response" in
+			[yY][eE][sS]|[yY]|"")
+				# User opted for additional updates
+				_PARAMETER_FAST=0
+				;;
+			*)
+				# User chose not to include additional updates
+				_PARAMETER_FAST=1
+				;;
+		esac
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Wait for user input at the end
+# -----------------------------------------------------------------------------
+function wait_for_user_input() {
+	# Check if confirmation parameter is enabled
+	if [ $_PARAMETER_CONFIRM -eq 1 ]; then
+		# Prompt user to press any key, displayed in yellow
+		echo -e "\033[1;33mPress any key to continue...\033[0m"
+
+		# Read one character of input silently (no echo to terminal)
+		read -n 1 -s
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Get the latest Arch Linux news
+# -----------------------------------------------------------------------------
+function get_latest_arch_news() {
+	# Check if confirmation parameter is enabled
+	if [ $_PARAMETER_CONFIRM -eq 1 ]; then
+		# Check if the w3m command exists for fetching web content
+		if command_exists w3m; then
+			# Print a red line for visual separation
+			print_line red
+
+			# Use w3m to fetch Arch Linux news, extracting relevant sections
+			w3m https://www.archlinux.org/ | sed -n "/Latest News/,/Older News/p" | head -n 30
+		fi
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Parse input parameters
+# -----------------------------------------------------------------------------
+function parse_parameters() {
+	# Initialize flags with default values set from passed in parameters
+	_PARAMETER_CONFIRM=0  # Flag for skipping confirmation prompts, off by default
+	_PARAMETER_FAST=0     # Flag for fast mode, off by default
+	_PARAMETER_FORCE=0    # Flag for fast mode, off by default
+	_PARAMETER_RESTART=0  # Flag for automatic restart, off by default
+
+	# Loop through all passed parameters
+	for param in "$@"; do
+		case $param in
+
+			# If parameter is --help or -h, show help
+			--help|-h)
+				display_help_message
+				exit 0
+				;;
+
+			# If parameter is --confirm or -c, enable confirmation prompts
+			--confirm|-c)
+				_PARAMETER_CONFIRM=1
+				shift
+				;;
+
+			# If parameter is --fast or -f, enable fast mode
+			--fast|-f)
+				_PARAMETER_FAST=1
+				shift
+				;;
+
+			# If parameter is --fast or -f, enable fast mode
+			--force|-e)
+				_PARAMETER_FORCE=1
+				shift
+				;;
+
+			# If parameter is --reboot, restart, or -r, enable auto reboot
+			--reboot|--restart|-r)
+					_PARAMETER_RESTART=1
+				shift
+				;;
+
+			# Default case for handling any other parameters
+			*)
+				# Handle other parameters or show help if needed
+				# Currently, this script does not use other parameters,
+				# but this section can be expanded in the future.
+				;;
+		esac
+	done
+}
+
+# -----------------------------------------------------------------------------
+# Check for necessary dependencies
+# -----------------------------------------------------------------------------
+function check_dependencies() {
+	# Verify if the pacman-contrib package is installed
+	# /usr/bin/checkupdates is a tool from pacman-contrib
+	if [ ! -x /usr/bin/checkupdates ]; then
+		# Display error message if pacman-contrib is not installed
+		echo -e "\033[1;31mError:\033[0m The pacman-contrib package is not installed."
+		exit 1  # Exit the script with an error status
+	fi
+
+	# Check if either paru or yay AUR helper commands exist
+	if ! command_exists paru && ! command_exists yay; then
+		# Display warning message if neither AUR helper is installed
+		echo -e "\033[1;33mWarning:\033[0m Neither paru nor yay is installed"
+		exit 1  # Exit the script with an error status
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Reboot the system
+# -----------------------------------------------------------------------------
+# Check conditions and perform a system reboot if required
+function check_and_perform_reboot() {
+	# Check if automatic restart is enabled
+	if [ $_PARAMETER_RESTART -eq 1 ]; then
+		# Check if user confirmation is required
+		if [ $_PARAMETER_CONFIRM -eq 1 ]; then
+			# Prompt the user for a reboot decision
+			echo -ne "\033[1;33mA reboot is required. Do you want to reboot now? [y/N]: \033[0m"
+			read -r response
+
+			# Decide action based on user response
+			case "$response" in
+				[yY][eE][sS]|[yY])
+					# Reboot the system if user confirms
+					sudo reboot
+					;;
+				*)
+					# Cancel reboot if user does not confirm
+					echo -e "\033[1;32mReboot canceled.\033[0m"
+					;;
+			esac
+		else
+			# Reboot the system immediately if no confirmation is needed
+			echo -e "\033[1;34mSystem will now reboot...\033[0m"
+			sudo reboot
+		fi
+	fi
+}
+
+# Retrieve the version of the boot kernel
+function get_boot_kernel() {
+	# Initialize a flag to indicate when the version is found
+	local get_version=0
+
+	# Iterate over the output of file command for each vmlinuz file in /boot
+	for field in $(file /boot/vmlinuz*); do
+		if [[ $get_version -eq 1 ]]; then
+			# If the flag is set, the current field contains the version
+			echo $field
+			return
+		elif [[ $field == version ]]; then
+			# The version field indicates that the next contains the version
+			get_version=1
+		fi
+	done
+}
+
+# Function to normalize a kernel version string
+function normalize_kernel_version() {
+	# Strip out anything that is not a number or a period
+	local sanitized_version=$(echo "$1" | sed 's/[^0-9.]//g')
+
+	# Remove leading zeroes in numbers, if necessary
+	echo "$sanitized_version" | sed 's/\b0+\([0-9]\)/\1/g'
+}
+
+# Check if a reboot is necessary
+function check_reboot_required() {
+	local _REBOOT_REQUIRED=0
+
+	# Read the ID from /etc/os-release to identify the distribution
+	local distro_id
+	if [[ -f /etc/os-release ]]; then
+		distro_id=$(grep ^ID= /etc/os-release | cut -d= -f2)
+	fi
+
+	# Get a list of libraries currently in use by processes
+	local libs=$(lsof -n +c 0 2> /dev/null | grep 'DEL.*lib' | awk '1 { print $1 ": " $NF }' | sort -u)
+	if [[ -n $libs ]]; then
+		# Flag a reboot is required
+		_REBOOT_REQUIRED=1
+
+		# Display the list of libraries and a message indicating reboot is required
+		print_line magenta
+		#cat <<< "$libs" # This can be long
+		echo -e "\033[1;31m->\033[0m \033[1;36mLIBS\033[0m: \033[1;33mReboot required\033[0m"
+	fi
+
+	# Get the active kernel version
+	local active_kernel=$(normalize_kernel_version "$(uname -r)")
+
+	# Get the version of the kernel that the system booted with
+	local current_kernel=$(normalize_kernel_version "$(get_boot_kernel)")
+
+	# If the kernel versions do not match
+	if [[ $active_kernel != $current_kernel ]]; then
+		# Display a message indicating kernel versions and that reboot is required
+		print_line magenta
+		echo "$active_kernel < $current_kernel"
+
+		# Skip kernel check if running Manjaro since you can manually pick kernels
+		if [[ "${distro_id}" != "manjaro" ]]; then
+			# Flag a reboot is required
+			_REBOOT_REQUIRED=1
+			echo -e "\033[1;31m->\033[0m \033[1;36mKERNEL\033[0m: \033[1;33mReboot required\033[0m"
+		fi
+	fi
+
+	# Make sure we do not flag a restart if it is not necessary
+	if [[ ${_REBOOT_REQUIRED} != 1 ]]; then
+		_PARAMETER_RESTART=0
+	else # Else reboot if all conditions are met
+		check_and_perform_reboot
+	fi
+
+	# Exit with the appropriate return code (0 if reboot required, 1 if not)
+	return $_PARAMETER_RESTART
+}
+
+# -----------------------------------------------------------------------------
+# Get the list of updates
+# -----------------------------------------------------------------------------
+function get_update_lists() {
+	# Clear the terminal screen for a clean display
+	clear
+
+	# Indicate the start of the update checking process
+	echo -e -n "\033[1;34m⌛ \033[0mChecking updates..."
+
+	# Retrieve list of pending updates from main Arch repositories
+	# /usr/bin/checkupdates Tool from pacman-contrib for safe update checks
+	_UPDATE_LIST=$(/usr/bin/checkupdates | sort | cat --number)
+
+	# Retrieve list of pending updates from AUR (Arch User Repository)
+	# Use paru if available, else fallback to yay
+	if command_exists paru; then
+		_AUR_UPDATE_LIST=$(paru -Qua | sort | cat --number)
+	elif command_exists yay; then
+		_AUR_UPDATE_LIST=$(yay -Qua | sort | cat --number)
+	else
+		_AUR_UPDATE_LIST=''  # Empty string if neither AUR helper is available
+	fi
+
+	# Check if Flatpak is installed
+	if command -v flatpak &>/dev/null; then
+		# Get a list of Flatpak updates
+		_FLATPAK_UPDATE_LIST=$(flatpak remote-ls --updates)
+	fi
+
+	# Check if Snap is installed
+	if command -v snap &>/dev/null; then
+		# Get a list of Snap updates
+		_SNAP_UPDATE_LIST=$(snap list --updates)
+	fi
+
+	# Indicate completion of the update checking process
+	\echo -e "\r\033[1;32m✓\033[0m"
+}
+
+# -----------------------------------------------------------------------------
+# Display update lists
+# -----------------------------------------------------------------------------
+function display_update_lists() {
+	# Display updates from the main Arch repositories if available
+	if [[ -n "${_UPDATE_LIST}" ]]; then
+		# Print the list of updates from main repositories
+		echo -e "\n${_UPDATE_LIST}"
+
+		# Display the count of total updates from main repositories
+		echo -e "\n\033[1;34m=>\033[1;37m There are \033[1;33m$(echo "${_UPDATE_LIST}" | wc -l)\033[1;37m total main repository updates\033[0m"
+
+		# Print a cyan line for visual separation
+		print_line cyan
+	fi
+
+	# Display updates from the AUR if available
+	if [[ -n "${_AUR_UPDATE_LIST}" ]]; then
+		# Print the list of updates from AUR
+		echo -e "\n${_AUR_UPDATE_LIST}"
+
+		# Display the count of total updates from AUR
+		echo -e "\n\033[1;34m=>\033[1;37m There are \033[1;33m$(echo "${_AUR_UPDATE_LIST}" | wc -l)\033[1;37m total Arch User Repository (AUR) updates\033[0m"
+
+		# Print a yellow line for visual separation
+		print_line yellow
+	fi
+
+	# Display updates for Flatpak packages if available
+	if [[ -n "${_FLATPAK_UPDATE_LIST}" ]]; then
+		# Print the list of Flatpak updates
+		echo -e "\n${_FLATPAK_UPDATE_LIST}"
+
+		# Display the count of total Flatpak updates
+		echo -e "\n\033[1;34m=>\033[1;37m There are \033[1;33m$(echo "${_FLATPAK_UPDATE_LIST}" | wc -l)\033[1;37m total Flatpak updates\033[0m"
+
+		# Print a yellow line for visual separation
+		print_line yellow
+	fi
+
+	# Display updates for Snap packages if available
+	if [[ -n "${_SNAP_UPDATE_LIST}" ]]; then
+		# Print the list of Snap updates
+		echo -e "\n${_SNAP_UPDATE_LIST}"
+
+		# Display the count of total Snap updates
+		echo -e "\n\033[1;34m=>\033[1;37m There are \033[1;33m$(echo "${_SNAP_UPDATE_LIST}" | wc -l)\033[1;37m total Snap updates\033[0m"
+
+		# Print a yellow line for visual separation
+		print_line yellow
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Perform main system update
+# -----------------------------------------------------------------------------
+function perform_system_update() {
+	# Add a new line for spacing
+	echo
+
+	# Check if there are updates available either from main repositories or AUR
+	if [[ -n "${_UPDATE_LIST}" ]] || [[ -n "${_AUR_UPDATE_LIST}" ]]; then
+		# Update package database with pacman
+		sudo pacman -Sy
+
+		# Check which AUR helper is available and perform update accordingly
+		if command_exists paru; then
+			# Perform update using paru if available
+			perform_update_with_paru
+		elif command_exists yay; then
+			# Perform update using yay if paru is not available
+			perform_update_with_yay
+		else
+			# Perform update using pacman if no AUR helper is available
+			sudo pacman -Syu --noconfirm
+		fi
+	fi
+}
+
+# Perform system update using paru AUR helper
+function perform_update_with_paru() {
+	# Indicate that paru is being used for updates
+	echo -e "\033[1;32m✓\033[0m Found \033[1;32mparu\033[0m package manager helper."
+
+	# Check if powerpill is installed for faster downloads
+	if command_exists powerpill; then
+		# Print a green line and indicate powerpill is found
+		print_line green
+		echo -e "\033[1;32m✓\033[0m Found \033[1;32mpowerpill\033[0m for parallel and segmented downloading."
+
+		# Use powerpill for downloading and paru for AUR updates
+		sudo pacman -Sy && sudo powerpill -Su && paru -Su --sudoloop --noconfirm
+	else
+		# Update using paru directly if powerpill is not available
+		print_line green
+		paru -Syu --sudoloop --noconfirm
+	fi
+
+	# Clean up local package cache with paru
+	paru --clean --noconfirm
+}
+
+# Perform system update using yay AUR helper
+function perform_update_with_yay() {
+	# Indicate that yay is being used for updates
+	echo -e "\033[1;32m✓\033[0m Found \033[1;32myay\033[0m package manager helper."
+
+	# Check if powerpill is installed for faster downloads
+	if command_exists powerpill; then
+		# Print a green line and indicate powerpill is found
+		print_line green
+		echo -e "\033[1;32m✓\033[0m Found \033[1;32mpowerpill\033[0m for parallel and segmented downloading."
+
+		# Use powerpill for downloading and yay for AUR updates
+		sudo pacman -Sy && sudo powerpill -Su && yay -Syu --sudoloop --noredownload --norebuild --nodiffmenu --noeditmenu --removemake
+	else
+		# Update using yay directly if powerpill is not available
+		print_line green
+		yay -Syu --sudoloop --noredownload --norebuild --nodiffmenu --noeditmenu --removemake
+	fi
+
+	# Clean up local package cache with yay
+	yay -Yc --noconfirm
+}
+
+# -----------------------------------------------------------------------------
+# Update Flatpak
+# -----------------------------------------------------------------------------
+function update_flatpak() {
+	# Check if there are updates for Flatpak packages and if Flatpak is installed
+	if [[ -n "${_FLATPAK_UPDATE_LIST}" ]] && command_exists flatpak; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about Flatpak update process
+		echo -e "\033[1;34m=>\033[0m Updating Flatpak..."
+
+		# Update all Flatpak packages
+		sudo flatpak update --assumeyes --noninteractive
+
+		# Uninstall any unused Flatpak runtimes and applications
+		sudo flatpak uninstall --assumeyes --noninteractive --unused
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update Snap
+# -----------------------------------------------------------------------------
+function update_snap() {
+	# Check if there are updates for Snap packages and if Snap is installed
+	if [[ -n "${_SNAP_UPDATE_LIST}" ]] && command_exists snap; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about Snap update process
+		echo -e "\033[1;34m=>\033[0m Updating Snap..."
+
+		# Refresh (update) all Snap packages
+		sudo snap refresh
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update Rust Cargo package manager and its packages
+# NOTE: This has been disabled in Arch Linux!
+#       because Rust packages are now located in the main repos
+# -----------------------------------------------------------------------------
+function update_rust_packages() {
+	# Check if the cargo command (Rust package manager) exists
+	if command_exists cargo; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating the Rust Cargo package manager
+		echo -e "\033[1;34m=>\033[0m Updating Rust Cargo package manager..."
+
+		# Install or update cargo-update, a utility for updating Rust packages
+		cargo install cargo-update
+
+		# Notify about updating installed Rust packages
+		echo -e "\033[1;34m=>\033[0m Updating Rust packages..."
+
+		# Update all installed Rust packages
+		cargo install-update -a
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update TLDR pages
+# -----------------------------------------------------------------------------
+function update_tldr() {
+	# Check if the tldr command exists
+	if command_exists tldr; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating TLDR pages
+		echo -e "\033[1;34m=>\033[0m Updating TLDR..."
+
+		# Update TLDR pages
+		tldr --update
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update DidYouMean
+# -----------------------------------------------------------------------------
+function update_did_you_mean() {
+	# Check if the dym command (DidYouMean) exists
+	if command_exists dym; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating DidYouMean language files
+		echo -e "\033[1;34m=>\033[0m Updating DidYouMean..."
+
+		# Update language files for DidYouMean
+		dym --update-langs
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update Git repositories in home directory
+# -----------------------------------------------------------------------------
+function update_git_repositories() {
+	# Check if the git command is available
+	if command_exists git; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating local Git repositories
+		echo -e "\033[1;34m=>\033[0m Updating local Git repos in the home directory"
+
+		# Change directory to the user's home
+		cd "${HOME}"
+
+		# Find all .git directories within the home directory (excluding the home directory itself)
+		# Iterate over each repository directory
+		find . -maxdepth 2 -type d -name '.git' ! -path './.git' | sed 's/\/.git//' | while read -r REPO_DIR; do
+			# Change directory to the repository or skip if the directory change fails
+			cd "${REPO_DIR}" || { echo -e "\033[1;31m=>\033[0m Error entering ${REPO_DIR}"; continue; }
+
+			# Print a blue line for each repository update
+			print_line blue
+
+			# Notify about updating the current Git repository
+			echo -e "\033[1;33m=>\033[0m Updating Git repo in ${REPO_DIR}..."
+
+			# Attempt to pull updates for the repository and report success or failure
+			git pull && echo -e "\033[1;32m=>\033[0m Successfully updated ${REPO_DIR}" || echo -e "\033[1;31m=>\033[0m Failed to update ${REPO_DIR}"
+
+			# Return to the home directory before processing the next repository
+			cd "${HOME}"
+		done
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update Git Aliases
+# -----------------------------------------------------------------------------
+function update_git_aliases() {
+	# Git Alias is a collection of git version control alias settings
+	# https://github.com/GitAlias/gitalias
+	local git_alias_file="${HOME}/gitalias.txt"
+	local gitalias_url="https://raw.githubusercontent.com/GitAlias/gitalias/main/gitalias.txt"
+
+	# Check if the Git alias file exists in the user's home directory
+	if [[ -f "${git_alias_file}" ]]; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating Git Aliases
+		echo -e "\033[1;34m=>\033[0m Updating Git Aliases from Gitalias repository..."
+
+		# Use curl to download the latest version of gitalias.txt
+		if curl -L --output "${git_alias_file}" "${gitalias_url}"; then
+			# If the download is successful, update the global Git configuration to include the new aliases
+			git config --global include.path "${git_alias_file}"
+			echo -e "\033[1;32m=>\033[0m Git Aliases updated successfully."
+		else
+			# If the download fails, display an error message
+			echo -e "\033[1;31m=>\033[0m Failed to update Git Aliases from ${gitalias_url}."
+		fi
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update Micro text editor plugins
+# -----------------------------------------------------------------------------
+function update_micro() {
+	# Check if the micro command exists
+	if command_exists micro; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating Micro text editor plugins
+		echo -e "\033[1;34m=>\033[0m Updating Micro..."
+
+		#\micro -plugin update # Always bombs on aspell!
+
+		# Loop through each installed plugin to update them individually
+		# This approach is used to avoid issues with the aspell plugin
+		micro -plugin list | cut -f1 -d' ' | while IFS=$'\n' read line; do
+			# Exclude certain plugins from updating
+			# bounce, comment, etc., are known to cause issues
+			if [[ ! "${line,,}" =~ ^(bounce|comment|diff|ftoptions|linter|literate|status|the)$ ]]; then
+				# Print a blue line for each plugin update
+				print_line blue
+
+				# Notify about updating the specific plugin
+				echo -e "\033[1;33m=>\033[0m Updating ${line}..."
+
+				# Update the individual plugin
+				micro -plugin update "${line}"
+			fi
+		done
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update Distrobox containers
+# -----------------------------------------------------------------------------
+function update_distrobox() {
+	# Check if the distrobox command exists
+	if command_exists distrobox; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating Distrobox containers
+		echo -e "\033[1;34m=>\033[0m Updating Distrobox containers..."
+
+		# Upgrade all Distrobox containers
+		distrobox-upgrade --all
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update ClamAV antivirus database
+# -----------------------------------------------------------------------------
+function update_clamav_database() {
+	# Check if the freshclam command exists
+	if command_exists freshclam; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating ClamAV antivirus database
+		echo -e "\033[1;34m=>\033[0m Updating ClamAV antivirus database..."
+
+		# Update the ClamAV database
+		sudo freshclam
+
+		# Notify that the ClamAV database update is complete
+		echo -e "\033[1;32m=>\033[0m ClamAV database updated successfully."
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update Wine
+# -----------------------------------------------------------------------------
+function update_wine() {
+	# First check for a Desktop Environment
+	if ( [ -n "${XDG_CURRENT_DESKTOP}" ] || [ -n "${DESKTOP_SESSION}" ] ) &&
+	[ -z "${SSH_CLIENT}" ] &&       # And not in SSH session
+	[ "$(tty)" != 'not a tty' ] &&  # And not in a TTY terminal
+	[ -d "${HOME}/.wine" ] &&       # And ~/.wine directory exists
+	command_exists wine; then       # And Wine command exists
+
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating Wine
+		echo -e "\033[1;34m=>\033[0m Updating Wine..."
+
+		# Run Wine with the WINEPREFIX environment variable set to the user's .wine directory
+		# This triggers Wine to check and apply any pending updates
+		env WINEPREFIX="${HOME}/.wine" wine C:\\\\windows\\\\rundll.exe >/dev/null 2>&1
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update the locate database
+# -----------------------------------------------------------------------------
+function update_locate_database() {
+	# Check if the updatedb command exists
+	if command_exists updatedb; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about updating the locate database
+		echo -e "\033[1;34m=>\033[0m Updating the locate file database..."
+
+		# Run the updatedb command with visibility requirement set to 0
+		# This updates the database used by locate for faster file searching
+		sudo updatedb --require-visibility 0
+
+		# Notify that the locate database update is complete
+		echo -e "\033[1;32m=>\033[0m locate database updated successfully."
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Update system firmware
+# -----------------------------------------------------------------------------
+function update_firmware() {
+	# Check if the fwupdmgr command exists for firmware updates
+	if command_exists fwupdmgr; then
+		# Print a green line for visual separation
+		print_line green
+
+		# Notify about checking for firmware updates
+		echo -e "\033[1;34m=>\033[0m Checking for firmware updates..."
+
+		# Refresh the firmware metadata forcibly
+		fwupdmgr refresh --force
+
+		# Check if there are available firmware updates
+		if ! { fwupdmgr get-updates 2>&1; } | grep -q "No updates available"; then
+			# Notify about available firmware updates and perform the update
+			echo -e "\033[1;34m=>\033[0m Firmware updates available, updating..."
+			fwupdmgr update
+			echo -e "\033[1;32m=>\033[0m Firmware updated successfully."
+		else
+			# Notify if firmware is already up to date
+			echo -e "\033[1;34m=>\033[0m Firmware is up to date."
+		fi
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Perform additional updates
+# -----------------------------------------------------------------------------
+function perform_additional_updates() {
+	# Check if fast mode is not enabled
+	if [ $_PARAMETER_FAST != 1 ]; then
+
+		# This has been disabled in Arch!
+		# update_rust_packages
+
+		# Update TLDR pages
+		update_tldr
+
+		# Update DidYouMean command correction tool
+		update_did_you_mean
+
+		# Update local Git repositories
+		update_git_repositories
+
+		# Update Git Aliases
+		update_git_aliases
+
+		# Update Micro text editor plugins
+		update_micro
+
+		# Update Distrobox containers
+		update_distrobox
+
+		# Update Wine
+		update_wine
+
+		# Update ClamAV antivirus database
+		update_clamav_database
+
+		# Update the locate file database
+		update_locate_database
+
+		# Update system firmware
+		update_firmware
+	fi
+}
+
+# -----------------------------------------------------------------------------
+# Main script execution starts here
+# -----------------------------------------------------------------------------
+
+# Parse input parameters to determine script behavior
+# This includes checking for flags like --fast or --no-confirm
+parse_parameters "$@"
+
+# Check for necessary dependencies like checkupdates
+# If dependencies are not met, the script will exit
+check_dependencies
+
+# Retrieve lists of available updates from both the main repositories and AUR
+get_update_lists
+
+# Check if main update lists are empty
+if [[ -z "${_UPDATE_LIST}" ]] \
+	&& [[ -z "${_AUR_UPDATE_LIST}" ]] \
+	&& [[ -z "${_FLATPAK_UPDATE_LIST}" ]] \
+	&& [[ -z "${_SNAP_UPDATE_LIST}" ]]
+then
+	echo -e "\033[1;36mNo updates are available.\033[0m"
+	wait_for_user_input
+
+	# Check the --force flag
+	if [ "$_PARAMETER_FORCE" -eq 1 ]; then
+		# Just make sure we have sudo access for additional updates
+		sudo true
+	else
+		# Let's exit the script since there is nothing else to do
+		exit 0
+	fi
+fi
+
+# Display the retrieved lists of updates, if any are available
+display_update_lists
+
+# Ask for confirmation before proceeding with updates
+if confirm_update_installation; then
+
+	# Prompt for fast mode (only if --confirm is set)
+	prompt_for_fast_mode
+
+	# Perform the system update, including updates from AUR helpers like paru or yay
+	perform_system_update
+
+	# Performs a Flatpak package update
+	update_flatpak
+
+	# Performs a Snap package update
+	update_snap
+
+	# Perform additional updates like updating Flatpak, Snap, TLDR pages, etc.
+	perform_additional_updates
+
+	# Retrieve and display the latest news from the Arch Linux website
+	get_latest_arch_news
+
+	# Check to see if a reboot is required
+	check_reboot_required
+
+	# Wait for user input before exiting if the --confirm flag is set
+	print_line white
+
+	# If the updates were completed successfully
+	echo -e "\033[1;32mUpdate complete!\033[0m"
+
+	# Call the function to wait for user input
+	wait_for_user_input
+
+	# Exit the script with a success status code
+	exit 0
+
+else # Else, if the update process was canceled by the user
+
+	# Print a cancellation message in red
+	echo -e "\033[1;31mUpdate canceled by the user.\033[0m"
+
+	# Call the function to wait for user input
+	wait_for_user_input
+
+	# Exit the script with an error status code
+	exit 1
+fi

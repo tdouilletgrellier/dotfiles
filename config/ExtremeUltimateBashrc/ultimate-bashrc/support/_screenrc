@@ -1,0 +1,67 @@
+# Turn off the welcome message splash screen copyright page
+startup_message off
+
+# 256 colors
+attrcolor b ".I"
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+defbce on
+
+# mouse tracking allows to switch region focus by clicking
+mousetrack on
+
+
+# Turn on the virtual visual bell
+vbell on
+
+# Set the virtual bell message
+vbell_msg 'Bell on %t (%n)'
+
+#activity "Activity in %t(%n)"
+
+# Automatically detach the session on SIGHUP
+autodetach on
+
+# Set scrollback buffer to the specified number of lines
+defscrollback 10000
+
+# Go to home dir
+#chdir
+
+# Log file path
+logfile /tmp/screen-%p.%S.log
+
+# Customize the status line
+hardstatus alwayslastline
+#hardstatus string '%{= kG}[%{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d %{W}%c %{g}]'
+hardstatus string '%{= kG}[%{G}%H%? %1`%?%{g}][%= %{= kw}%-w%{+b yk} %n*%t%?(%u)%? %{-}%+w %=%{g}][%{B}%m/%d %{W}%C%A%{g}]'
+
+# Look and feel
+#caption always "%{= bb}%{+b w}%h %=%{=b rw} %l %{= db} ${USER}%S@%H %{= dg}%c"
+#caption always "%{.bW}%-w%{.rW}%n %t%{-}%+w %=%H %Y-%m-%d %c %p.%S"
+
+# Add keyboard bindings
+bind } history
+bind k kill
+
+# CTRL-a v sets your X clipboard to the content of screens copy buffer
+bind v eval "writebuf" "exec sh -c 'exec xsel -b --display :0 -i < /tmp/screen-exchange'"
+
+# Navigating regions with Ctrl-arrows
+bindkey "^[[1;5D" focus left
+bindkey "^[[1;5C" focus right
+bindkey "^[[1;5A" focus up
+bindkey "^[[1;5B" focus down
+
+# Reset the region sizes with "=" in resize mode
+bind -c rsz = eval "resize =" "command -c rsz"
+
+# Switch windows with F3 (prev) and F4 (next)
+bindkey "^[OR" prev
+bindkey "^[OS" next
+
+# Switch layouts with Ctrl+F3 (prev layout) and Ctrl+F4 (next)
+bindkey "^[O1;5R" layout prev
+bindkey "^[O1;5S" layout next
+
+# F2 puts Screen into resize mode. Resize regions using hjkl keys.
+bindkey "^[OQ" eval "command -c rsz" # enter resize mode
