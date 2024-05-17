@@ -267,7 +267,16 @@ trap _exit EXIT
 
 #-------------------------------------------------------------
 # Welcome message
-clear && printf '\e[3J'
+if [ -n "$SSH_CLIENT" ]; then
+    if [ -z "${TMUX}" ]; then
+      clear && printf '\e[3J' 
+    else
+      printf '\e[3J'
+    fi
+else
+  echo "no ssh"
+clear && printf '\e[3J'  
+fi
 welcome
 # # Old Welcome message
 # if cmd-exists --strict toilet; then
@@ -291,8 +300,10 @@ if [ -x /usr/games/fortune ]; then
     sparkbars | lolcat
 fi
 else
+    if [ -z "${TMUX}" ]; then
     echo -e '\e[m'
     echo -e "$COLOR_S$(sparkbars)${NC}"
+    fi
 fi
 #-------------------------------------------------------------
 

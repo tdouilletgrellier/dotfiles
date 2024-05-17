@@ -676,7 +676,7 @@ _BDAY_FONT=future
 # Set to have the built in prompt use a faster but less precise Git method
 # This might be necessary on slow connections or networked directories
 # Also if set to true, will remove eza/exa's --git flag (use lsg for Git info)
-_GIT_IS_SLOW=false
+_GIT_IS_SLOW=true
 
 # Recognize the depreciated _PROMPT_BUILTIN_FASTER_GIT option
 if [[ ${_PROMPT_BUILTIN_FASTER_GIT} = true ]]; then
