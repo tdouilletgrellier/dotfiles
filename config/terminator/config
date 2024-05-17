@@ -12,6 +12,7 @@
   go_left = <Primary>Left
   go_right = <Primary>Right
   toggle_zoom = <Primary><Shift>m
+  full_screen = <Alt>Return
 [profiles]
   [[default]]
     background_darkness = 0.95
