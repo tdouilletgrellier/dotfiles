@@ -23,7 +23,7 @@ color brightyellow "="
 color brightblue "!.*"
 color brightblue "\*.*"
 color brightblue "\$.*"
-color brightblue "TITLE.*"
+color white "TITLE.*"
 color white "TITRE.*"
 
 
