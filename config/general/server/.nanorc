@@ -101,7 +101,7 @@ include "~/epx.nanorc"
 ## M-Ins   insert anchor
 ## M-PgDwn goto next anchor
 
-bind ^Q   exit          all
+bind ^W   exit          all
 bind M-Z  suspend       main
 #bind M-U  undo          main
 #bind M-R  redo          main
@@ -119,7 +119,7 @@ bind ^Space complete    main
 #bind M-C  location      main
 #bind ^E   wherewas      all # cronos ok
 bind M-E  findprevious  all
-bind ^R   replace       main
+bind ^H   replace       main
 bind ^_   gotoline      main
 bind ^G   firstline     all
 bind M-G  lastline      all
