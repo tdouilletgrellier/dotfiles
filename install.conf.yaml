@@ -46,6 +46,11 @@
     ~/.vimrc: config/general/.vimrc
     ~/.vim_runtime: config/vim
 
+    #micro
+    ~/.config/micro/settings.json: config/micro/settings.json
+    ~/.config/micro/bindings.json: config/micro/bindings.json
+    ~/.config/micro/syntax/europlexus.yaml: config/micro/syntax/europlexus.yaml
+
     #tmux
     ~/.tmux.conf: config/tmux/.tmux.conf
     ~/.tmux/plugins/tpm: lib/tpm    

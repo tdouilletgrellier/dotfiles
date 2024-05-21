@@ -1,0 +1,8 @@
+{
+    "Alt-/": "lua:comment.comment",
+    "CtrlUnderscore": "lua:comment.comment",
+    "Ctrl-w":         "Quit",
+    "Ctrl-q":         "NextSplit",
+    "Ctrl-h": "None",
+    "Ctrl-r": "command-edit:replace",
+}
