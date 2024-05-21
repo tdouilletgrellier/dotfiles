@@ -2,7 +2,6 @@
 # Trueline Custom Configuration
 # Link: https://github.com/petobens/trueline
 # !!! Requires Nerd Fonts: https://www.nerdfonts.com/
-source ${HOME}/trueline_def.sh
 
 # Check to see if we are in a TTY terminal
 export _tty_info="$(tty | sed -e 's:/dev/::' 2> /dev/null)"

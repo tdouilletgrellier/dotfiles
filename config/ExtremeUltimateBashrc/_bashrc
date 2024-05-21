@@ -832,6 +832,11 @@ elif [[ -f "$HOME/.bashrc_help" ]]; then
 	fi
 fi
 
+# Alias to edit the global bashrc if it exists using the same aliases upper case
+if [[ -f "/etc/bash.bashrc" ]]; then
+	alias {EBRC,EDITBASHRC}='sudoedit /etc/bash.bashrc'
+fi
+
 # Alias to show the help file
 alias hlp='\less -f -r -n -S "$_BASHRC_HELP"'
 
@@ -923,6 +928,54 @@ function a() {
 	# The output is piped into less with several options for improved viewing.
 	{ list_aliases; echo; list_functions; } | less --line-numbers --no-init
 }
+
+#######################################################
+### DIRECTORY ALIASES
+#######################################################
+
+declare -A ALIASES=(
+	["bashrc"]="$HOME"
+	["bashrc"]="$HOME/.config/bashrc"
+	["bin"]="$HOME/.local/bin"
+	["BIN"]="/usr/bin"
+	["config"]="$HOME/.config"
+	["CONFIG"]="/etc"
+	["desktop"]="$HOME/Desktop"
+	["docs"]="$HOME/Documents"
+	["DOCS"]="/usr/local/man"
+	["DOCS"]="/usr/local/share/man"
+	["DOCS"]="/usr/share/man"
+	["downloads"]="$HOME/Downloads"
+	["fonts"]="$HOME/.local/share/fonts"
+	["fonts"]="$HOME/.fonts"
+	["FONTS"]="/usr/share/fonts"
+	["icons"]="$HOME/.local/share/icons"
+	["icons"]="$HOME/.icons"
+	["ICONS"]="/usr/share/icons"
+	["music"]="$HOME/Music"
+	["pics"]="$HOME/Pictures"
+	["share"]="$HOME/.local/share"
+	["SHARE"]="/usr/share"
+	["themes"]="$HOME/.local/share/themes"
+	["THEMES"]="/usr/share/themes"
+	["tmp"]="~/tmp"
+	["tmp"]="~/.cache/tmp"
+	["tmp"]="~/.cache"
+	["TMP"]="${TMPDIR:-/tmp}"
+	["videos"]="$HOME/Videos"
+	["wallpaper"]="$HOME/.local/share/wallpapers"
+	["WALLPAPER"]="/usr/share/backgrounds"
+	["WALLPAPER"]="/usr/share/wallpapers"
+)
+
+# Loop through the associative array and create aliases for existing directories
+for ALIAS in "${!ALIASES[@]}"; do
+	[ -d "${ALIASES[$ALIAS]}" ] && alias "$ALIAS"="cd \"${ALIASES[$ALIAS]}\""
+done
+
+# Clean up
+unset ALIAS
+unset ALIASES
 
 #######################################################
 ### GIT ALIASES
@@ -1050,7 +1103,7 @@ if cmd-exists git; then
 	# Link: https://github.com/Bhupesh-V/ugit
 	# Install: sh -c "$(curl -fsSL https://raw.githubusercontent.com/Bhupesh-V/ugit/master/install)"
 	if cmd-exists ugit; then
-		alias gitundo='ugit'
+		alias {gitundo,ggundo}='ugit'
 	fi
 
 	# List Git files by last modified date

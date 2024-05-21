@@ -1,647 +1,480 @@
-# shellcheck disable=SC2155,SC2148
-#---------+
-# Helpers |
-#---------+
-_trueline_font_style() {
-    style="$1"
-    case "$style" in
-        bold)
-            style=1
-            ;;
-        dim)
-            style=2
-            ;;
-        italic)
-            style=3
-            ;;
-        underlined)
-            style=4
-            ;;
-        **)
-            style=22
-            ;;
-    esac
-    style+="m"
-    echo "$style"
-}
+<!doctype html>
 
-_trueline_content() {
-    fg_c="${TRUELINE_COLORS[$1]}"
-    bg_c="$2"
-    style="$(_trueline_font_style "$3")"
-    content="$4"
-    esc_seq_start="\["
-    esc_seq_end="\]"
-    if [[ -n "$5" ]] && [[ "$5" == "vi" ]]; then
-        esc_seq_start="\1"
-        esc_seq_end="\2"
-    fi
-    output="$esc_seq_start\033[0m\033[38;2;$fg_c;"
-    if [[ "$bg_c" != 'default_bg' ]]; then
-        bg_c="${TRUELINE_COLORS[$bg_c]}"
-        output+="48;2;$bg_c;"
-    fi
-    output+="$style$esc_seq_end$content$esc_seq_start\033[0m$esc_seq_end"
-    echo "$output"
-}
+<html class="no-js" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1716233750"></script>
+<link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1716233750">
+<script>
+        window.bizx.cmp.init({
+            gam_gdpr_technical_delivery: true,
+        });
+    </script>
+<script>
+            /*global unescape, window, SF*/
+            // Setup our namespace
+            if (!window.SF) { window.SF = {}; }
+            if (!window.net) { window.net = {}; }
+            if (!window.net.sf) { window.net.sf = {}; }
+            SF.Ads = {};
+            SF.cdn = '//a.fsdn.com/con';
+            SF.deploy_time = '1716233750';
+            SF.sandiego = true;
+            SF.sandiego_chrome = true;
+            SF.variant = 'sf';
+            SF.fpid = '170e24ac-e13d-4ae7-9c1f-43a9cff4ba21';
+            
+            SF.Breakpoints = {
+              small: 0,
+              medium: 640,
+              leaderboard: 743,
+              billboard: 985,
+              large: 1053,
+              xlarge: 1295,
+              xxlarge: 1366
+            };
+            SF.initial_breakpoints_visible = {};
+            for (var bp in SF.Breakpoints) {
+                if (!SF.Breakpoints.hasOwnProperty(bp)) {
+                    continue;
+                }
+                SF.initial_breakpoints_visible[bp] = !window.matchMedia || window.matchMedia('(min-width: ' + SF.Breakpoints[bp] + 'px)').matches;
+            }
+            
+        </script>
+<link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1716233750">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1716233750">
+<meta name="description" content="Free, secure and fast downloads from the largest Open Source applications and software directory - SourceForge.net">
+<meta name="keywords" content="Open Source, Open Source Software, Development, Community, Source Code, Secure,  Downloads, Free Software">
+<title>Page not found
+    - SourceForge.net</title>
+<link rel="icon" sizes="180x180" href="//a.fsdn.com/con/img/sandiego/logo-180x180.png" type="image/png">
+<link rel="icon" sizes="any" href="//a.fsdn.com/con/img/sandiego/svg/originals/sf-icon-orange-no_sf.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href="//a.fsdn.com/con/img/sandiego/logo-180x180.png">
+<link rel="mask-icon" href="//a.fsdn.com/con/img/sandiego/svg/originals/sf-icon-orange-no_sf.svg" color="#FF6600">
+<script>
+            /*global unescape, window, console, jQuery, $, net, SF, DD_belatedPNG, bizx  */
+            if (!window.SF) {
+                window.SF = {};
+            }SF.EU_country_codes = ["SI","GL","LT","IS","LU","SE","GG","CW","BM","DK","PM","AI","DE","HR","FR","ES","BE","NL","PN","CZ","RO","BL","ME","WF","AX","MS","RE","GF","SK","PT","SH","IE","KY","CH","YT","HU","CY","TF","MT","FK","BG","PL","EE","PF","AT","GB","MQ","GP","SX","NC","GR","FI","IT","IO","VG","GS","JE","TC","NO","MF","GI","LI","LV","AW"];
+            SF.unknown_country_codes = ["","A1","A2","O1"];
+        </script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1716233750"></script>
+<style>.w656a267fd5c8c6761a6447eb47d505a58b79297b { display: none !important; }</style>
+<script>SF.adblock = true;</script>
+<script src="//a.fsdn.com/con/js/adsbanner.js?1716233750"></script>
+<script>
+        function initPiwik(){
+            var _paq = window._paq = window._paq || [];
+            _paq.push(['trackPageView', document.title, {
+                dimension2: 'error-content',
+                dimension3: SF.devicePixelRatio,
+                
+            }]);
+            _paq.push(['enableLinkTracking']);
 
-_trueline_separator() {
-    if [[ -n "$_last_color" ]]; then
-        # Only add a separator if it's not the first section (and hence last
-        # color is set/defined)
-        if [[ -n "$1" ]]; then
-            local bg_color="$1"
-        fi
-        _trueline_content "$_last_color" "$bg_color" bold "${TRUELINE_SYMBOLS[segment_separator]}"
-    fi
-}
+            (function() {
+                var u="//analytics.slashdotmedia.com/";
+                _paq.push(['setTrackerUrl', u+'sf.php']);
+                _paq.push(['setSiteId', 39]);
+                 
+        // only execute if 'measurement' has been granted
+        bizx.cmp.ifConsent({ purposes: ['measurement'], vendors: 'sdm'}, function() {
+            var interval = 6 * 60 * 60 * 1000; // 6 hrs, expressed in ms
+            var vid_date = new Date(localStorage.getItem('vid_date'));
+            if (new Date() - vid_date >= interval) {
+                var data = {firstparty_id: "170e24ac-e13d-4ae7-9c1f-43a9cff4ba21", do_not_sell: false};
+                bizx.cmp.ifConsent({ purposes: ['ads'], vendors: 'sdm'}, function() {},
+                    function(){
+                        // no consent (opt-out)
+                        data.do_not_sell = true;
+                    },
+                    function(){
+                        //finally call api endpoint
+                        // push promise to pwik and set it run if pwik is allowed to run based on it's own ifConsent check
+                        _paq.push([ function() {
+                            data.matomo_id = this.getVisitorId();
+							data.domain = "sourceforge.net";
+                            $.ajax({
+                                method: 'PUT',
+                                url: '/p/sfapi/push_vid',
+                                data:  JSON.stringify(data)
+                            })
+                            .always(function(){
+                                localStorage.setItem('vid_date', new Date());
+                            });
+                        }]);
+                    }
+                    );
+                }
+            });
+    
+                var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+                g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'sf.js'; s.parentNode.insertBefore(g,s);
+            })();
+        }
+        bizx.cmp.ifConsent({ purposes: ['storage', 'measurement'], vendors: 'sdm' }, initPiwik);
+    </script>
+<script type="application/ld+json">
+            {
+                "@context": "http://schema.org",
+                "@type": "WebSite",
+                "name": "SourceForge",
+                "url": "https://sourceforge.net/"
+            }
+        </script>
+</head>
+<body id="error-content" class="  anonymous has-ads sandiego v-sf">
+<div id="busy-spinner"></div>
+<div id="messages">
+<section class="message error notify-sticky  ">
+<div class="content">The "/bashrc.d/trueline_d..ashrc.d/trueline_def" file could not be found or is not available. Please select another file.</div>
+</section>
+</div>
+<div class="off-canvas position-right" id="offCanvas" data-off-canvas>
 
-_trueline_record_colors() {
-    local force="$4"
-    if [[ -z "$_first_color_fg" ]] || [[ -n "$force" ]]; then
-        _first_color_fg="$1"
-        _first_color_bg="$2"
-        _first_font_style="$3"
-    fi
-    _last_color="$2"
-}
+<ul class="header-nav-menulist">
+<li class="highlight search">
+<form method="get" action="/directory/" class="m-search-form">
+<input type="text" placeholder="Search for software or solutions" autocomplete="off" name="q">
+<label>
+<input type="submit" class="bt" value>
+<svg data-name="search" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1216 832q0-185-131.5-316.5t-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5 316.5-131.5 131.5-316.5zm512 832q0 52-38 90t-90 38q-54 0-90-38l-343-342q-179 124-399 124-143 0-273.5-55.5t-225-150-150-225-55.5-273.5 55.5-273.5 150-225 225-150 273.5-55.5 273.5 55.5 225 150 150 225 55.5 273.5q0 220-124 399l343 343q37 37 37 90z" /></svg>
+</label>
+</form>
+</li>
+<li class="highlight"><a href="https://sourceforge.net/auth/">Join/Login</a></li>
+<li><a href="/directory/">Open Source Software</a></li>
+<li><a href="/software/">Business Software</a></li>
+<li><a href="/software/vendors/" title="For Vendors">For Vendors</a></li>
+<li><a href="/blog/" title="Blog">Blog</a></li>
+<li><a href="/about">About</a></li>
+<li><a id="header-nav-more" data-toggle="header-nav-more header-nav-more-content" data-toggler=".toggled">More</a></li>
+<li>
+<ul id="header-nav-more-content" class="toggled" data-toggler=".toggled">
+<li><a href="/articles/">Articles</a></li>
+<li><a href="/create">Create</a></li>
+<li><a href="/learn/">Learn</a></li>
+<li><a href="https://sourceforge.net/articles/category/sourceforge-podcast/">SourceForge Podcast</a></li>
+<li><a href="https://sourceforge.net/p/forge/documentation/Docs%20Home/">Site Documentation</a></li>
+<li><a href="/user/newsletters">Subscribe to our Newsletter</a></li>
+<li><a href="/support">Support Request</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="off-canvas-content" data-off-canvas-content>
+<script>
+    SF.linkout_icon = '<svg  data-name="sf-linkout-icon" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve"><polygon class="st0" points="243.2,243.2 56.8,243.2 56.8,56.8 123,56.8 123,9 9,9 9,291 291,291 291,179.4 243.2,179 "/><polygon class="st0" points="128.5,213 155,186.5 176,165.5 206.7,196.3 235.5,132.5 248.9,102.6 290.6,9.8 291,9 290.6,9.2 197.4,51.1 169.1,63.8 103.7,93.3 137,126.5 115.9,147.5 89.5,174 "/></svg>';
+</script>
+<div class="l-header-nav sticky sandiego">
+<section class="sandiego l-header-nav-top show-for-large">
+<div class="row">
+<a href="/" title="Home" class="sf-logo">
+<img src="//a.fsdn.com/con/images/sandiego/sf-logo-full.svg" alt="SourceForge logo" class="sf-logo-full" />
+</a>
+<nav class="links">
+<a href="/software/vendors/" title="For Vendors">For Vendors</a>
+<a href="/support" title="Help">Help</a>
+<a href="/create/" title="Create">Create</a>
+<a href="/user/registration" title="Join">Join</a>
+<a href="https://sourceforge.net/auth/" title="Login">Login</a>
+</nav>
+</div>
+</section>
+<section class="sandiego l-header-nav-top hide-for-large">
+<div class="row">
+<a href="/" title="Home" class="sf-logo">
+<img src="//a.fsdn.com/con/images/sandiego/sf-logo-full.svg" alt="SourceForge logo" class="sf-logo-full" />
+</a>
+<div class="title-bar-right">
+<button type="button" class="menu-icon" data-toggle="offCanvas"></button>
+</div>
+</div>
+</section>
+<section class="sandiego l-header-nav-bottom">
+<nav class="row">
+<a href="/" title="Home" class="sf-logo">
+<img src="//a.fsdn.com/con/images/sandiego/sf-logo-full.svg" alt="SourceForge logo" class="sf-logo-full" />
+</a>
+<div class="links">
+<div class="nav-dropdown">
+<a href="/directory/" title="Browse">Open Source Software</a>
+</div>
+<div class="nav-dropdown">
+<a href="/software/">Business Software</a>
+</div>
+<div class="nav-dropdown">
+<a>Resources</a>
+<ul class="nav-dropdown-menu">
+<li><a href="/articles/">Articles</a></li>
+<li><a href="/software/case-studies/">Case Studies</a></li>
+<li><a href="/learn/">Learn</a></li>
+<li><a href="/blog/">Blog</a></li>
+<li><a href="https://sourceforge.net/articles/category/sourceforge-podcast/">SourceForge Podcast</a></li>
+</ul>
+</div>
+<div class="dev-menu-when-stuck">
+Menu
+<ul class="dev-menu-dropdown header-nav-menulist">
+<li><a href="/support">Help</a></li>
+<li><a href="/create">Create</a></li>
+<li><a href="/user/registration/" title="Join">Join</a></li>
+<li><a href="https://sourceforge.net/auth/" title="Login">Login</a></li>
+</ul>
+</div>
+<div class="search-toggle-when-stuck">
+<a class="search-toggle">
+<svg data-name="search" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1216 832q0-185-131.5-316.5t-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5 316.5-131.5 131.5-316.5zm512 832q0 52-38 90t-90 38q-54 0-90-38l-343-342q-179 124-399 124-143 0-273.5-55.5t-225-150-150-225-55.5-273.5 55.5-273.5 150-225 225-150 273.5-55.5 273.5 55.5 225 150 150 225 55.5 273.5q0 220-124 399l343 343q37 37 37 90z" /></svg>
+</a>
+</div>
+</div>
+<div class="search">
+<div class="main-nav-button">
+<a href="/p/import_project/github/" rel="nofollow" title="Sync your Github project to SourceForge" id="github-link">
+<img src="//a.fsdn.com/con/images/sandiego/github-sync.png" srcset="//a.fsdn.com/con/images/sandiego/github-sync_2x.png 2x" alt="GitHub sync" id="main-nav-badge" />
+</a>
+</div>
+<form method="get" action="/directory/" class="m-search-form">
+<div class="typeahead__container">
+<div class="typeahead__field">
+<div class="typeahead__query">
+<input type="text" placeholder="Search for software or solutions" autocomplete="off" name="q">
+</div>
+<label>
+<input type="submit" class="bt" value>
+<svg data-name="search" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1216 832q0-185-131.5-316.5t-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5 316.5-131.5 131.5-316.5zm512 832q0 52-38 90t-90 38q-54 0-90-38l-343-342q-179 124-399 124-143 0-273.5-55.5t-225-150-150-225-55.5-273.5 55.5-273.5 150-225 225-150 273.5-55.5 273.5 55.5 225 150 150 225 55.5 273.5q0 220-124 399l343 343q37 37 37 90z" /></svg>
+</label>
+</div>
+</div>
+</form>
+</div>
+</nav>
+</section>
+</div>
+<div class="error-body">
+<div id="message-image-404" class="message-image">
+<svg data-name="MissingPage_Error" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 240.2 240.1" style="enable-background:new 0 0 240.2 240.1;" xml:space="preserve"><circle class="st0" cx="120.1" cy="120" r="120" /><text transform="matrix(1 0 0 1 79.9553 201.9287)" class="st1 st2">?</text></svg>
+</div>
+<h1>
+Whoops, we can't find that page.
+</h1>
+<div class="nav-block">
+<a href="/directory/">Browse Open Source Software</a> or <a href="/software/">Browse Business Software and Services</a>
+</div>
+</div>
+<footer class="sandiego">
+<div class="as-row">
+<div class="footer-wrapper">
+<nav aria-label="Site Links" role="navigation">
+<section>
+<div class="as-h2">SourceForge</div>
+<ul>
+<li><a href="/create/" title="Create a Project">Create a Project</a></li>
+<li><a href="/directory/" title="Open Source Software Directory">Open Source Software</a></li>
+<li><a href="/software/" title="Business Software Directory">Business Software</a></li>
+<li><a href="/top" title="Top Open Source Projects">Top Downloaded Projects</a></li>
+</ul>
+</section>
+</nav>
+<nav aria-label="Company Links" role="navigation">
+<section>
+<div class="as-h2">Company</div>
+<ul>
+<li><a href="/about">About</a></li>
+<li><a href="/about/leadership" title="Open Source Software Directory">Team</a></li>
+<li class="h-card">
+<address>
+<span class="p-name p-org">SourceForge Headquarters</span><br>
+<span class="p-street-address">225 Broadway Suite 1600</span><br>
+<span class="p-locality">San Diego, CA <span class="p-postal-code">92101</span></span><br>
+<span class="p-tel">+1 (858) 454-5900</span><br>
+</address>
+</li>
+<li id="social">
+<span></span>
+<a href="https://twitter.com/sourceforge" class="twitter" rel="nofollow" target="_blank">
+<svg class="vertical-icon-fix" data-name="twitter" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5t-115.5 248.5-184.5 210.5-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5t-114-159.5q33 5 61 5 43 0 85-11-112-23-185.5-111.5t-73.5-205.5v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5t371.5 99.5q-8-38-8-74 0-134 94.5-228.5t228.5-94.5q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z" /></svg></a>
+<a href="https://fosstodon.org/@sourceforge" rel="me nofollow" target="_blank">
+<svg class="vertical-icon-fix" data-name="mastodon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.54 102.54 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5zm-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z" /></svg></a>
+<a href="https://www.facebook.com/sourceforgenet/" class="facebook" rel="nofollow" target="_blank">
+<svg data-name="facebook" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759h-306v-759h-255v-296h255v-218q0-186 104-288.5t277-102.5q147 0 228 12z" /></svg></a>
+<a href="https://www.linkedin.com/company/sourceforge.net" class="linkedin" rel="nofollow" target="_blank">
+<svg data-name="linkedin" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991h-330v-991h330zm21-306q1 73-50.5 122t-135.5 49h-2q-82 0-132-49t-50-122q0-74 51.5-122.5t134.5-48.5 133 48.5 51 122.5zm1166 729v568h-329v-530q0-105-40.5-164.5t-126.5-59.5q-63 0-105.5 34.5t-63.5 85.5q-11 30-11 81v553h-329q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5 114.5-15.5q171 0 275 113.5t104 332.5z" /></svg></a>
+<span></span>
+</li>
+</ul>
+</section>
+</nav>
+<nav aria-label="Resources Links" role="navigation">
+<section>
+<div class="as-h2">Resources</div>
+<ul>
+<li><a href="/support" title="Support Section">Support</a></li>
+<li><a href="/p/forge/documentation/Docs%20Home/" title="Site Documentation">Site Documentation</a></li>
+<li><a href="https://fosstodon.org/@sourceforgestatus" title="Site Status" rel="me nofollow">Site Status</a></li>
+</ul>
+</section>
+</nav>
+<section class="footer-logo">
+<a href="/" title="Home" class="sf-logo">
+<img src="//a.fsdn.com/con/images/sandiego/sf-logo-full.svg" alt="SourceForge logo" class="sf-logo-full" />
+</a>
+</section>
+</div>
+</div>
+<section class="l-nav-bottom">
+<nav class="row">
+<div class="columns small-12 large-6 copyright-notice">
+&copy; 2024 Slashdot Media. All Rights Reserved.
+</div>
+<div class="columns large-6 links links-right">
+<a href="https://slashdotmedia.com/terms-of-use" title="Terms" rel="nofollow">Terms</a>
+<a href="https://slashdotmedia.com/privacy-statement/" title="Privacy" rel="nofollow">Privacy</a>
+<a href="#" title="Privacy Choices" id="privacy-choices" class="btn-privay-choices">Privacy Choices</a>
+<a href="https://slashdotmedia.com/contact/" target="_blank" title="Advertise" rel="nofollow">Advertise</a>
+</div>
+</nav>
+</section>
+</footer>
+</div>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1716233750"></script>
+<script>
+        /* global Dropzone */
+        Dropzone.options.blockthisForm = false;
+    </script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1716233750"></script>
+<script>
+            /* global Foundation */
+            $(document).foundation();
+            Foundation.Triggers.forceListenersNow();
+        </script>
+<script>
+            bizx.cmp.ifConsent('', ['all', 'google-ads'], function () {}, function () {
+                $('body').addClass('no-ads-consent');  
+            });
+        </script>
+<script>
 
-#----------+
-# Segments |
-#----------+
-_trueline_is_root() {
-    if [[ "${EUID}" -eq 0 ]]; then
-        echo 'is_root'
-    fi
-}
-_trueline_ip_address() {
-    \ip route get 1 | tr -s ' ' | cut -d' ' -f7
-}
-_trueline_has_ssh() {
-    if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
-        echo 'has_ssh'
-    fi
-}
-_trueline_user_segment() {
-    local fg_color="$1"
-    local bg_color="$2"
-    local font_style="$3"
-    local user="$USER"
-    local is_root="$(_trueline_is_root)"
-    if [[ -n "$is_root" ]]; then
-        if [[ -z "$user" ]]; then
-            user='root'
-        fi
-        fg_color=${TRUELINE_USER_ROOT_COLORS[0]}
-        bg_color=${TRUELINE_USER_ROOT_COLORS[1]}
-    fi
-    local has_ssh="$(_trueline_has_ssh)"
-    if [[ -n "$has_ssh" ]]; then
-        user="${TRUELINE_SYMBOLS[ssh]} $user"
-    fi
-    if [[ -n "$has_ssh" ]] || [[ "$TRUELINE_USER_ALWAYS_SHOW_HOSTNAME" = true ]]; then
-        user+="@"
-        if [ "$TRUELINE_USER_SHOW_IP_SSH" = true ]; then
-            user+="$(_trueline_ip_address)"
-        elif [ "$TRUELINE_USER_SHORTEN_HOSTNAME" = true ]; then
-            user+="$(hostname -s)"
-        else
-            user+="$HOSTNAME"
-        fi
-    fi
-    local segment="$(_trueline_separator)"
-    segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " $user ")"
-    PS1+="$segment"
-    _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-}
+        function geturl(url, params) {
+            params = Object
+                .keys(params)
+                .map(function(key) {
+                    return key + "=" + encodeURIComponent(params[key]);
+                })
+                .join("&");
+            return url + "?" + params;
+        }
 
-_trueline_has_venv() {
-    printf "%s" "${VIRTUAL_ENV##*/}"
-}
-_trueline_venv_segment() {
-    local venv="$(_trueline_has_venv)"
-    if [[ -n "$venv" ]]; then
-        local fg_color="$1"
-        local bg_color="$2"
-        local font_style="$3"
-        local segment="$(_trueline_separator)"
-        segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " ${TRUELINE_SYMBOLS[venv]} $venv ")"
-        PS1+="$segment"
-        _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-    fi
-}
+        
+        function loadimg(params, dimension_prefix) {
+            params = Object.assign({"idsite":1,"rec":1,"rand":99107,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
+            for (var key in params) {
+                if (params.hasOwnProperty(key) && key.indexOf('dimension') === 0 && params[key] !== undefined) {
+                    params[key] = (dimension_prefix||'') + params[key];
+                }
+            }
+            params.rand = Math.floor(Math.random() * 100000);
+            bizx.cmp.ifConsent('publisher', ['measurement'], function() {
+                var url = geturl("//sourceforge.net/software/visit", params);
+                if (!('sendBeacon' in navigator) || !navigator.sendBeacon(url)) {
+                    var img = document.createElement('img');
+                    img.src = url;
+                    img.style = "border:0;";
+                    img.alt = "";
+                    document.body.appendChild(img);
+                }
+            });
+        }
 
-_trueline_has_conda_env() {
-    printf "%s" "${CONDA_DEFAULT_ENV}"
-}
-_trueline_conda_env_segment() {
-    local conda_env="$(_trueline_has_conda_env)"
-    if [[ -n "$conda_env" ]]; then
-        local fg_color="$1"
-        local bg_color="$2"
-        local font_style="$3"
-        local segment="$(_trueline_separator)"
-        segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " ${TRUELINE_SYMBOLS[venv]} $conda_env")"
-        PS1+="$segment"
-        _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-    fi
-}
+        var $typeaheads = $('.typeahead__container input[name=q]');
+        $typeaheads.on('typeahead-item-clicked', function(ev, $typeahead, q, item){
+            var groupIndex = ($typeahead.data('groups') || []).indexOf(item.group);
+            if (groupIndex === 2 || groupIndex === 3) {
+                loadimg({
+                    'e_c': 'Search | Typeahead | ' + item.group,
+                    'e_a': "Typeahead Click | q=" + q,
+                    'e_n': item.href, 
+                 }, 'typeahead_on_');
+            }
+        });
+        </script>
 
-_trueline_has_aws_profile() {
-    printf "%s" "${AWS_PROFILE}"
-}
-_trueline_aws_profile_segment() {
-    local profile_aws="$(_trueline_has_aws_profile)"
-    if [[ -n "$profile_aws" ]]; then
-        local fg_color="$1"
-        local bg_color="$2"
-        local font_style="$3"
-        local segment="$(_trueline_separator)"
-        segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " ${TRUELINE_SYMBOLS[aws_profile]} $profile_aws ")"
-        PS1+="$segment"
-        _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-    fi
-}
+<script>
+    (function () {
+        bizx.cmp.ifConsent({ purposes: 'all', vendors: 'bombora'}, function () {
+            /*global _ml:true, window */
+            _ml = window._ml || {};
+            _ml.eid = '771';
+            _ml.fp = '170e24ac-e13d-4ae7-9c1f-43a9cff4ba21';  
+            var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');
+            mltag.type = 'text/javascript';
+            mltag.async = true;
+            mltag.defer = true;
+            mltag.src = '//ml314.com/tag.aspx?' + cd.getDate() + cd.getMonth() + cd.getFullYear();
+            s.parentNode.insertBefore(mltag, s);
+        });
+    })();
+</script>
 
-_trueline_has_git_branch() {
-    branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-
-    if [[ "$?" -ne "128" ]]; then
-        printf "%s" "$branch"
-    else
-        printf "%s" ""
-    fi
-}
-_trueline_git_mod_files() {
-    nr_mod_files="$(git diff --name-only --diff-filter=M 2> /dev/null | wc -l | sed 's/^ *//')"
-    mod_files=''
-    if [[ ! "$nr_mod_files" -eq 0 ]]; then
-        mod_files="${TRUELINE_SYMBOLS[git_modified]} "
-        if [[ "$TRUELINE_GIT_SHOW_STATUS_NUMBERS" = true ]]; then
-            mod_files+="$nr_mod_files "
-        fi
-    fi
-    echo "$mod_files"
-}
-_trueline_git_behind_ahead() {
-    branch="$1"
-    upstream="$(git config --get branch."$branch".merge)"
-    if [[ -n $upstream ]]; then
-        nr_behind_ahead="$(git rev-list --count --left-right '@{upstream}...HEAD' 2> /dev/null)" || nr_behind_ahead=''
-        nr_behind="${nr_behind_ahead%	*}"
-        nr_ahead="${nr_behind_ahead#*	}"
-        git_behind_ahead=''
-        if [[ ! "$nr_behind" -eq 0 ]]; then
-            git_behind_ahead+="${TRUELINE_SYMBOLS[git_behind]} "
-            if [[ "$TRUELINE_GIT_SHOW_STATUS_NUMBERS" = true ]]; then
-                git_behind_ahead+="$nr_behind "
-
-            fi
-        fi
-        if [[ ! "$nr_ahead" -eq 0 ]]; then
-            git_behind_ahead+="${TRUELINE_SYMBOLS[git_ahead]} "
-            if [[ "$TRUELINE_GIT_SHOW_STATUS_NUMBERS" = true ]]; then
-                git_behind_ahead+="$nr_ahead "
-
-            fi
-        fi
-        echo "$git_behind_ahead"
-    fi
-}
-_trueline_git_remote_icon() {
-    remote=$(command git ls-remote --get-url 2> /dev/null)
-    remote_icon="${TRUELINE_SYMBOLS[git_branch]}"
-    if [[ "$remote" =~ "github" ]]; then
-        remote_icon="${TRUELINE_SYMBOLS[git_github]} "
-    elif [[ "$remote" =~ "bitbucket" ]]; then
-        remote_icon="${TRUELINE_SYMBOLS[git_bitbucket]} "
-    elif [[ "$remote" =~ "gitlab" ]]; then
-        remote_icon="${TRUELINE_SYMBOLS[git_gitlab]} "
-    fi
-    if [[ -n "${remote_icon// /}" ]]; then
-        remote_icon=" $remote_icon "
-    fi
-    echo "$remote_icon"
-}
-_trueline_git_segment() {
-    local branch="$(_trueline_has_git_branch)"
-    if [[ -n $branch ]]; then
-        local fg_color="$1"
-        local bg_color="$2"
-        local font_style="$3"
-        local segment="$(_trueline_separator)"
-
-        local branch_icon="$(_trueline_git_remote_icon)"
-        segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" "$branch_icon$branch ")"
-        local mod_files="$(_trueline_git_mod_files)"
-        if [[ -n "$mod_files" ]]; then
-            segment+="$(_trueline_content "$TRUELINE_GIT_MODIFIED_COLOR" "$bg_color" "$font_style" "$mod_files")"
-        fi
-        local behind_ahead="$(_trueline_git_behind_ahead "$branch")"
-        if [[ -n "$behind_ahead" ]]; then
-            segment+="$(_trueline_content "$TRUELINE_GIT_BEHIND_AHEAD_COLOR" "$bg_color" "$font_style" "$behind_ahead")"
-        fi
-        PS1+="$segment"
-        _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-    fi
-}
-
-_trueline_working_dir_segment() {
-    local fg_color="$1"
-    local bg_color="$2"
-    local font_style="$3"
-    local segment="$(_trueline_separator)"
-    local wd_separator="${TRUELINE_SYMBOLS[working_dir_separator]}"
-    if [[ "$TRUELINE_WORKING_DIR_SPACE_BETWEEN_PATH_SEPARATOR" = true ]]; then
-        wd_separator=" $wd_separator "
-    fi
-
-    local p="${PWD/#$HOME/${TRUELINE_SYMBOLS[working_dir_home]}}"
-    local arr=
-    IFS='/' read -r -a arr <<< "$p"
-    local path_size="${#arr[@]}"
-    if [[ "$path_size" -eq 1 ]]; then
-        local path_="\[\033[1m\]${arr[0]:=/}"
-    elif [[ "$path_size" -eq 2 ]]; then
-        local path_="${arr[0]:=/}$wd_separator\[\033[1m\]${arr[+1]}"
-    else
-        if [[ "$path_size" -gt 3 ]]; then
-            if [[ "$TRUELINE_WORKING_DIR_ABBREVIATE_PARENT_DIRS" = true ]]; then
-                p=$(echo "$p" | sed -r "s:([^/]{,$TRUELINE_WORKING_DIR_ABBREVIATE_PARENT_DIRS_LENGTH})[^/]*/:\1/:g")
-            else
-                p="${TRUELINE_SYMBOLS[working_dir_folder]}/"$(echo "$p" | awk -F'/' '{n=NF; print $(n-2)"/"$(n-1)"/"$n}')
-            fi
-        fi
-        local curr=$(basename "$p")
-        p=$(dirname "$p")
-        local path_="${p//\//$wd_separator}$wd_separator\[\033[1m\]$curr"
-        if [[ "${p:0:1}" = '/' ]]; then
-            path_="/$path_"
-        fi
-    fi
-    segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " $path_ ")"
-    PS1+="$segment"
-    _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-}
-
-_trueline_bg_jobs_segment() {
-    # Note: We clear terminated foreground job information by first calling
-    # `jobs &>/dev/null' and then obtain the information of the currently running
-    # jobs by `jobs -p'.
-    local bg_jobs=$(
-        jobs &> /dev/null
-        jobs -p | wc -l | sed 's/^ *//'
-    )
-    if [[ ! "$bg_jobs" -eq 0 ]]; then
-        local fg_color="$1"
-        local bg_color="$2"
-        local font_style="$3"
-        local segment="$(_trueline_separator)"
-        segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " ${TRUELINE_SYMBOLS[bg_jobs]} $bg_jobs ")"
-        PS1+="$segment"
-        _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-    fi
-}
-
-_trueline_is_read_only() {
-    if [[ ! -w $PWD ]]; then
-        echo 'read_only'
-    fi
-}
-_trueline_read_only_segment() {
-    local read_only="$(_trueline_is_read_only)"
-    if [[ -n $read_only ]]; then
-        local fg_color="$1"
-        local bg_color="$2"
-        local font_style="$3"
-        local segment="$(_trueline_separator)"
-        segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " ${TRUELINE_SYMBOLS[read_only]} ")"
-        PS1+="$segment"
-        _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-    fi
-}
-
-_trueline_exit_status_segment() {
-    if [[ "$_exit_status" != 0 ]]; then
-        local fg_color="$1"
-        local bg_color="$2"
-        local font_style="$3"
-        local segment="$(_trueline_separator)"
-        segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" "${TRUELINE_SYMBOLS[exit_status]} $_exit_status ")"
-        PS1+="$segment"
-        _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-    fi
-}
-
-_trueline_newline_segment() {
-    local fg_color="$1"
-    local bg_color="$2"
-    local font_style="$3"
-    local is_root="$(_trueline_is_root)"
-    local newline_symbol="${TRUELINE_SYMBOLS[newline]}"
-    if [[ -n "$is_root" ]]; then
-        local newline_symbol="${TRUELINE_SYMBOLS[newline_root]}"
-    fi
-    local segment="$(_trueline_separator default_bg)"
-    segment+="\n"
-    segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" "$newline_symbol")"
-    PS1+="$segment"
-    _trueline_record_colors "$fg_color" "$bg_color" "$font_style" true
-}
-
-_trueline_vimode_cursor_shape() {
-    shape="$1"
-    case "$shape" in
-        under)
-            cursor_parameter=4
-            ;;
-        vert)
-            cursor_parameter=6
-            ;;
-        **)
-            cursor_parameter=2
-            ;;
-    esac
-    # shellcheck disable=SC2028
-    echo "\1\e[$cursor_parameter q\2"
-}
-_trueline_vimode_segment() {
-    if [[ "$TRUELINE_SHOW_VIMODE" = true ]]; then
-        if [[ ! -o vi ]]; then
-            set -o vi
-        fi
-
-        local seg_separator=${TRUELINE_SYMBOLS[segment_separator]}
-
-        bind "set show-mode-in-prompt on"
-        local vimode_ins_fg=${TRUELINE_VIMODE_INS_COLORS_STYLE[0]}
-        local vimode_ins_bg=${TRUELINE_VIMODE_INS_COLORS_STYLE[1]}
-        local vimode_ins_font_style=${TRUELINE_VIMODE_INS_COLORS_STYLE[2]}
-        local segment="$(_trueline_content "$vimode_ins_fg" "$vimode_ins_bg" "$vimode_ins_font_style" " ${TRUELINE_SYMBOLS[vimode_ins]} " "vi")"
-        segment+="$(_trueline_content "$vimode_ins_bg" "$_first_color_bg" bold "$seg_separator" "vi")"
-        segment+="$(_trueline_vimode_cursor_shape "$TRUELINE_VIMODE_INS_CURSOR")"
-        bind "set vi-ins-mode-string $segment"
-
-        local vimode_cmd_fg=${TRUELINE_VIMODE_CMD_COLORS_STYLE[0]}
-        local vimode_cmd_bg=${TRUELINE_VIMODE_CMD_COLORS_STYLE[1]}
-        local vimode_cmd_font_style=${TRUELINE_VIMODE_CMD_COLORS_STYLE[2]}
-        segment="$(_trueline_content "$vimode_cmd_fg" "$vimode_cmd_bg" "$vimode_cmd_font_style" " ${TRUELINE_SYMBOLS[vimode_cmd]} " "vi")"
-        segment+="$(_trueline_content "$vimode_cmd_bg" "$_first_color_bg" bold "$seg_separator" "vi")"
-        segment+="$(_trueline_vimode_cursor_shape "$TRUELINE_VIMODE_CMD_CURSOR")"
-        bind "set vi-cmd-mode-string $segment"
-
-        # Switch to block cursor before executing a command
-        bind -m vi-insert 'RETURN: "\e\n"'
-    else
-        bind "set show-mode-in-prompt off"
-    fi
-}
-
-_trueline_cmd_duration_segment() {
-
-    function _trueline_format_time {
-        local T=$1
-        local D=$((T / 60 / 60 / 24))
-        local H=$((T / 60 / 60 % 24))
-        local M=$((T / 60 % 60))
-        local S=$((T % 60))
-        local result=""
-
-        ((D > 0)) && result="${D}d "
-        ((H > 0)) && result="${result}${H}h "
-        ((M > 0)) && result="${result}${M}m "
-        ((S > 0)) && result="${result}${S}s "
-        echo -e "${result}" | sed -e 's/[[:space:]]*$//'
-    }
-
-    function _trueline_timestamp_cleanup() {
-        command rm -f "$TRUELINE_TIMESTAMP_FILE" 2> /dev/null
-    }
-
-    trap _trueline_timestamp_cleanup EXIT
-
-    # PS0 gets expanded after a command is read (just before execution)
-    TRUELINE_TIMESTAMP_FILE="/tmp/trueline.user-${USER}.pid-$$.timestamp"
-    # shellcheck disable=SC2034,SC2016
-    PS0='$(date +%s > "$TRUELINE_TIMESTAMP_FILE")'
-
-    local duration=0
-    if [ -e "$TRUELINE_TIMESTAMP_FILE" ]; then
-        local end=$(date +%s)
-        local start=$(cat "$TRUELINE_TIMESTAMP_FILE")
-        duration="$((end - start))"
-        _trueline_timestamp_cleanup
-    fi
-
-    if ((duration > 0)); then
-        local fg_color="$1"
-        local bg_color="$2"
-        local font_style="$3"
-        local segment="$(_trueline_separator)"
-        local elapsed="$(_trueline_format_time duration)"
-        segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " ${TRUELINE_SYMBOLS[timer]}$elapsed ")"
-        PS1+="$segment"
-        _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-    fi
-}
-
-_trueline_distro_icon_segment() {
-    case "$(grep ^ID= /etc/os-release)" in
-        *ubuntu*) distro_icon=" " ;;
-        *fedora*) distro_icon=" " ;;
-        *debian*) distro_icon=" " ;;
-        *arch*) distro_icon=" " ;;
-        *) distro_icon="${TRUELINE_SYMBOLS[distro_icon]} " ;;
-    esac
-
-    local fg_color="$1"
-    local bg_color="$2"
-    local font_style="$3"
-    local segment="$(_trueline_separator)"
-    segment+="$(_trueline_content "$fg_color" "$bg_color" "$font_style" " $distro_icon ")"
-    PS1+="$segment"
-    _trueline_record_colors "$fg_color" "$bg_color" "$font_style"
-}
-
-#-------------+
-# PS1 and PS2 |
-#-------------+
-_trueline_continuation_prompt() {
-    PS2=$(_trueline_content "$_first_color_fg" "$_first_color_bg" "$_first_font_style" " ${TRUELINE_SYMBOLS[ps2]} ")
-    PS2+=$(_trueline_content "$_first_color_bg" default_bg bold "${TRUELINE_SYMBOLS[segment_separator]} ")
-}
-
-_trueline_prompt_command() {
-    local _exit_status="$?"
-    PS1=""
-
-    local segment_def=
-    for segment_def in "${TRUELINE_SEGMENTS[@]}"; do
-        local segment_name=$(echo "$segment_def" | cut -d ',' -f1)
-        local segment_fg=$(echo "$segment_def" | cut -d ',' -f2)
-        local segment_bg=$(echo "$segment_def" | cut -d ',' -f3)
-        local font_style=$(echo "$segment_def" | cut -d ',' -f4)
-        # Note: we cannot call within a subshell because global variables
-        # (such as _last_color) won't be passed along
-        '_trueline_'"$segment_name"'_segment' "$segment_fg" "$segment_bg" "$font_style"
-    done
-
-    _trueline_vimode_segment
-    PS1+=$(_trueline_content "$_last_color" default_bg bold "${TRUELINE_SYMBOLS[segment_separator]}")
-    PS1+=" " # non-breakable space
-    _trueline_continuation_prompt
-
-    unset _first_color_fg
-    unset _first_color_bg
-    unset _first_font_style
-    unset _last_color
-
-    # Note: we reset the exit status to the original value for the subsequent
-    # commands in PROMPT_COMMAND.
-    return "$_exit_status"
-}
-
-#---------------+
-# Configuration |
-#---------------+
-declare -A TRUELINE_COLORS_DEFAULT=(
-    [black]='36;39;46'        #24272e
-    [cursor_grey]='40;44;52'  #282c34
-    [green]='152;195;121'     #98c379
-    [grey]='171;178;191'      #abb2bf
-    [light_blue]='97;175;239' #61afef
-    [mono]='130;137;151'      #828997
-    [orange]='209;154;102'    #d19a66
-    [purple]='198;120;221'    #c678dd
-    [red]='224;108;117'       #e06c75
-    [special_grey]='59;64;72' #3b4048
-    [white]='208;208;208'     #d0d0d0
-)
-if [[ "${#TRUELINE_COLORS[@]}" -eq 0 ]]; then
-    declare -A TRUELINE_COLORS=()
-fi
-for i in "${!TRUELINE_COLORS_DEFAULT[@]}"; do
-    if [[ ! "${TRUELINE_COLORS["$i"]+exists}" ]]; then
-        TRUELINE_COLORS["$i"]="${TRUELINE_COLORS_DEFAULT["$i"]}"
-    fi
-done
-unset TRUELINE_COLORS_DEFAULT
-
-if [[ "${#TRUELINE_SEGMENTS[@]}" -eq 0 ]]; then
-    declare -a TRUELINE_SEGMENTS=(
-        'user,black,white,bold'
-        'aws_profile,black,orange,bold'
-        'venv,black,purple,bold'
-        'conda_env,black,purple,bold'
-        'git,grey,special_grey,normal'
-        'working_dir,mono,cursor_grey,normal'
-        'read_only,black,orange,bold'
-        'bg_jobs,black,orange,bold'
-        'exit_status,black,red,bold'
-        # 'cmd_duration,black,grey,normal'
-        # 'newline,black,orange,bold'
-        # 'distro_icon,black,green,normal'
-    )
-fi
-
-declare -A TRUELINE_SYMBOLS_DEFAULT=(
-    [aws_profile]=''
-    [bg_jobs]=''
-    [distro_icon]=' '
-    [exit_status]=' '
-    [git_ahead]=''
-    [git_behind]=''
-    [git_bitbucket]=''
-    [git_branch]=''
-    [git_github]=''
-    [git_gitlab]=''
-    [git_modified]=''
-    [newline]='  '
-    [newline_root]='  '
-    [ps2]='...'
-    [read_only]=''
-    [segment_separator]=''
-    [ssh]='󰌘'
-    [timer]='󰔟'
-    [venv]=''
-    [vimode_cmd]='N'
-    [vimode_ins]='I'
-    [working_dir_folder]=''
-    [working_dir_home]=''
-    [working_dir_separator]=''
-)
-if [[ "${#TRUELINE_SYMBOLS[@]}" -eq 0 ]]; then
-    declare -A TRUELINE_SYMBOLS=()
-fi
-for i in "${!TRUELINE_SYMBOLS_DEFAULT[@]}"; do
-    if [[ ! "${TRUELINE_SYMBOLS["$i"]+exists}" ]]; then
-        TRUELINE_SYMBOLS["$i"]="${TRUELINE_SYMBOLS_DEFAULT["$i"]}"
-    fi
-done
-unset TRUELINE_SYMBOLS_DEFAULT
-
-# Vimode
-if [[ -z "$TRUELINE_SHOW_VIMODE" ]]; then
-    TRUELINE_SHOW_VIMODE=false
-fi
-if [[ -z "$TRUELINE_VIMODE_INS_COLORS_STYLE" ]]; then
-    TRUELINE_VIMODE_INS_COLORS_STYLE=('black' 'light_blue' 'bold')
-fi
-if [[ -z "$TRUELINE_VIMODE_CMD_COLORS_STYLE" ]]; then
-    TRUELINE_VIMODE_CMD_COLORS_STYLE=('black' 'green' 'bold')
-fi
-if [[ -z "$TRUELINE_VIMODE_INS_CURSOR" ]]; then
-    TRUELINE_VIMODE_INS_CURSOR='vert'
-fi
-if [[ -z "$TRUELINE_VIMODE_CMD_CURSOR" ]]; then
-    TRUELINE_VIMODE_CMD_CURSOR='block'
-fi
-
-# Git
-if [[ -z "$TRUELINE_GIT_SHOW_STATUS_NUMBERS" ]]; then
-    TRUELINE_GIT_SHOW_STATUS_NUMBERS=true
-fi
-if [[ -z "$TRUELINE_GIT_MODIFIED_COLOR" ]]; then
-    TRUELINE_GIT_MODIFIED_COLOR='red'
-fi
-if [[ -z "$TRUELINE_GIT_BEHIND_AHEAD_COLOR" ]]; then
-    TRUELINE_GIT_BEHIND_AHEAD_COLOR='purple'
-fi
-
-# User
-if [[ -z "$TRUELINE_USER_ROOT_COLORS" ]]; then
-    TRUELINE_USER_ROOT_COLORS=('black' 'red')
-fi
-if [[ -z "$TRUELINE_USER_SHOW_IP_SSH" ]]; then
-    TRUELINE_USER_SHOW_IP_SSH=false
-fi
-if [[ -z "$TRUELINE_USER_ALWAYS_SHOW_HOSTNAME" ]]; then
-    TRUELINE_USER_ALWAYS_SHOW_HOSTNAME=false
-fi
-if [[ -z "$TRUELINE_USER_SHORTEN_HOSTNAME" ]]; then
-    TRUELINE_USER_SHORTEN_HOSTNAME=false
-fi
-
-# Working dir
-if [[ -z "$TRUELINE_WORKING_DIR_SPACE_BETWEEN_PATH_SEPARATOR" ]]; then
-    TRUELINE_WORKING_DIR_SPACE_BETWEEN_PATH_SEPARATOR=true
-
-fi
-if [[ -z "$TRUELINE_WORKING_DIR_ABBREVIATE_PARENT_DIRS" ]]; then
-    TRUELINE_WORKING_DIR_ABBREVIATE_PARENT_DIRS=false
-fi
-if [[ -z "$TRUELINE_WORKING_DIR_ABBREVIATE_PARENT_DIRS_LENGTH" ]]; then
-    TRUELINE_WORKING_DIR_ABBREVIATE_PARENT_DIRS_LENGTH=1
-fi
-
-#----------------+
-# PROMPT_COMMAND |
-#----------------+
-if ((BASH_VERSINFO[0] > 5 || BASH_VERSINFO[0] == 5 && BASH_VERSINFO[1] >= 1)); then
-    # Bash 5.1 and above supports the PROMPT_COMMAND array
-    PROMPT_COMMAND=${PROMPT_COMMAND-}
-    PROMPT_COMMAND+=(_trueline_prompt_command)
-else
-    # shellcheck disable=SC2128,SC2178
-    PROMPT_COMMAND="_trueline_prompt_command${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
-fi
+<div id="overlay-blockthis-wrapper" style="display: none;">
+<div id="overlay-blockthis">
+<div class="as-h2 title">Thanks for helping keep SourceForge clean.</div>
+<a href="#" id="btn-blockthis-close">X</a>
+<form class="dropzone small-12" action="/api/instrumentation/gpt" id="blockthisForm" method="POST">
+<div class="row small-12">
+<div class="column description small-12">
+<input type="hidden" name="_visit_cookie" value="170e24ac-e13d-4ae7-9c1f-43a9cff4ba21" />
+<input type="hidden" name="timestamp" value="1716284983" />
+<input type="hidden" name="spinner" value="XMbLZYPeRSJLk:_A0lly4Pxt_OaQ" />
+<p class="w656a267fd5c8c6761a6447eb47d505a58b79297b"><label for="XNsOawrYOwpLDqHjCogsLw6DDq8KLdGPDu8KSZx4A">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XNsOawrYOwpLDqHjCogsLw6DDq8KLdGPDu8KSZx4A" name="XN8OawrYOwpLDqHh9FMOrLynCvsKHfMK2A1jCncKC" type="text" /></p>
+<p class="w656a267fd5c8c6761a6447eb47d505a58b79297b"><label for="XNsOawrYOwpLDqHjCowsLw6DDq8KLdGPDu8KSZx4A">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XNsOawrYOwpLDqHjCowsLw6DDq8KLdGPDu8KSZx4A" name="XN8OawrYOwpLDqHl9FMOrLynCvsKHfMK2A1jCncKC" type="text" /></p>
+Briefly describe the problem (required):
+<input name="XOsOWwrwTwpTDoyHDosKQwpLCn1p5wqzCqMOgBlfDomA" type="text" required>
+</div>
+</div>
+<div class="column small-12">
+<div class="upload-text">Upload screenshot of ad (required):</div>
+<div id="upload-it">
+<a href="#" id="upload-select-file">Select a file</a>, or drag & drop file here.
+</div>
+<div id="upload-it-placeholder"></div>
+<div class="dropzone-previews" style="display: none"></div>
+<div class="dz-message" style="display: none"></div>
+<div id="dropzone-preview-template" style="display: none">
+<div class="dz-preview dz-file-preview">
+<img data-dz-thumbnail src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt />
+<div class="dz-success-mark"><span>✔</span></div>
+<div class="dz-error-mark"><span>✘</span></div>
+<div class="dz-error-message"><span data-dz-errormessage></span></div>
+</div>
+</div>
+</div>
+<div class="column small-12">
+<u>Screenshot instructions:</u>
+</div>
+<div class="row small-12">
+<div class="column large-5 small-6">
+<p>
+<u>Click URL instructions:</u><br>
+Right-click on the ad, choose "Copy Link", then paste here &rarr;<br>
+(This may not be possible with some types of ads)
+</p>
+<a class="more-info" href="https://sourceforge.net/p/forge/documentation/Report%20a%20problem%20with%20Ad%20content/" target="_blank">More information about our ad policies</a>
+</div>
+<div class="column large-7 small-6">
+<p>Ad destination/click URL:
+<input name="XOMORwrUJwpTDuhfDp8KWwpcfw4TChsKDwqUXw4DCu8Kwwrw" type="url" required>
+</p>
+<textarea id="gpt-info" name="XNcOWwrgUwpZ:wrjCgjvDpsOYw69Sw5XCoBjCv1nDgSE"></textarea>
+<input class="button" type="submit" id="btn-blockthis-submit" value="Submit Report">
+</div>
+</div>
+</form>
+</div>
+</div>
+</body>
+</html>
