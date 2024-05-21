@@ -5,4 +5,6 @@
     "Ctrl-q":         "NextSplit",
     "Ctrl-h": "None",
     "Ctrl-r": "command-edit:replace",
+    "Ctrl-Alt-v": "VSplit",
+    "Ctrl-Alt-h": "HSplit",        
 }
