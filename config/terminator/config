@@ -5,7 +5,7 @@
   tab_position = hidden
   title_hide_sizetext = True
   title_use_system_font = False
-  title_font = Hack Nerd Font Bold 9
+  title_font = Hack Nerd Font 9
 [keybindings]
   go_up = <Primary>Up
   go_down = <Primary>Down
@@ -25,6 +25,7 @@
     scrollback_lines = 10000
     palette = "#000000:#cd0000:#00cd00:#cdcd00:#1c71d8:#cd00cd:#00cdcd:#faebd7:#404040:#ff0000:#00ff00:#e5a50a:#1a5fb4:#ff00ff:#00ffff:#ffffff"
     use_system_font = False
+    copy_on_selection = True
 [layouts]
   [[default]]
     [[[window0]]]
@@ -33,4 +34,5 @@
     [[[child1]]]
       type = Terminal
       parent = window0
+      profile = default
 [plugins]
