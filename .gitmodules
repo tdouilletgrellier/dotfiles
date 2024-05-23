@@ -10,9 +10,6 @@
 [submodule "config/fzf-git"]
 	path = config/fzf-git
 	url = https://github.com/junegunn/fzf-git.sh
-[submodule "config/NvChad"]
-	path = config/NvChad
-	url = https://github.com/NvChad/starter
 [submodule "config/bash-completion"]
 	path = config/bash-completion
 	url = https://github.com/scop/bash-completion
