@@ -133,9 +133,9 @@ return {
     "jubnzv/virtual-types.nvim",
     event = "LspAttach",
   },
-
+  
   {
-    "rafamadriz/neon"
+    "ray-x/aurora"
   },
 
 }
