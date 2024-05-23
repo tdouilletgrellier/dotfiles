@@ -135,7 +135,7 @@ return {
   },
 
   {
-    "iagorrr/noctishc.nvim"
+    "rafamadriz/neon"
   },
 
 }
