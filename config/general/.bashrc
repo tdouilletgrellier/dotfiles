@@ -6414,17 +6414,6 @@ elif [[ -f /usr/share/bashmarks/bashmarks.sh ]]; then
 fi
 
 #######################################################
-# Zoxide is a smarter cd command (inspired by z and autojump)
-# Link: https://github.com/ajeetdsouza/zoxide
-# Install: curl -sS https://webinstall.dev/zoxide | bash
-#######################################################
-
-# If Zoxide is installed, run it's initialization
-if cmd-exists --strict zoxide; then
-	eval "$(zoxide init bash)"
-fi
-
-#######################################################
 # commacd Improved cd
 # Link: https://github.com/shyiko/commacd
 # Install: curl -sSL https://github.com/shyiko/commacd/raw/v1.0.0/commacd.sh -o ~/.commacd.sh
@@ -7636,4 +7625,15 @@ if [[ $TILIX_ID ]] || [[ $VTE_VERSION ]]; then
 	if [[ -f /etc/profile.d/vte.sh ]]; then
 		source /etc/profile.d/vte.sh
 	fi
+fi
+
+#######################################################
+# Zoxide is a smarter cd command (inspired by z and autojump)
+# Link: https://github.com/ajeetdsouza/zoxide
+# Install: curl -sS https://webinstall.dev/zoxide | bash
+#######################################################
+
+# If Zoxide is installed, run it's initialization
+if cmd-exists --strict zoxide; then
+	eval "$(zoxide init bash)"
 fi
