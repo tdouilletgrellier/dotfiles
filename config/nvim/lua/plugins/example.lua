@@ -1,6 +1,6 @@
 return {
 
-    {
+  {
     "mcauley-penney/visual-whitespace.nvim",
     event = "ModeChanged",
     opts = {
@@ -15,42 +15,42 @@ return {
     "RRethy/vim-illuminate",
     event = "CursorHold",
     config = function()
-      require("illuminate").configure {
+      require("illuminate").configure({
         providers = {
           "lsp",
           "treesitter",
           "regex",
         },
         under_cursor = false,
-      }
+      })
     end,
   },
 
   {
     "kdheepak/lazygit.nvim",
-     cmd = {
-       "LazyGit",
-       "LazyGitConfig",
-       "LazyGitCurrentFile",
-       "LazyGitFilter",
-       "LazyGitFilterCurrentFile",
-     },
-     -- optional for floating window border decoration
-     dependencies = {
-       "nvim-lua/plenary.nvim",
-     },
-     -- setting the keybinding for LazyGit with 'keys' is recommended in
-     -- order to load the plugin when the command is run for the first time
-     keys = {
-       { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
-    }
-  }, 
+    cmd = {
+      "LazyGit",
+      "LazyGitConfig",
+      "LazyGitCurrentFile",
+      "LazyGitFilter",
+      "LazyGitFilterCurrentFile",
+    },
+    -- optional for floating window border decoration
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    -- setting the keybinding for LazyGit with 'keys' is recommended in
+    -- order to load the plugin when the command is run for the first time
+    keys = {
+      { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
+    },
+  },
 
   {
     "hiphish/rainbow-delimiters.nvim",
     event = "BufReadPost",
     config = function()
-      local rainbow_delimiters = require "rainbow-delimiters"
+      local rainbow_delimiters = require("rainbow-delimiters")
 
       vim.g.rainbow_delimiters = {
         strategy = {
@@ -72,9 +72,9 @@ return {
         },
       }
     end,
-  },    
- 
-   {
+  },
+
+  {
     "tzachar/highlight-undo.nvim",
     event = "BufReadPost",
     opts = {},
@@ -88,30 +88,29 @@ return {
   {
     "NvChad/nvim-colorizer.lua",
     opts = {
-  filetypes = {
-    "*",
-    cmp_docs = { always_update = true },
-    cmp_menu = { always_update = true },
-  },
-  user_default_options = {
-    names = false,
-    RRGGBBAA = true,
-    rgb_fn = true,
-    tailwind = true,
-    RGB = true,
-    RRGGBB = true,
-    AARRGGBB = true,
-    hsl_fn = true,
-    css = true,
-    css_fn = true,
-    mode = "background",
-    sass = { enable = true, parsers = { "css" } },
-    mode = "background", -- Available methods are false / true / "normal" / "lsp" / "both"
-    virtualtext = "■",
-    always_update = true,
-  },
-}
-
+      filetypes = {
+        "*",
+        cmp_docs = { always_update = true },
+        cmp_menu = { always_update = true },
+      },
+      user_default_options = {
+        names = false,
+        RRGGBBAA = true,
+        rgb_fn = true,
+        tailwind = true,
+        RGB = true,
+        RRGGBB = true,
+        AARRGGBB = true,
+        hsl_fn = true,
+        css = true,
+        css_fn = true,
+        mode = "background",
+        sass = { enable = true, parsers = { "css" } },
+        mode = "background", -- Available methods are false / true / "normal" / "lsp" / "both"
+        virtualtext = "■",
+        always_update = true,
+      },
+    },
   },
   {
     "NStefan002/visual-surround.nvim",
@@ -123,9 +122,9 @@ return {
     "m-demare/hlargs.nvim",
     event = "BufWinEnter",
     config = function()
-      require("hlargs").setup {
+      require("hlargs").setup({
         hl_priority = 200,
-      }
+      })
     end,
   },
 
@@ -147,15 +146,95 @@ return {
         change = "_",
       },
     },
-  },      
+  },
 
   {
     "jubnzv/virtual-types.nvim",
     event = "LspAttach",
   },
-  
-  {
-    "ray-x/aurora"
-  },
 
+  {
+    "scottmckendry/cyberdream.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require("cyberdream").setup({
+        -- Enable transparent background
+        transparent = true,
+
+        -- Enable italics comments
+        italic_comments = true,
+
+        -- Replace all fillchars with ' ' for the ultimate clean look
+        hide_fillchars = true,
+
+        -- Modern borderless telescope theme
+        borderless_telescope = true,
+
+        -- Set terminal colors used in `:terminal`
+        terminal_colors = true,
+
+        theme = {
+          variant = "default", -- use "light" for the light variant
+          highlights = {
+            -- Highlight groups to override, adding new groups is also possible
+            -- See `:h highlight-groups` for a list of highlight groups or run `:hi` to see all groups and their current values
+
+            -- Example:
+            -- Comment = { fg = "#696969", bg = "NONE", italic = true },
+
+            -- Complete list can be found in `lua/cyberdream/theme.lua`
+          },
+
+          -- Override a color entirely
+          colors = {
+            -- For a list of colors see `lua/cyberdream/colours.lua`
+            -- Example:
+            bg = "#000000",
+            green = "#00ff00",
+            magenta = "#ff00ff",
+            blue = "#4b69de",
+            grey = "#838b8b",
+            orange = "#ff4f00",
+            cyan = "#00ffff",
+            yellow = "#ffeb00",
+            purple = "#bf00ff",
+            pink = "#fd6c9e",
+            red = "#ff0000",
+            bgAlt = "#1e2124",
+            bgHighlight = "#3c4048",
+            fg = "#ffffff",
+            -- bg = "#16181a",
+            -- bgAlt = "#1e2124",
+            -- bgHighlight = "#3c4048",
+            -- fg = "#ffffff",
+            -- grey = "#7b8496",
+            -- blue = "#5ea1ff",
+            -- green = "#5eff6c",
+            -- cyan = "#5ef1ff",
+            -- red = "#ff6e5e",
+            -- yellow = "#f1ff5e",
+            -- magenta = "#ff5ef1",
+            -- pink = "#ff5ea0",
+            -- orange = "#ffbd5e",
+            -- purple = "#bd5eff",
+            -- bg = "#ffffff",
+            -- bgAlt = "#eaeaea",
+            -- bgHighlight = "#acacac",
+            -- fg = "#16181a",
+            -- grey = "#7b8496",
+            -- blue = "#0057d1",
+            -- green = "#008b0c",
+            -- cyan = "#008c99",
+            -- red = "#d11500",
+            -- yellow = "#997b00",
+            -- magenta = "#d100bf",
+            -- pink = "#f40064",
+            -- orange = "#d17c00",
+            -- purple = "#a018ff",   --
+          },
+        },
+      })
+    end,
+  },
 }

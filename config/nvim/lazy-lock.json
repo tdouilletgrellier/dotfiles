@@ -1,7 +1,6 @@
 {
   "LazyVim": { "branch": "main", "commit": "c6e8c5b45011210042e0791bd52baff8784ed26a" },
   "LuaSnip": { "branch": "master", "commit": "de1a287c9cb525ae52bc846e8f6207e5ef1da5ac" },
-  "aurora": { "branch": "master", "commit": "fe84aed4bcf6648381adbe1f81ccf3aec752fa45" },
   "bufferline.nvim": { "branch": "main", "commit": "73edc1f2732678e7a681e3d3be49782610914f6b" },
   "catppuccin": { "branch": "main", "commit": "d97387aea8264f484bb5d5e74f2182a06c83e0d8" },
   "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },
@@ -10,6 +9,7 @@
   "cmp_luasnip": { "branch": "master", "commit": "05a9ab28b53f71d1aece421ef32fee2cb857a843" },
   "conform.nvim": { "branch": "master", "commit": "f3b930db4964d60e255c8f9e37b7f2218dfc08cb" },
   "cutlass.nvim": { "branch": "main", "commit": "1ac7e4b53d79410be52a9e464d44c60556282b3e" },
+  "cyberdream.nvim": { "branch": "main", "commit": "17f9e55bd3c349006190e7ff8203c2af6b7e3051" },
   "dashboard-nvim": { "branch": "master", "commit": "5182c09ac8085dc73b78ad0ea9f5479c9a866fc4" },
   "dressing.nvim": { "branch": "master", "commit": "3c38ac861e1b8d4077ff46a779cde17330b29f3a" },
   "flash.nvim": { "branch": "main", "commit": "11a2e667d19d8f48c93c6ed2e2e525ac6b1b79be" },
