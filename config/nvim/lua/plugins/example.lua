@@ -133,7 +133,7 @@ return {
     keys = { "<leader>pj", "<leader>ph" },
   },
 
-  {
+--[[  {
     "gbprod/cutlass.nvim",
     event = "BufReadPost",
     opts = {
@@ -146,7 +146,7 @@ return {
         change = "_",
       },
     },
-  },
+  },]]
 
   {
     "jubnzv/virtual-types.nvim",

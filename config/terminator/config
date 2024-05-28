@@ -4,7 +4,7 @@
   borderless = True
   tab_position = hidden
   title_hide_sizetext = True
-  inactive_color_offset = 0.30039525691699603
+  inactive_color_offset = 0.7035573122529645
   title_use_system_font = False
   title_font = Hack Nerd Font 9
 [keybindings]

@@ -226,6 +226,16 @@ fi
 if [[ -f "/opt/sublime_text/sublime_text" ]]; then
 alias sublime_text='/opt/sublime_text/sublime_text'
 fi
+if [[ -f "${HOME}/paraview/bin/paraview" ]]; then
+alias paraview="${HOME}/paraview/bin/paraview &"
+fi
+if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
+alias epxenv="source ${HOME}/dev/epx/devtools/env.sh"
+epxenv
+fi
+if [[ -f "${HOME}/arm/forge/22.1.2/bin/ddt" ]]; then
+alias ddt="${HOME}/arm/forge/22.1.2/bin/ddt &"
+fi
 alias weather="proxy && curl wttr.in/?F"
 alias c='clear'                             # c:            Clear terminal display
 alias which='type -all'                     # which:        Find executables
@@ -247,13 +257,16 @@ elif cmd-exists --strict vi; then
   alias v='vi'
   alias svi='sudo vi'
 fi
+if cmd-exists --strict batcat; then
+alias bat='batcat --decorations=always --color=always'
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-# Fonction _exit
-BRed='\e[1;31m'         # Red
-NC="\e[m" 
-function _exit()              # Function to run upon exit of shell.
+# Exit message
+BRed='\e[1;31m' # Red
+NC="\e[m" # Normal color
+function _exit() # Function to run upon exit of shell.
 {
     #echo -e "${BRed}Hasta la vista, baby${NC}"
     echo -e '\e[m'
@@ -262,11 +275,16 @@ function _exit()              # Function to run upon exit of shell.
     echo -e "$BRed$(sparkbars)${NC}"
     echo -e '\e[m'
 }
+# If not running in nested shell, then show exit message :)
+if [[ "${SHLVL}" -lt 2 ]]; then
 trap _exit EXIT
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # Welcome message
+# If not running in nested shell, then show welcome message :)
+if [[ "${SHLVL}" -lt 2 ]]; then
 if [ -n "$SSH_CLIENT" ]; then
     if [ -z "${TMUX}" ]; then
       clear && printf '\e[3J' 
@@ -278,19 +296,6 @@ else
 clear && printf '\e[3J'  
 fi
 welcome
-# # Old Welcome message
-# if cmd-exists --strict toilet; then
-# BRed='\e[1;31m'         # Red
-# NC="\e[m"               # Color Reset
-# clear && printf '\e[3J'
-# echo -e '\e[1;32m'
-# toilet -Wf big ${USER} --filter border --export utf8
-# echo -e '\e[m'
-# echo -e "${BRed}$(date '+%A %d %B %Y -- %Hh%M' | toilet -f term -F border)${NC}\n"
-# else
-# clear && printf '\e[3J'
-# welcome
-# fi
 # Fortune message
 if cmd-exists --strict lolcat; then
 if [ -x /usr/games/fortune ]; then
@@ -304,6 +309,7 @@ else
     echo -e '\e[m'
     echo -e "$COLOR_S$(sparkbars)${NC}"
     fi
+fi
 fi
 #-------------------------------------------------------------
 
@@ -370,7 +376,7 @@ fi
 
 #-------------------------------------------------------------
 # Sync with cronos to back up my data
-#rsync -ravP ~/Documents/ f66379@cronos.hpc.edf.fr:/home/f66379/f66379/
+#rsync -ravP ~/Documents/ ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
