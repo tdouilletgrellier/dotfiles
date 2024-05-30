@@ -16,7 +16,7 @@
   full_screen = <Alt>Return
 [profiles]
   [[default]]
-    background_darkness = 0.9
+    background_darkness = 0.95
     background_type = transparent
     cursor_color = "#aaaaaa"
     font = Hack Nerd Font Mono 10
