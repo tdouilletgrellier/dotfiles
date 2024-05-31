@@ -154,6 +154,10 @@ return {
   },
 
   {
+  'sheerun/vim-polyglot'
+  },  
+
+  {
     "catppuccin/nvim",
     name = "catppuccin",
     priority = 1000,
