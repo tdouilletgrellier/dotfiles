@@ -20,11 +20,11 @@
     background_type = transparent
     cursor_color = "#aaaaaa"
     font = Hack Nerd Font Mono 10
-    foreground_color = "#00ff00"
+    foreground_color = "#3bcf1d"
     show_titlebar = False
     scrollbar_position = hidden
     scrollback_lines = 10000
-    palette = "#000000:#cd0000:#00cd00:#cdcd00:#1c71d8:#cd00cd:#00cdcd:#faebd7:#404040:#ff0000:#00ff00:#e5a50a:#1a5fb4:#ff00ff:#00ffff:#ffffff"
+    palette = "#2a2a2a:#ff0000:#79ff0f:#e7bf00:#386bd7:#b349be:#66ccff:#bbbbbb:#666666:#cd0000:#66ff66:#f3d64e:#709aed:#db67e6:#79dff2:#ffffff"
     use_system_font = False
     copy_on_selection = True
 [layouts]
