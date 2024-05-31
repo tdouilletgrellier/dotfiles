@@ -1,0 +1,31 @@
+git:
+  paging:
+    colorArg: always
+    pager: delta -s --dark --paging=never --24-bit-color=never
+
+gui:
+  nerdFontsVersion: "3"
+
+theme:
+  activeBorderColor:
+    - '#386bd7'
+    - bold
+  inactiveBorderColor:
+    - '#bbbbbb'
+  optionsTextColor:
+    - '#709aed'
+  selectedLineBgColor:
+    - '#2a2a2a'
+  cherryPickedCommitBgColor:
+    - '#666666'
+  cherryPickedCommitFgColor:
+    - '#66ccff'
+  unstagedChangesColor:
+    - '#cd0000'
+  defaultFgColor:
+    - '#79ff0f'
+  searchingActiveBorderColor:
+    - '#e7bf00'
+
+authorColors:
+  '*': '#db67e6'    

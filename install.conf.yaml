@@ -27,6 +27,12 @@
     #screen
     ~/.screenrc: config/ExtremeUltimateBashrc/support/_screenrc
 
+    #lazygit
+    ~/.config/lazygit: config/lazygit
+
+    #bpytop
+    ~/.config/bpytop: config/bpytop    
+
     #readline
     ~/.inputrc: config/ExtremeUltimateBashrc/support/_inputrc
 
@@ -56,7 +62,7 @@
     ~/.tmux/plugins/tpm: lib/tpm    
 
     #nvim
-    ~/.config/nvim: config/NvChad
+    ~/.config/nvim: config/nvim
 
     #bash-completion
     ~/.config/bash-completion: config/bash-completion
