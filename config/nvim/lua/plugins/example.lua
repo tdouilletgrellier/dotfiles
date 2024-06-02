@@ -154,8 +154,8 @@ return {
   },
 
   {
-  'sheerun/vim-polyglot'
-  },  
+    "sheerun/vim-polyglot",
+  },
 
   {
     "catppuccin/nvim",
@@ -285,7 +285,7 @@ return {
             bg = "#000000",
             bgAlt = "#2a2a2a",
             -- red2 = "#ff0000",
-            -- green2 = "#79ff0f",
+            green = "#79ff0f",
             yellow = "#e7bf00",
             blue = "#386bd7",
             -- purple2 = "#b349be",
@@ -293,7 +293,7 @@ return {
             grey = "#bbbbbb",
             bgHighlight = "#666666",
             red = "#cd0000",
-            green = "#66ff66",
+            -- green2 = "#66ff66",
             orange = "#f3d64e",
             -- blue3 = "#709aed",
             purple = "#db67e6",
@@ -335,7 +335,6 @@ return {
             -- bgAlt =  "#353576",
             -- -- From Palette 1
             -- bgHighlight =  "#1e2124",
-
           },
         },
       })
