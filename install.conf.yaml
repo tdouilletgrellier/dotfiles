@@ -79,6 +79,9 @@
     #sublime
     ~/.config/sublime-text: config/sublime-text
 
+    #conky
+    ~/.conkyrc: config/conky/.conkyrc    
+
     #tools
     ~/bin:
         path: utils/
