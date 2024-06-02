@@ -329,7 +329,7 @@ export HOSTFILE=$HOME/.hosts # Put a list of remote hosts in ~/.hosts
 
 #-------------------------------------------------------------
 # Bat theme
-export BAT_THEME=DarkNeon
+export BAT_THEME=base16
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -393,4 +393,3 @@ if [[ -f "${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/clear_color_spa
 	source ${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/clear_color_spark/tty_terminal_color_scheme
 fi
 #-------------------------------------------------------------
-
