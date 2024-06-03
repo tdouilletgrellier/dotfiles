@@ -52,6 +52,9 @@ conky.config = {
 	uppercase = false,
 };
 conky.text = [[
+
+${color6}${font Hack Nerd:size=20}${alignc}${time %H}:${time %M}${font}
+${color6}${font Hack Nerd:size=15}${alignc}${time %A} ${time %B} ${time %e}, ${time %Y}${font}${color}
 ${font sans-serif:bold:size=10}CPU ${hr 2}${font}${color2}
 ${font sans-serif:bold:size=7}${goto 30}CPU 1 ${goto 95}CPU 2${goto 160}CPU 3${goto 225}CPU 4
 ${voffset -3}${color3}${if_match ${cpu cpu1}>=70}${color8}${endif}${if_match ${cpu cpu1}>95}${color9}${endif}${goto 18}${cpugraph cpu1 13,50}${if_match ${cpu cpu2}>=70}${color8}${endif}${if_match ${cpu cpu2}>95}${color9}${endif}${goto 83}${cpugraph cpu2 13,50}${if_match ${cpu cpu3}>=70}${color8}${endif}${if_match ${cpu cpu3}>95}${color9}${endif}${goto 148}${cpugraph cpu3 13,50}${if_match ${cpu cpu4}>=70}${color8}${endif}${if_match ${cpu cpu4}>95}${color9}${endif}${goto 213}${cpugraph cpu4 13,50}
