@@ -59,6 +59,13 @@ conky.text = [[
 ${color6}${font Hack Nerd:size=20}${alignc}${time %H}:${time %M}${font}
 ${color6}${font Hack Nerd:size=15}${alignc}${time %A} ${time %B} ${time %e}, ${time %Y}${font}${color}
 ${font sans-serif:bold:size=10}CPU ${hr 2}${font}${color2}
+${font sans-serif:bold:size=8}CPU : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $1}'}${color2}
+${font sans-serif:bold:size=8}FREQUENCY : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $2}'}${color2}
+${font sans-serif:bold:size=8}CPU TEMP : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C / ${color3}${if_match ${hwmon 2 temp 1}>=70}${color8}${endif}${if_match ${hwmon 2 temp 1}>=90}${color9}${endif}${hwmon 2 temp 1}°C ${color2}
+${font sans-serif:bold:size=8}TOTAL CPU USAGE : ${color3}${cpu}%${color2}
+${font sans-serif:bold:size=8}CPU FREQUENCY : ${color3}${freq} MHz${color2}
+${font sans-serif:bold:size=8}FAN TEMP : ${color3}${acpitemp}°C${color2}
+
 ${font sans-serif:bold:size=7}${goto 30}CPU 1 ${goto 95}CPU 2${goto 160}CPU 3${goto 225}CPU 4
 ${voffset -3}${color3}${if_match ${cpu cpu1}>=70}${color8}${endif}${if_match ${cpu cpu1}>95}${color9}${endif}${goto 18}${cpugraph cpu1 13,50}${if_match ${cpu cpu2}>=70}${color8}${endif}${if_match ${cpu cpu2}>95}${color9}${endif}${goto 83}${cpugraph cpu2 13,50}${if_match ${cpu cpu3}>=70}${color8}${endif}${if_match ${cpu cpu3}>95}${color9}${endif}${goto 148}${cpugraph cpu3 13,50}${if_match ${cpu cpu4}>=70}${color8}${endif}${if_match ${cpu cpu4}>95}${color9}${endif}${goto 213}${cpugraph cpu4 13,50}
 ${voffset -3}${color3}${if_match ${cpu cpu1}>=70}${color8}${endif}${if_match ${cpu cpu1}>95}${color9}${endif}${font sans-serif:normal:size=8}${goto 35}${cpu cpu1}%${if_match ${cpu cpu2}>=70}${color8}${endif}${if_match ${cpu cpu2}>95}${color9}${endif}${goto 101}${cpu cpu2}%${if_match ${cpu cpu3}>=70}${color8}${endif}${if_match ${cpu cpu3}>95}${color9}${endif}${goto 165}${cpu cpu3}%${if_match ${cpu cpu4}>=70}${color8}${endif}${if_match ${cpu cpu4}>95}${color9}${endif}${goto 230}${cpu cpu4}%${color2}
@@ -82,14 +89,7 @@ ${font sans-serif:bold:size=7}CPU 7${goto 50}${color6}${cpubar cpu7 9, 80}${goto
 ${font sans-serif:bold:size=7}CPU 9${goto 50}${color6}${cpubar cpu9 9, 80}${goto 155}${color2}CPU 10${color6}${goto 200}${cpubar cpu10 9, 80}${color2}
 ${font sans-serif:bold:size=7}CPU 11${goto 50}${color6}${cpubar cpu11 9, 80}${goto 155}${color2}CPU 12${color6}${goto 200}${cpubar cpu12 9, 80}${color2}
 ${font sans-serif:bold:size=7}CPU 13${goto 50}${color6}${cpubar cpu13 9, 80}${goto 155}${color2}CPU 14${color6}${goto 200}${cpubar cpu14 9, 80}${color2}
-${font sans-serif:bold:size=7}CPU 15${goto 50}${color6}${cpubar cpu15 9, 80}${goto 155}${color2}CPU 16${color6}${goto 200}${cpubar cpu16 9, 80}${color2}
-
-${font sans-serif:bold:size=8}${alignc}${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//'}${color2}
-
-${font sans-serif:bold:size=8}CPU TEMP : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C  ${color3}${if_match ${hwmon 2 temp 1}>=70}${color8}${endif}${if_match ${hwmon 2 temp 1}>=90}${color9}${endif}${hwmon 2 temp 1}°C  ${color3}${if_match ${hwmon 4 temp 1}>=70}${color8}${endif}${if_match ${hwmon 4 temp 1}>=90}${color9}${endif}${hwmon 4 temp 1}°C  ${color2}
-${font sans-serif:bold:size=8}TOTAL CPU USAGE : ${alignr}${color3}${cpu}% ${color6}${cpubar 9, 120}${color2}
-${font sans-serif:bold:size=8}CPU FREQUENCY : ${color3}${freq} MHz${color2}
-${font sans-serif:bold:size=8}FAN TEMP : ${color3}${acpitemp}°C${color}
+${font sans-serif:bold:size=7}CPU 15${goto 50}${color6}${cpubar cpu15 9, 80}${goto 155}${color2}CPU 16${color6}${goto 200}${cpubar cpu16 9, 80}${color}
 
 ${font sans-serif:bold:size=10}MEMORY ${hr 2}${font}${color2}
 ${font sans-serif:bold:size=8}RAM : ${color3}${mem} / ${memmax}${alignr}${memperc}% ${membar 7, 70}${color2}
@@ -101,12 +101,11 @@ ${font sans-serif:bold:size=8}Free : ${color3}${fs_free}${color2}
 ${font sans-serif:bold:size=8}Type : ${color3}${fs_type}${color}
 
 ${font sans-serif:bold:size=10}SYSTEM ${hr 2}${font}${color2}
-${font sans-serif:bold:size=8}INFO : ${color3}${sysname} ${distribution} ${machine} ${kernel}${color2}
+${font sans-serif:bold:size=8}OS : ${color3}${execi 86400 cat /etc/*-release | grep 'NAME' | awk -F '=' 'NR==1 {print $2}' | tr -d '"'}${color2}
+${font sans-serif:bold:size=8}SHELL : ${color3}${exec gnome-shell --version}${color2}
+${font sans-serif:bold:size=8}KERNEL : ${color3}${kernel}${color2}
 ${font sans-serif:bold:size=8}BATTERY : ${color3}${uppercase ${battery_status}}${color3} ${alignr}${battery_percent}% ${if_match ${battery_percent}<=20}${color9}${endif}${if_match ${battery_percent}>20}${color8}${endif}${if_match ${battery_percent}>80}${color #00BB00}${endif}${if_match "${battery_status}"=="charged"}${color #00CCFF}${endif} ${battery_bar 9, 100}${color2}
-${font sans-serif:bold:size=8}LANGUAGE : ${color3}${keyboard_layout}${color2}
-${font sans-serif:bold:size=8}UPTIME : ${color3}${uptime}${color2}
-${font sans-serif:bold:size=8}Desktop : ${color3}${desktop}/${desktop_number} ${color2}
-${font sans-serif:bold:size=8}Monitors : ${color3}${monitor_number}${color}
+${font sans-serif:bold:size=8}UPTIME : ${color3}${uptime}${color}
 
 ${font sans-serif:bold:size=10}PROCESSES ${hr 2}${font}${color2}
 ${font sans-serif:bold:size=8}AMOUNT : ${color3}${execi 1000 ps aux | wc -l}${color2}${alignr}TOTAL THREADS : ${color3}${threads}${color}
