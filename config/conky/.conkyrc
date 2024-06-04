@@ -86,7 +86,7 @@ ${font sans-serif:bold:size=7}CPU 15${goto 50}${color6}${cpubar cpu15 9, 80}${go
 
 ${font sans-serif:bold:size=8}${alignc}${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//'}${color2}
 
-${font sans-serif:bold:size=8}CPU TEMP : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C  ${color3}${if_match ${hwmon 2 temp 1}>=70}${color8}${endif}${if_match ${hwmon 2 temp 1}>=90}${color9}${endif}${hwmon 2 temp 1}°C  ${color3}${if_match ${hwmon 4 temp 1}>=70}${color8}${endif}${if_match ${hwmon 4 temp 1}>=90}${color9}${endif}${hwmon 4 temp 1}°C  ${color3}
+${font sans-serif:bold:size=8}CPU TEMP : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C  ${color3}${if_match ${hwmon 2 temp 1}>=70}${color8}${endif}${if_match ${hwmon 2 temp 1}>=90}${color9}${endif}${hwmon 2 temp 1}°C  ${color3}${if_match ${hwmon 4 temp 1}>=70}${color8}${endif}${if_match ${hwmon 4 temp 1}>=90}${color9}${endif}${hwmon 4 temp 1}°C  ${color2}
 ${font sans-serif:bold:size=8}TOTAL CPU USAGE : ${alignr}${color3}${cpu}% ${color6}${cpubar 9, 120}${color2}
 ${font sans-serif:bold:size=8}CPU FREQUENCY : ${color3}${freq} MHz${color2}
 ${font sans-serif:bold:size=8}FAN TEMP : ${color3}${acpitemp}°C${color}
