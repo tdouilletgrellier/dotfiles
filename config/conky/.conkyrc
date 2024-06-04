@@ -63,7 +63,6 @@ ${font sans-serif:bold:size=8}MODEL : ${color3}${execi 1000 grep model /proc/cpu
 ${font sans-serif:bold:size=8}CLOCK RATE : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $2}'}${color2}
 ${font sans-serif:bold:size=8}TEMP. : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C / ${color3}${if_match ${hwmon 2 temp 1}>=70}${color8}${endif}${if_match ${hwmon 2 temp 1}>=90}${color9}${endif}${hwmon 2 temp 1}°C ${color2}
 ${font sans-serif:bold:size=8}TOTAL USAGE : ${color3}${cpu}%${color2}
-${font sans-serif:bold:size=8}FREQ. : ${color3}${freq}MHz${color2}
 ${font sans-serif:bold:size=8}FAN TEMP : ${color3}${acpitemp}°C${color2}
 
 ${font sans-serif:bold:size=7}${goto 30}CPU 1 ${goto 95}CPU 2${goto 160}CPU 3${goto 225}CPU 4
@@ -96,20 +95,21 @@ ${font sans-serif:bold:size=8}RAM : ${color3}${mem} / ${memmax}${alignr}${memper
 ${font sans-serif:bold:size=8}SWAP : ${color3}${swap} / ${swapmax}${alignr}${swapperc}% ${swapbar 7, 70}${color}
 
 ${font sans-serif:bold:size=10}STORAGE ${hr 2}${font}${color2}
-${font sans-serif:bold:size=8}USED : ${color3}${fs_used} / ${fs_size} ${alignr}${fs_used_perc}% ${fs_bar 7, 70}${color2}
-${font sans-serif:bold:size=8}FREE : ${color3}${fs_free}${color2}
-${font sans-serif:bold:size=8}TYPE : ${color3}${fs_type}${color}
+${font sans-serif:bold:size=8}USED / : ${color3}${fs_used /home/f66379/} / ${fs_size /home/f66379/} ${alignr}${fs_used_perc /home/f66379/}% ${fs_bar 7, 70}${color2}
+${font sans-serif:bold:size=8}FREE / : ${color3}${fs_free /home/f66379/}${color2}
+${font sans-serif:bold:size=8}TYPE : ${color3}${fs_type /home/f66379/}${color}
 
 ${font sans-serif:bold:size=10}SYSTEM ${hr 2}${font}${color2}
 ${font sans-serif:bold:size=8}OS : ${color3}${execi 86400 cat /etc/*-release | grep 'NAME' | awk -F '=' 'NR==1 {print $2}' | tr -d '"'}${color2}
 ${font sans-serif:bold:size=8}SHELL : ${color3}${exec gnome-shell --version}${color2}
 ${font sans-serif:bold:size=8}KERNEL : ${color3}${kernel}${color2}
+${font sans-serif:bold:size=8}MACHINE : ${color3}${machine}${color2}
 ${font sans-serif:bold:size=8}BATTERY : ${color3}${uppercase ${battery_status}}${color3} ${alignr}${battery_percent}% ${if_match ${battery_percent}<=20}${color9}${endif}${if_match ${battery_percent}>20}${color8}${endif}${if_match ${battery_percent}>80}${color #00BB00}${endif}${if_match "${battery_status}"=="charged"}${color #00CCFF}${endif} ${battery_bar 9, 100}${color2}
 ${font sans-serif:bold:size=8}UPTIME : ${color3}${uptime}${color}
 
 ${font sans-serif:bold:size=10}PROCESSES ${hr 2}${font}${color2}
 ${font sans-serif:bold:size=8}AMOUNT : ${color3}${execi 1000 ps aux | wc -l}${color2}${alignr}TOTAL THREADS : ${color3}${threads}${color}
-${font sans-serif:bold:size=8}${color3}NAME ${alignr} PID     CPU      MEM  ${font sans-serif:bold:size=8}${color3}
+${font sans-serif:bold:size=8}${color2}NAME ${alignr} PID     CPU      MEM  ${font sans-serif:bold:size=8}${color2}
 ${voffset -4}${hr 1}${color4}
 ${top name 1} $alignr ${top pid 1} ${top cpu 1}% ${top mem 1}%${color6}
 ${top name 2} $alignr ${top pid 2} ${top cpu 2}% ${top mem 2}%${color4}
