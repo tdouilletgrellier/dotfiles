@@ -59,11 +59,11 @@ conky.text = [[
 ${color6}${font Hack Nerd:size=20}${alignc}${time %H}:${time %M}${font}
 ${color6}${font Hack Nerd:size=15}${alignc}${time %A} ${time %B} ${time %e}, ${time %Y}${font}${color}
 ${font sans-serif:bold:size=10}CPU ${hr 2}${font}${color2}
-${font sans-serif:bold:size=8}CPU : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $1}'}${color2}
-${font sans-serif:bold:size=8}FREQUENCY : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $2}'}${color2}
-${font sans-serif:bold:size=8}CPU TEMP : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C / ${color3}${if_match ${hwmon 2 temp 1}>=70}${color8}${endif}${if_match ${hwmon 2 temp 1}>=90}${color9}${endif}${hwmon 2 temp 1}°C ${color2}
-${font sans-serif:bold:size=8}TOTAL CPU USAGE : ${color3}${cpu}%${color2}
-${font sans-serif:bold:size=8}CPU FREQUENCY : ${color3}${freq} MHz${color2}
+${font sans-serif:bold:size=8}MODEL : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $1}'}${color2}
+${font sans-serif:bold:size=8}CLOCK RATE : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $2}'}${color2}
+${font sans-serif:bold:size=8}TEMP. : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C / ${color3}${if_match ${hwmon 2 temp 1}>=70}${color8}${endif}${if_match ${hwmon 2 temp 1}>=90}${color9}${endif}${hwmon 2 temp 1}°C ${color2}
+${font sans-serif:bold:size=8}TOTAL USAGE : ${color3}${cpu}%${color2}
+${font sans-serif:bold:size=8}FREQ. : ${color3}${freq}MHz${color2}
 ${font sans-serif:bold:size=8}FAN TEMP : ${color3}${acpitemp}°C${color2}
 
 ${font sans-serif:bold:size=7}${goto 30}CPU 1 ${goto 95}CPU 2${goto 160}CPU 3${goto 225}CPU 4
