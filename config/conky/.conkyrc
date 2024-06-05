@@ -95,15 +95,15 @@ ${font sans-serif:bold:size=8}RAM : ${color3}${mem} / ${memmax}${alignr}${memper
 ${font sans-serif:bold:size=8}SWAP : ${color3}${swap} / ${swapmax}${alignr}${swapperc}% ${swapbar 7, 70}${color}
 
 ${font sans-serif:bold:size=10}STORAGE ${hr 2}${font}${color2}
-${font sans-serif:bold:size=8}USED / : ${color3}${fs_used /home/f66379/} / ${fs_size /home/f66379/} ${alignr}${fs_used_perc /home/f66379/}% ${fs_bar 7, 70}${color2}
-${font sans-serif:bold:size=8}FREE / : ${color3}${fs_free /home/f66379/}${color2}
+${font sans-serif:bold:size=8}USED : ${color3}${fs_used /home/f66379/} / ${fs_size /home/f66379/} ${alignr}${fs_used_perc /home/f66379/}% ${fs_bar 7, 70}${color2}
+${font sans-serif:bold:size=8}FREE : ${color3}${fs_free /home/f66379/}${color2}
 ${font sans-serif:bold:size=8}TYPE : ${color3}${fs_type /home/f66379/}${color}
 
 ${font sans-serif:bold:size=10}SYSTEM ${hr 2}${font}${color2}
 ${font sans-serif:bold:size=8}OS : ${color3}${execi 86400 cat /etc/*-release | grep 'NAME' | awk -F '=' 'NR==1 {print $2}' | tr -d '"'}${color2}
 ${font sans-serif:bold:size=8}SHELL : ${color3}${exec gnome-shell --version}${color2}
 ${font sans-serif:bold:size=8}KERNEL : ${color3}${kernel}${color2}
-${font sans-serif:bold:size=8}MACHINE : ${color3}${machine}${color2}
+${font sans-serif:bold:size=8}ARCH. : ${color3}${machine}${color2}
 ${font sans-serif:bold:size=8}BATTERY : ${color3}${uppercase ${battery_status}}${color3} ${alignr}${battery_percent}% ${if_match ${battery_percent}<=20}${color9}${endif}${if_match ${battery_percent}>20}${color8}${endif}${if_match ${battery_percent}>80}${color #00BB00}${endif}${if_match "${battery_status}"=="charged"}${color #00CCFF}${endif} ${battery_bar 9, 100}${color2}
 ${font sans-serif:bold:size=8}UPTIME : ${color3}${uptime}${color}
 

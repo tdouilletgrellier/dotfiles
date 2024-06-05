@@ -376,6 +376,7 @@ fi
 #-------------------------------------------------------------
 # Sync with cronos to back up my data
 #rsync -ravP ~/Documents/ ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/
+#rsync -avzP ~/Documents/file.txt ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/file.txt
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
