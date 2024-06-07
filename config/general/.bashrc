@@ -7522,9 +7522,6 @@ for _BLESH_PATH in "${_BLESH_PATHS[@]}"; do
 			# If found, source ble.sh from the located path
 			source "${_BLESH_PATH}"
 
-			# Set the prompt end-of-line mark to a specific character
-			bleopt prompt_eol_mark='⏎'
-
 			# Easier to read syntax highlighting for function names
 			ble-face argument_error=fg=#cd0000,bold 
 			ble-face argument_option=fg=#66ccff,italic
@@ -7540,7 +7537,7 @@ for _BLESH_PATH in "${_BLESH_PATHS[@]}"; do
 			ble-face command_keyword=fg=#709aed
 			ble-face command_suffix=fg=#ffffff 
 			ble-face command_suffix_new=fg=#ffffff 
-			ble-face disabled=fg=#bbbbbb
+			ble-face disabled=fg=#666666
 			ble-face filename_block=fg=#e7bf00,bold
 			ble-face filename_character=fg=#ffffff
 			ble-face filename_directory=fg=#386bd7,bold
@@ -7631,7 +7628,7 @@ for _BLESH_PATH in "${_BLESH_PATHS[@]}"; do
 			alias blesh="ble-reload"
 		else
 			# Create an alias to load/reload ble.sh
-			alias blesh="source ${_BLESH_PATH} && bleopt prompt_eol_mark='⏎' && ble-face -s syntax_function_name fg=171,bold && ble-face -s command_function fg=171 && ble-face -s varname_expr fg=171,bold && ble-bind -x 'C-d' 'exit' > /dev/null 2>&1"
+			alias blesh="source ${_BLESH_PATH}"
 		fi
 
 		# Exit the loop as ble.sh has been found and sourced
