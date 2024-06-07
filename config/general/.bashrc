@@ -7525,9 +7525,103 @@ for _BLESH_PATH in "${_BLESH_PATHS[@]}"; do
 			bleopt prompt_eol_mark='⏎'
 
 			# Easier to read syntax highlighting for function names
-			ble-face -s syntax_function_name  fg=171,bold
-			ble-face -s command_function      fg=171
-			ble-face -s varname_expr          fg=171,bold
+			ble-face argument_error=fg=grey 
+			ble-face argument_option=fg=teal
+			ble-face auto_complete=fg=238 
+			ble-face cmdinfo_cd_cdpath=fg=26 
+			ble-face command_alias=fg=teal
+			ble-face command_builtin=fg=red
+			ble-face command_builtin_dot=fg=red,bold
+			ble-face command_directory=fg=26
+			ble-face command_file=fg=green
+			ble-face command_function=fg=171
+			ble-face command_jobs=fg=red,bold
+			ble-face command_keyword=fg=blue
+			ble-face command_suffix=fg=white 
+			ble-face command_suffix_new=fg=white 
+			ble-face disabled=fg=242
+			ble-face filename_block=fg=yellow
+			ble-face filename_character=fg=white
+			ble-face filename_directory=fg=26
+			ble-face filename_directory_sticky=fg=white
+			ble-face filename_executable=fg=green
+			ble-face filename_link=fg=teal
+			ble-face filename_ls_colors=none
+			ble-face filename_orphan=fg=teal
+			ble-face filename_other=underline
+			ble-face filename_pipe=fg=lime
+			ble-face filename_setgid=fg=grey
+			ble-face filename_setuid=fg=grey
+			ble-face filename_socket=fg=cyan
+			ble-face filename_url=fg=blue
+			ble-face filename_warning=fg=red
+			ble-face menu_desc_default=none
+			ble-face menu_desc_quote=ref:syntax_quoted
+			ble-face menu_desc_type=ref:syntax_delimiter
+			ble-face menu_filter_fixed=bold
+			ble-face menu_filter_input=fg=16 
+			ble-face overwrite_mode=fg=grey 
+			ble-face prompt_status_line=fg=231 
+			ble-face region=fg=white 
+			ble-face region_insert=fg=blue 
+			ble-face region_match=fg=white 
+			ble-face region_target=fg=grey 
+			ble-face syntax_brace=fg=37,bold
+			ble-face syntax_command=fg=brown
+			ble-face syntax_comment=fg=242
+			ble-face syntax_default=none
+			ble-face syntax_delimiter=bold
+			ble-face syntax_document=fg=94
+			ble-face syntax_document_begin=fg=94,bold
+			ble-face syntax_error=fg=231 
+			ble-face syntax_escape=fg=magenta
+			ble-face syntax_expr=fg=26
+			ble-face syntax_function_name=fg=171,bold
+			ble-face syntax_glob=fg=198,bold
+			ble-face syntax_history_expansion=fg=231 
+			ble-face syntax_param_expansion=fg=purple
+			ble-face syntax_quotation=fg=green,bold
+			ble-face syntax_quoted=fg=green
+			ble-face syntax_tilde=fg=navy,bold
+			ble-face syntax_varname=fg=orange
+			ble-face varname_array=fg=orange,bold
+			ble-face varname_empty=fg=31
+			ble-face varname_export=fg=200,bold
+			ble-face varname_expr=fg=171,bold
+			ble-face varname_hash=fg=70,bold
+			ble-face varname_number=fg=64
+			ble-face varname_readonly=fg=200
+			ble-face varname_transform=fg=29,bold
+			ble-face varname_unset=fg=124
+			ble-face vbell=reverse
+			ble-face vbell_erase=fg=red
+			ble-face vbell_flash=fg=green,reverse
+
+			# Integration with fzf-completion and fzf-git
+			ble-import -d integration/fzf-completion
+			ble-import -d integration/fzf-key-bindings
+			_ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
+			ble-import -d integration/fzf-git
+
+			# Disable EOF marker like "[ble: EOF]"
+			bleopt prompt_eol_mark=''
+			
+			# Disable error exit marker like "[ble: exit %d]"
+			bleopt exec_errexit_mark=
+			
+			# Disable elapsed-time marker like "[ble: elapsed 1.203s (CPU 0.4%)]"
+			bleopt exec_elapsed_mark=
+			
+			# Disable exit marker like "[ble: exit]"
+			bleopt exec_exit_mark=
+			
+			# Disable some other markers like "[ble: ...]"
+			bleopt edit_marker=
+			bleopt edit_marker_error=		
+
+			# The setting "filename_ls_colors" can be used to import the filename coloring
+			# scheme by the environment variable LS_COLORS.
+			bleopt filename_ls_colors="$LS_COLORS"
 
 			# Bind 'C-d' to exit in ble.sh and suppress any output or error
 			ble-bind -x 'C-d' 'exit' > /dev/null 2>&1 # CTRL+d to exit
