@@ -270,7 +270,10 @@ fi
 alias e="edit"
 function edit() {
 
-	# Post-edit action function to handle special file edits
+	# Local variable to track if the immutable attribute was modified
+	local IMMUTABLE_SET=""
+
+	# Post-edit action function to handle specific file edits and reapply the immutable attribute if it was removed
 	function post_edit_action() {
 		# Convert the provided path to an absolute path
 		local ABSOLUTE_PATH=$(realpath "${1}" 2>/dev/null)
@@ -396,6 +399,7 @@ function edit() {
 	# Helper function to use the more secure sudoedit only if it's possible
 	# since sudoedit cannot edit a file in a directory with write permissions
 	function sudo_edit() {
+
 		# Determine the directory containing the file
 		local DIRNAME=$(dirname "${1}")
 		[[ "${DIRNAME}" == "." ]] && DIRNAME="${PWD}"
@@ -414,7 +418,66 @@ function edit() {
 
 		# Restore the Tmux tab name
 		restore_tab
+	}
 
+	# Function to check and modify the immutable attribute of a file
+	# Parameters:
+	#   $1 - The filename to check and potentially modify the immutable attribute
+	function immutable_remove() {
+		# Check if required commands exist
+		if ! cmd-exists chattr || ! cmd-exists lsattr; then
+			return
+		fi
+
+		# Check if the file and commands exists
+		if [[ -f "${1}" ]] && cmd-exists chattr && cmd-exists lsattr; then
+
+			# Extract file attributes using lsattr
+			local ATTRIBUTES=$(lsattr "${1}" 2>/dev/null | cut -d' ' -f1)
+
+			# Check if the immutable attribute is set (indicated by 'i')
+			if [[ "${ATTRIBUTES}" =~ i ]]; then
+
+				# Ask user if they want to temporarily remove the immutable attribute to allow editing
+				if ask "${BRIGHT_YELLOW}This file is immutable. Temporarily remove immutable attribute to edit?${RESET}" Y; then
+
+					# Try to remove the immutable attribute without using sudo first
+					if ! chattr -i "${1}" > /dev/null 2>&1; then
+						# If the command fails, inform the user and retry with sudo
+						sudo chattr -i "${1}" > /dev/null 2>&1
+					fi
+
+					# Set a flag to indicate the attribute was modified
+					IMMUTABLE_SET="true"
+				else
+
+					# If the user chooses not to edit the file, exit and show a message
+					echo -e "${BRIGHT_RED}Cannot edit the file without removing the immutable attribute.${RESET}"
+
+					# Exit the function with status 1 indicating an error
+					exit 1
+				fi
+			fi
+		fi
+	}
+
+	# Reapply the immutable attribute if it was previously removed
+	function immutable_restore() {
+		# Check if the file and commands exists
+		if [[ -f "${1}" ]] && cmd-exists chattr; then
+
+			# If we changed the immutable attribute
+			if [[ "${IMMUTABLE_SET}" == "true" ]]; then
+
+					# Try to restore the immutable attribute without using sudo first
+					if ! chattr +i "${1}" > /dev/null 2>&1; then
+						# If the command fails, inform the user and retry with sudo
+						sudo chattr +i "${1}" > /dev/null 2>&1
+					fi
+
+				echo -e "${BRIGHT_GREEN}Immutable attribute reapplied to ${BRIGHT_MAGENTA}${1}${RESET}"
+			fi
+		fi
 	}
 
 	# Helper function to rename the current Tmux or console tab if supported
@@ -487,9 +550,11 @@ function edit() {
 	if [[ "${ACTUAL_FILE}" == "/etc/sudoers" ]] && cmd-exists visudo; then
 		echo -ne "${BRIGHT_RED}Security alert:"
 		echo -e "${BRIGHT_YELLOW} Using visudo to edit ${BRIGHT_CYAN}${ACTUAL_FILE}${RESET}"
+		immutable_remove "${1}"
 		rename_tab ${ACTUAL_FILE}
 		sudo visudo
 		restore_tab
+		immutable_restore "${1}"
 		return
 
 	# Check if EDITOR is set...
@@ -506,16 +571,20 @@ function edit() {
 
 	# Check if file exists and has read/write permissions...
 	elif [[ -r "${ACTUAL_FILE}" ]] && [[ -w "${ACTUAL_FILE}" ]]; then
+		immutable_remove "${1}"
 		rename_tab ${ACTUAL_FILE}
 		"${EDITOR}" "${ACTUAL_FILE}" && post_edit_action "${ACTUAL_FILE}"
 		restore_tab
+		immutable_restore "${1}"
 		return
 
 	# Check if the file exists but doesn't have write permission...
 	elif [[ -f "${ACTUAL_FILE}" ]]; then
 		echo -ne "${BRIGHT_RED}Insufficient permissions:"
 		echo -e "${BRIGHT_YELLOW} Using super user to edit ${BRIGHT_CYAN}${ACTUAL_FILE}${RESET}"
+		immutable_remove "${1}"
 		sudo_edit "${ACTUAL_FILE}"
+		immutable_restore "${1}"
 		return
 
 	# File doesn't exist, check if we can create it...
@@ -529,7 +598,9 @@ function edit() {
 			restore_tab
 			echo -ne "${BRIGHT_RED}Insufficient permissions:"
 			echo -e "${BRIGHT_YELLOW} Retrying with super user to edit ${BRIGHT_CYAN}${ACTUAL_FILE}${RESET}"
+			immutable_remove "${1}"
 			sudo_edit "${ACTUAL_FILE}"
+			immutable_restore "${1}"
 			return
 		fi
 
