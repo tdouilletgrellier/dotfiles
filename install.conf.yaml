@@ -51,6 +51,9 @@
     #vimrc
     ~/.vimrc: config/general/.vimrc
     ~/.vim_runtime: config/vim
+    ~/.vim_runtime/syntax: config/vimrc/syntax
+    ~/.vim_runtime/ftdetect: config/vimrc/ftdetect
+    ~/.vim_runtime/my_configs.vim: config/vimrc/my_configs.vim
 
     #micro
     ~/.config/micro/settings.json: config/micro/settings.json
