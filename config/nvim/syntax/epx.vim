@@ -39,10 +39,8 @@ syn match epxKeywords '\<\(error\|attention\|has failed\|warning\|alert\|unknown
 syn match epxKeywords '\<\(ok\|successful\|success\|finished\|end of initializations\|normal end\|the final time is reached\)\>'
 
 " Europlexus equal and words
-syn match epxVariable '%[A-Z_][0-9A-Z_]\+' 
-syn match epxVariable '%[a-z_][0-9a-z_]\+'
-syn match epxVariable '%[a-z_]\+'
-syn match epxVariable '%[A-Z_]\+'
+syn match epxVariable '%[a-zA-Z_]\+'
+syn match epxVariable '%[a-zA-Z_][0-9a-za-z_]\+'
 syn match epxEqual '=' 
 
 " Europlexus string
