@@ -387,7 +387,7 @@ endfunction
 
 set number relativenumber
 
-colorscheme desert
+colorscheme Tomorrow-Night-Bright 
 
 highlight epxNumber      ctermfg=red  guifg=#cd0000
 highlight epxWord        ctermfg=white  guifg=#ffffff
