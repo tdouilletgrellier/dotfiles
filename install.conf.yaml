@@ -27,6 +27,9 @@
     #screen
     ~/.screenrc: config/ExtremeUltimateBashrc/support/_screenrc
 
+    #latexmk
+    ~/.config/latexmk/latexmkrc: config/latexmk/latexmkrc
+
     #lazygit
     ~/.config/lazygit: config/lazygit
 

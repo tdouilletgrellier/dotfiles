@@ -27,6 +27,9 @@ endif
 let s:pdflatex = 'pdflatex -file-line-error -interaction=nonstopmode ' .
       \ '-halt-on-error -synctex=1 -output-directory=' . expand(b:tex_root_dir)
 let s:latexmk = 'latexmk -pdf -output-directory=' . expand(b:tex_root_dir)
+let s:lualatex = 'pdflatex -file-line-error -interaction=nonstopmode ' .
+      \ '-halt-on-error -synctex=1 -output-directory=' . expand(b:tex_root_dir)
+let s:defaultlatex = s:lualatex
 " ---------------------------------------------
 " End project root detection
 
@@ -34,7 +37,7 @@ let s:latexmk = 'latexmk -pdf -output-directory=' . expand(b:tex_root_dir)
 " Variables used to toggle latexmk and shell-escape compilation on and off.
 " Values are initialized to zero, then potentially turned on below.
 let b:tex_compile_use_latexmk = 0
-let b:tex_compile_use_shell_escape = 0
+let b:tex_compile_use_shell_escape = 1
 
 
 " Search for the minted package in the document preamble.
@@ -77,7 +80,7 @@ function! s:TexSetMakePrg() abort
   if b:tex_compile_use_latexmk
     let &l:makeprg = expand(s:latexmk)
   else
-    let &l:makeprg = expand(s:pdflatex)
+    let &l:makeprg = expand(s:defaultlatex)
   endif
   if b:tex_compile_use_shell_escape
     let &l:makeprg = &makeprg . ' -shell-escape'
