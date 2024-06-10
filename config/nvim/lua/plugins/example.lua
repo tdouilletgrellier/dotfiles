@@ -206,7 +206,7 @@ return {
             }
       
       -- if g:os_current == "Linux"
-      --   vim.g.vimtex_view_method = 'zathura'
+      vim.g.vimtex_view_method = 'zathura'
       -- elseif g:os_current == "Darwin"
       --   vim.g.vimtex_view_method = 'skim'
       -- else
