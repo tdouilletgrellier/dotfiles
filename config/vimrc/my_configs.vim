@@ -1,5 +1,16 @@
+" Relative line numbers
+set number relativenumber
+
+" Color scheme
 colorscheme Tomorrow-Night-Bright 
 
+" Transparent background
+hi Normal guibg=NONE ctermbg=NONE
+
+" Escape to desactive serach hl
+nnoremap <Esc><Esc> :nohlsearch<CR>
+
+" Custom colors for EPX
 highlight epxNumber      ctermfg=red  guifg=#cd0000
 highlight epxWord        ctermfg=white  guifg=#ffffff
 highlight epxKeywords    ctermfg=blue  guifg=#386bd7
