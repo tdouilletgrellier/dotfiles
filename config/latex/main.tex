@@ -1,0 +1,252 @@
+\documentclass[a4paper,10pt]{article}
+%\documentclass{edf}
+
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{textcomp} % for copyright symbol in arial
+
+%PAGE LAYOUT
+%margins
+\setlength{\voffset}{-1in} %top margin (page offset) = 0
+\setlength{\topmargin}{1.25cm} %top margin = 1.25cm
+\setlength{\hoffset}{-1in} %left margin (page offset) = 0
+\setlength{\oddsidemargin}{2.3677cm} %odd left margin = 2.5cm -3.75pt
+\setlength{\evensidemargin}{\oddsidemargin} %even left margin = odd left margin
+%header
+\setlength{\headheight}{2cm}
+\setlength{\headsep}{0.5cm}
+%footer
+\setlength{\footskip}{1cm}
+%text area : height
+\setlength{\textheight}{\paperheight}  % should be 29.7cm
+\addtolength{\textheight}{-5.55cm}
+%text area : width
+\setlength{\textwidth}{\paperwidth} % should be 21cm
+\addtolength{\textwidth}{-4.815cm} %5cm -5.25pt
+%no indentation, parskip 0.25cm
+\parindent=0in
+\setlength{\parskip}{0.25cm}
+
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+%\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{alltt}
+\usepackage{appendix}
+\usepackage{listings}
+\newcommand{\plexus}{Europlexus}
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem*{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% Packages Thomas %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\definecolor{ExecusharesRed}{RGB}{230,37,52}
+\definecolor{ExecusharesOtherRed}{RGB}{213,94,0}
+\definecolor{ExecusharesDarkRed}{rgb}{0.8,0,0}
+\definecolor{ExecusharesBlack}{RGB}{43,40,40}
+\definecolor{ExecusharesBlue}{RGB}{0,114,178}
+\definecolor{ExecusharesLightBlue}{RGB}{86,180,233}
+\definecolor{ExecusharesWhite}{RGB}{255,255,243}
+%\definecolor{ExecusharesWhite}{RGB}{255,255,255}
+\definecolor{ExecusharesOrange}{RGB}{230,159,0}
+\definecolor{ExecusharesGrey}{RGB}{107,110,108}
+\definecolor{ExecusharesGreen}{RGB}{0,158,115}
+\definecolor{ExecusharesYellow}{RGB}{240,228,66}
+\definecolor{ExecusharesPurple}{RGB}{204,121,167}
+\definecolor{green}{RGB}{45,180,0}
+\definecolor{orange}{RGB}{218,165,32}
+\definecolor{red}{RGB}{245,0,33}
+% SI Units
+\usepackage[squaren, Gray, cdot]{SIunits}
+\numberwithin{equation}{section}
+% Figures
+\usepackage{placeins}
+\graphicspath{{./Figures/}}
+\usepackage{subfig}
+\usepackage{wrapfig}
+\usepackage{alphalph}
+\renewcommand*{\thesubfigure}{%
+	\alphalph{\value{subfigure}}%
+}
+
+% Math
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage{mathtools}
+\DeclarePairedDelimiterX{\openinterval}[2]{]}{[}{#1,#2}
+\usepackage{empheq}
+\newcommand{\boxedeq}[1]{\begin{empheq}[box={\fboxsep=6pt\fbox}]{align*}#1\end{empheq}}
+
+% Tables and algorithms
+\usepackage[labelfont=bf,labelsep=period,textfont=it]{caption}
+\usepackage{algorithm,algorithmicx,algpseudocode}
+\usepackage{adjustbox}
+\usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{multirow}
+\newcommand{\specialcell}[2][l]{\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+%\usepackage{framed,color,verbatim}
+\definecolor{shadecolor}{rgb}{.9, .9, .9}
+%\newenvironment{code}%
+%{\snugshade\verbatim}%
+%{\endverbatim\endsnugshade}
+\usepackage{listings}
+\lstset{backgroundcolor=\color{shadecolor},frame=single,basicstyle=\ttfamily\small,morecomment=[l][\textbf]{\%},morecomment=[l][\textbf]{!}}
+
+% TikZ and pgf
+\usepackage{tikz}
+\usepackage{pgf}
+\usepackage{pgfplots}
+%\DeclareUnicodeCharacter{2212}{−}
+\usepgfplotslibrary{groupplots,dateplot}
+\pgfplotsset{compat=newest,
+	width=6cm,
+	height=3cm,
+	scale only axis=true,
+	max space between ticks=25pt,
+	try min ticks=5,
+	every axis/.style={
+		axis y line=left,
+		axis x line=bottom,
+		axis line style={thick,->,>=latex, shorten >=-.4cm}
+	},
+	every axis plot/.append style={thick},
+	tick style={black, thick}
+}
+\tikzset{
+	semithick/.style={line width=0.8pt},
+}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{shapes,arrows,backgrounds,patterns,calc,angles,quotes,math,matrix}
+\usetikzlibrary{intersections, pgfplots.fillbetween}
+\usetikzlibrary{arrows.meta}
+\usepgfplotslibrary{external} 
+\tikzexternalize
+\newcommand{\includetikz}[1]{%
+	\tikzsetnextfilename{./tikz_out/#1}%
+	\input{./tikz_in/#1.tex}%
+}
+
+% acronyms
+\usepackage{acronym} 
+
+\interfootnotelinepenalty=10000
+
+
+\makeatletter
+\renewcommand\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{ExecusharesRed}~$\dagger$\@thefnmark}}}
+\makeatother
+
+\makeatletter
+\newcommand\cref[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark}
+\makeatother
+
+
+\definecolor{orange}{rgb}{1,0.5,0}
+
+\usepackage[hidelinks,colorlinks=true,linkcolor=ExecusharesRed,citecolor=ExecusharesBlue,urlcolor=ExecusharesOtherRed]{hyperref}
+\usepackage{cleveref}[2012/02/15]% v0.18.4; 
+
+
+\crefformat{footnote}{#2\footnotemark[#1]#3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% set the title, reference and version in the header
+%\header{\vfill\Large blabla\vfill}{\scriptsize XXX}{1.0}
+% set accessibility and copyright year in the footer
+%\footer{Interne}{2023}
+
+%\input{macros_edf}
+
+\begin{document}
+
+%\caution
+
+%\synthese{\input{synthese}}
+
+%\summary{\input{summary}}
+
+
+%\summary{%
+%Summary in english}
+
+%\setcounter{tocdepth}{3}
+
+%\hypersetup{linkcolor=black}
+%\tableofcontents
+%\hypersetup{linkcolor=ExecusharesRed}
+
+%\begin{center}
+%	\section*{List of acronyms}
+%\end{center}
+%\input{acro_list}
+%\newpage
+
+% Intro du document
+%\input{intro}
+
+% Contexte
+%\input{context}
+
+% Description du nouveau modèle
+%\input{description_4_DT}
+
+
+%\input{pmod_4_DT}
+
+% Cas tests de vérification
+%\input{verif}
+
+% Comparaisons avec la brèche en T
+%\input{comp_t}
+
+% Influence de la configuration géomtrique initiale
+%\input{variable}
+
+%% Save/restart
+%\input{sr}
+
+%% Cas tests de validation
+%\input{valid}
+
+% Cas d'usage et recommendations
+%\input{reco}
+
+% Conclu du document
+%\input{conclu}
+
+
+
+\newpage
+
+%\appendix
+%
+%% Appendix: DCRI directive
+%%============================
+%\input{jet_force_eval}
+%\input{pmod}
+%\bibliographystyle{unsrt}
+\bibliographystyle{abbrv}
+\bibliography{./biblio}
+%\addcontentsline{3}{section}{References}
+
+
+% this label should be on the last page for page numbering
+
+\label{lastpage}
+
+\end{document}

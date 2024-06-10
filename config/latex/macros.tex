@@ -1,0 +1,114 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Dimensions Document
+%%%%%%%%%%%%%%%%%%%%%%%%
+% %\topmargin -13mm
+% \setlength{\topmargin}{-20mm}
+% \setlength{\headheight}{10mm}
+% \setlength{\headsep}{8mm}
+% \setlength{\footskip}{15mm}
+%
+% \setlength{\evensidemargin}{0mm}
+% \setlength{\oddsidemargin}{0mm}
+% %\textwidth 156mm
+% \setlength{\textwidth}{165mm}
+% \setlength{\textheight}{245mm}
+%
+% \setlength{\parindent}{5mm}
+% \setlength{\parskip}{2pt}
+% \setlength{\tabcolsep}{1mm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%.. Notes de bas de page
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \newcounter{fctr}[page]
+% \newcommand{\notepage}{\addtocounter{fctr}{1}\footnote}
+%
+% \def\symbnote#1{\ifcase #1 \or \dagger \or \ddagger
+% \or \dagger\!\dagger \else \ddagger\!\ddagger \fi}
+%
+% \renewcommand{\thefootnote}{$\symbnote{\value{fctr}}$}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%.. Accents
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \def\^#1{\if#1i{\accent"5E\i}\else{\accent"5E #1}\fi}
+% \def\"#1{\if#1i{\accent"7F\i}\else{\accent"7F #1}\fi}
+
+%%%%%%%%%%
+%.. Divers
+%%%%%%%%%%
+\newcommand{\be} {\begin{equation}}
+		\newcommand{\ee} {\end{equation}}
+%
+\newcommand{\bc} {\begin{center}}
+		\newcommand{\ec} {\end{center}}
+%
+% \def\cejour{\number\day \space\ifcase\month\or
+%  Janvier\or F\'evrier\or Mars\or Avril\or Mai\or Juin\or
+%  Juillet\or Ao\^ut\or Septembre\or Octobre\or Novembre\or D\'ecembre\fi
+%  \space\number\year}
+%
+\newcommand{\etal}{{\sl et al. }}
+
+
+%%%%%%%%%%%%%%%%%%
+%.. Style francais
+%%%%%%%%%%%%%%%%%%
+%% style report
+% \def\contentsname{T\lowercase{able des mati\`eres}}
+\def\contentsname{S\lowercase{ommaire}}
+% \def\listfigurename{Liste des figures}
+% \def\listtablename{Liste des tableaux}
+% \def\bibname{R\'ef\'erences}
+\def\bibname{References}
+% \def\indexname{Index}
+% \def\figurename{Figure}
+% \def\tablename{Tableau}
+% \def\chaptername{Chapitre}
+% \def\appendixname{Annexe}
+% \def\partname{Partie}
+% \def\abstractname{R\'esum\'e}
+
+%% Style article
+% \def\refname{R\'ef\'erences}
+\def\refname{References}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\pagestyle{fancyplain}
+%%\plainheadrulewidth=0.4pt
+%%\renewcommand{\chaptermark}[1]{\markboth{\thechapter .\ #1}{\thechapter .\ #1}}
+%%\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+%%\lhead[\fancyplain{\bf\thepage}{\bf\thepage}]{\fancyplain{}{\bf\rightmark}}
+%%\rhead[\fancyplain{}{\bf\leftmark}]{\fancyplain{\bf\thepage}{\bf\thepage}}
+%%\cfoot{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%.. def. chapitre %%%%%%%%%%%%%%%
+%\makeatletter
+%\def\@makechapterhead#1{%
+%\vspace*{10\p@}%
+%{\parindent \z@ \raggedright
+%\interlinepenalty\@M
+%\ifnum \c@secnumdepth >\m@ne
+%\huge \bfseries \thechapter \quad
+%\fi
+%\huge \bfseries #1\par\nobreak
+%\rule{\textwidth}{1mm}
+%\vskip 10\p@
+%}}
+%
+%\def\@makeschapterhead#1{%
+%\vspace*{10\p@}%
+%{\parindent \z@ \raggedright
+%\normalfont
+%\interlinepenalty\@M
+%\huge \bfseries #1\par\nobreak
+%\vskip 10\p@
+%}}
+%\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
