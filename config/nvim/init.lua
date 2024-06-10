@@ -16,3 +16,5 @@ vim.cmd("highlight epxTitle       ctermfg=yellow  guifg=#ffbd5e")
 vim.cmd("highlight epxDescBlock   ctermfg=grey  guifg=#666666")
 
 vim.cmd("au BufRead,BufNewFile *.epx set filetype=epx")
+
+vim.cmd("let b:fortran_fixed_source = 1")

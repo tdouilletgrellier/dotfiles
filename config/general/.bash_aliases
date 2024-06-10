@@ -37,6 +37,12 @@ debian_apps=(
 	'zoxide'        # Auto-learning navigation (better cd)
 	'delta'         # git-delta
 	'lazygit'       # lazygit
+	'micro'         # micro
+	'tree-sitter'   # syntax hl
+	'xdotools'      # keys	
+	'grc'           # color	
+	'zellij'        # term multiplexer
+	'ble.sh'        # bash syntax hl
 	'wmctrl'        # Window management
 
 	# Languages, compilers, runtimes, etc
@@ -45,6 +51,7 @@ debian_apps=(
 	'gfortran'
 	'python'
 	'LateX'
+	'zathura'
 
 	# Monitoring, management and stats
 	'bpytop'        # Live system resource monitoring
