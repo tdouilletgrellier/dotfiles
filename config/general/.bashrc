@@ -7301,6 +7301,7 @@ function _pwd() {
 export PROMPT_COMMAND=''
 
 # Set the prompt
+
 # Extra line for clarity
 export PS1="________________________________________________________________________________\n"
 # If using Git Bash or Cygwin...

@@ -18,14 +18,13 @@ color brightcyan "(\b(ok|successful|success|finished|end of initializations|norm
 
 color brightred "%\w+"
 color brightyellow "="
-
+color yellow start="'" end="'"
 
 color brightblue "!.*"
 color brightblue "\*.*"
 color brightblue "\$.*"
 color white "TITLE.*"
 color white "TITRE.*"
-
 
 
 color brightblue start="BEGIN DESCRIPTION" end="END DESCRIPTION"
