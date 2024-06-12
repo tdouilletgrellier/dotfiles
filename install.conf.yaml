@@ -30,6 +30,9 @@
     #latexmk
     ~/.config/latexmk/latexmkrc: config/latexmk/latexmkrc
 
+    #zathura
+    ~/.config/zathura/zathurarc: config/zathura/zathurarc    
+
     #lazygit
     ~/.config/lazygit: config/lazygit
 
