@@ -22,7 +22,11 @@ highlight epxComment     ctermfg=grey  guifg=#666666
 highlight epxTitle       ctermfg=yellow  guifg=#ffbd5e
 highlight epxDescBlock   ctermfg=grey  guifg=#666666
 
+" oo and OO to add new line
+nmap oo o<Esc>
+nmap OO O<Esc>
 
+" Disable arrow keys in normal mode
 nnoremap <Left>  :echoe "Use h"<CR>
 nnoremap <Right> :echoe "Use l"<CR>
 nnoremap <Up>    :echoe "Use k"<CR>
