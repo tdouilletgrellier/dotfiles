@@ -974,7 +974,7 @@ if cmd-exists git; then
 	alias ggac='git add --all && git commit --verbose -m' # Add "commit message"
 	alias ggc='git commit --verbose -m' # Add "commit message"
 	alias ggm='git commit --amend --verbose'
-	alias ggl='git log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short'
+	alias ggl='git log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --graph'
 	alias ggls='_f() { git ls-files "$@" | sort; }; _f'
 	alias ggd='git diff'
 	alias ggds='git diff --stat'
