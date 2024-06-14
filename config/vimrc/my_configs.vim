@@ -1,6 +1,8 @@
 " Relative line numbers
 set number relativenumber
 
+let mapleader = " "
+
 " Color scheme
 colorscheme Tomorrow-Night-Bright 
 
@@ -25,6 +27,49 @@ highlight epxDescBlock   ctermfg=grey  guifg=#666666
 " oo and OO to add new line
 nmap oo o<Esc>
 nmap OO O<Esc>
+
+"" Make Y behave like C or D
+"nmap Y y$
+"
+"" Keep window centered when going up/down
+"nmap J mzJ`z
+"nmap <C-d> <C-d>zz
+"nmap <C-u> <C-u>zz
+"nmap n nzzzv
+"nmap N Nzzzv
+"
+"" Paste without overwriting register
+"vmap p "_dP
+"nmap p "_dP
+"
+"" Copy text to " register
+"nmap <leader>y "+y
+"vmap <leader>y "+y
+"nmap <leader>Y "+Y
+"
+"" Delete text to " register
+"nmap <leader>d "_d
+"vmap <leader>d "_d
+"
+"" Navigate between quickfix items
+"vnmap <leader>h <cmd>cnext<CR>zz
+"vnmap <leader>; <cmd>cprev<CR>zz
+"
+"" Navigate between location list items
+"nmap <leader>k <cmd>lnext<CR>zz
+"nmap <leader>j <cmd>lprev<CR>zz
+"
+"" Replace word under cursor across entire buffer
+"nmap <leader>sf :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>
+"
+"" Visual "
+"" Stay in indent mode
+"vmap < <gv
+"vmap > >gv
+"
+"" Move block
+"vmap J :m '>+1<CR>gv=gv
+"vmap K :m '<-2<CR>gv=gv
 
 " Disable arrow keys in normal mode
 nnoremap <Left>  :echoe "Use h"<CR>
