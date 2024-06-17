@@ -18,5 +18,5 @@ vim.cmd("highlight epxDescBlock   ctermfg=grey  guifg=#666666")
 -- EPX syntax detection
 vim.cmd("au BufRead,BufNewFile *.epx set filetype=epx")
 
--- FIxed form Fortran by default
+-- Fixed form Fortran by default
 vim.cmd("let b:fortran_fixed_source = 1")

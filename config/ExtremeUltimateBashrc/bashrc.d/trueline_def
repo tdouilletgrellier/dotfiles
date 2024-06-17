@@ -4,8 +4,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1717616553"></script>
-<link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1717616553">
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1718214368"></script>
+<link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1718214368">
 <script>
         window.bizx.cmp.init({
             gam_gdpr_technical_delivery: true,
@@ -19,11 +19,11 @@
             if (!window.net.sf) { window.net.sf = {}; }
             SF.Ads = {};
             SF.cdn = '//a.fsdn.com/con';
-            SF.deploy_time = '1717616553';
+            SF.deploy_time = '1718214368';
             SF.sandiego = true;
             SF.sandiego_chrome = true;
             SF.variant = 'sf';
-            SF.fpid = 'bae5fa8e-e8b1-417a-b374-70b4e77e8e5a';
+            SF.fpid = '5afdf4c6-d0eb-4bfa-9bb7-7c6778b4910a';
             
             SF.Breakpoints = {
               small: 0,
@@ -43,8 +43,8 @@
             }
             
         </script>
-<link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1717616553">
-<link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1717616553">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1718214368">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1718214368">
 <meta name="description" content="Free, secure and fast downloads from the largest Open Source applications and software directory - SourceForge.net">
 <meta name="keywords" content="Open Source, Open Source Software, Development, Community, Source Code, Secure,  Downloads, Free Software">
 <title>Page not found
@@ -57,13 +57,13 @@
             /*global unescape, window, console, jQuery, $, net, SF, DD_belatedPNG, bizx  */
             if (!window.SF) {
                 window.SF = {};
-            }SF.EU_country_codes = ["GF","LI","LT","CW","GS","JE","PN","IT","PT","VG","MT","HR","SK","YT","CY","SH","TC","FR","MQ","GB","WF","DK","PL","RE","MS","PM","BE","SX","HU","BL","IO","LV","KY","FK","GG","GI","ES","MF","DE","AT","GR","SE","GL","TF","BM","LU","AW","IS","AX","GP","NC","SI","FI","BG","RO","PF","AI","ME","NO","EE","NL","CH","IE","CZ"];
+            }SF.EU_country_codes = ["SE","ME","PN","DK","GP","LT","SI","PM","BL","KY","NO","GI","HR","VG","PT","BG","HU","EE","SK","PF","LI","GL","YT","MF","SX","TF","AX","MT","WF","FK","CY","IS","AW","TC","IO","FR","GB","JE","GR","NL","ES","SH","GS","IE","BM","BE","CW","AT","GF","RO","RE","NC","MS","FI","MQ","CZ","AI","LU","GG","IT","PL","CH","DE","LV"];
             SF.unknown_country_codes = ["","A1","A2","O1"];
         </script>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1717616553"></script>
-<style>.ca8dec962e12ae6150c59157eeff385b86fe61203 { display: none !important; }</style>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1718214368"></script>
+<style>.S7ae9d0be581747b9813eb8cedfd6d7f5cc7a8008 { display: none !important; }</style>
 <script>SF.adblock = true;</script>
-<script src="//a.fsdn.com/con/js/adsbanner.js?1717616553"></script>
+<script src="//a.fsdn.com/con/js/adsbanner.js?1718214368"></script>
 <script>
         function initPiwik(){
             var _paq = window._paq = window._paq || [];
@@ -84,7 +84,7 @@
             var interval = 6 * 60 * 60 * 1000; // 6 hrs, expressed in ms
             var vid_date = new Date(localStorage.getItem('vid_date'));
             if (new Date() - vid_date >= interval) {
-                var data = {firstparty_id: "bae5fa8e-e8b1-417a-b374-70b4e77e8e5a", do_not_sell: false};
+                var data = {firstparty_id: "5afdf4c6-d0eb-4bfa-9bb7-7c6778b4910a", do_not_sell: false};
                 bizx.cmp.ifConsent({ purposes: ['ads'], vendors: 'sdm'}, function() {},
                     function(){
                         // no consent (opt-out)
@@ -95,7 +95,7 @@
                         // push promise to pwik and set it run if pwik is allowed to run based on it's own ifConsent check
                         _paq.push([ function() {
                             data.matomo_id = this.getVisitorId();
-							data.domain = "sourceforge.net";
+                            data.domain = "sourceforge.net";
                             $.ajax({
                                 method: 'PUT',
                                 url: '/p/sfapi/push_vid',
@@ -339,12 +339,12 @@ Whoops, we can't find that page.
 </section>
 </footer>
 </div>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1717616553"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1718214368"></script>
 <script>
         /* global Dropzone */
         Dropzone.options.blockthisForm = false;
     </script>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1717616553"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1718214368"></script>
 <script>
             /* global Foundation */
             $(document).foundation();
@@ -369,7 +369,7 @@ Whoops, we can't find that page.
 
         
         function loadimg(params, dimension_prefix) {
-            params = Object.assign({"idsite":1,"rec":1,"rand":84450,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
+            params = Object.assign({"idsite":1,"rec":1,"rand":82677,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
             for (var key in params) {
                 if (params.hasOwnProperty(key) && key.indexOf('dimension') === 0 && params[key] !== undefined) {
                     params[key] = (dimension_prefix||'') + params[key];
@@ -417,7 +417,7 @@ Whoops, we can't find that page.
             /*global _ml:true, window */
             _ml = window._ml || {};
             _ml.eid = '771';
-            _ml.fp = 'bae5fa8e-e8b1-417a-b374-70b4e77e8e5a';  
+            _ml.fp = '5afdf4c6-d0eb-4bfa-9bb7-7c6778b4910a';  
             var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');
             mltag.type = 'text/javascript';
             mltag.async = true;
@@ -435,15 +435,15 @@ Whoops, we can't find that page.
 <form class="dropzone small-12" action="/api/instrumentation/gpt" id="blockthisForm" method="POST">
 <div class="row small-12">
 <div class="column description small-12">
-<input type="hidden" name="_visit_cookie" value="bae5fa8e-e8b1-417a-b374-70b4e77e8e5a" />
-<input type="hidden" name="timestamp" value="1717837742" />
-<input type="hidden" name="spinner" value="XtSfDbxRWm5P8S:Gg2ULMn725SFM" />
-<p class="ca8dec962e12ae6150c59157eeff385b86fe61203"><label for="XwrJPwqwBcS_Cq8KjwpDDvsKRwoR8w73CmDssw70rwp8">You seem to have CSS turned off.
-Please don't fill out this field.</label><input id="XwrJPwqwBcS_Cq8KjwpDDvsKRwoR8w73CmDssw70rwp8" name="XwrNPwqwBcS_Cq8O_STvDhQVmFmgOw7nDmsKEwpY" type="text" /></p>
-<p class="ca8dec962e12ae6150c59157eeff385b86fe61203"><label for="XwrJPwqwBcS_Cq8KiwpDDvsKRwoR8w73CmDssw70rwp8">You seem to have CSS turned off.
-Please don't fill out this field.</label><input id="XwrJPwqwBcS_Cq8KiwpDDvsKRwoR8w73CmDssw70rwp8" name="XwrNPwqwBcS_CqsO_STvDhQVmFmgOw7nDmsKEwpY" type="text" /></p>
+<input type="hidden" name="_visit_cookie" value="5afdf4c6-d0eb-4bfa-9bb7-7c6778b4910a" />
+<input type="hidden" name="timestamp" value="1718610254" />
+<input type="hidden" name="spinner" value="XYeq3mARNo35YjBh9ir1T97zyD4Q" />
+<p class="S7ae9d0be581747b9813eb8cedfd6d7f5cc7a8008"><label for="XZsKCw5jDtmE0wpNOwq5UwrkDwpwSbS7DgMOuRkY">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XZsKCw5jDtmE0wpNOwq5UwrkDwpwSbS7DgMOuRkY" name="XZ8KCw5jDtmE0wpPCiMKALWZrJcKDworCi8KgwrvDjcOq" type="text" /></p>
+<p class="S7ae9d0be581747b9813eb8cedfd6d7f5cc7a8008"><label for="XZsKCw5jDtmE0wpNPwq5UwrkDwpwSbS7DgMOuRkY">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XZsKCw5jDtmE0wpNPwq5UwrkDwpwSbS7DgMOuRkY" name="XZ8KCw5jDtmE0wpLCiMKALWZrJcKDworCi8KgwrvDjcOq" type="text" /></p>
 Briefly describe the problem (required):
-<input name="Xwr5DwqYcdyTDssOjwogiwo7DjsK1w7fCvMK7GAYcw7c" type="text" required>
+<input name="XasKOw5LDq2c_w4oOLMOldxN8ZcOywonCql0xXQ" type="text" required>
 </div>
 </div>
 <div class="column small-12">
@@ -477,9 +477,9 @@ Right-click on the ad, choose "Copy Link", then paste here &rarr;<br>
 </div>
 <div class="column large-7 small-6">
 <p>Ad destination/click URL:
-<input name="XwrxEwq8Gdz3DhMOmwo4nwo0VwqlmaSDDqR3DmRc" type="url" required>
+<input name="XaMKJw5vDsWcmw7wLKsOgw67CpSvDg0VYwoIrc8KY" type="url" required>
 </p>
-<textarea id="gpt-info" name="XwrFDwqIbdTouw6PDmMOuXsO0fcOTwojDvHF8w54r"></textarea>
+<textarea id="gpt-info" name="XZcKOw5bDrGXCu3vDnybCmsK3Q1PDgU_Cvn7CnARc"></textarea>
 <input class="button" type="submit" id="btn-blockthis-submit" value="Submit Report">
 </div>
 </div>
