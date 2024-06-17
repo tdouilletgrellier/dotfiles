@@ -66,6 +66,14 @@ vim.keymap.set(
   { desc = "Replace word under cursor" }
 )
 
+-- Live Grep (args)
+vim.keymap.set(
+  "n",
+  "<leader>fs",
+  require("telescope").extensions.live_grep_args.live_grep_args,
+  { desc = "Live Grep (args)" }
+)
+
 -- Visual --
 -- Stay in indent mode
 vim.keymap.set("v", "<", "<gv")
