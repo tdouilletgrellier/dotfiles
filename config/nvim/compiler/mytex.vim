@@ -95,12 +95,12 @@ endfunction
 " Key mappings for functions
 " ---------------------------------------------
 " TexToggleShellEscape
-nmap <leader>te <Plug>TexToggleShellEscape
+nmap <leader>ve <Plug>TexToggleShellEscape
 nnoremap <script> <Plug>TexToggleShellEscape <SID>TexToggleShellEscape
 nnoremap <SID>TexToggleShellEscape :call <SID>TexToggleShellEscape()<CR>
 
 " TexToggleLatexmk
-nmap <leader>tl <Plug>TexToggleLatexmk
+nmap <leader>vl <Plug>TexToggleLatexmk
 nnoremap <script> <Plug>TexToggleLatexmk <SID>TexToggleLatexmk
 nnoremap <SID>TexToggleLatexmk :call <SID>TexToggleLatexmk()<CR>
 

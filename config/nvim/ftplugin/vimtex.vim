@@ -6,9 +6,9 @@ if exists("b:did_myvimtexsettings")
 endif
 let b:did_myvimtexsettings = 1
 
-nmap <leader>i <plug>(vimtex-info)
+nmap <leader>vi <plug>(vimtex-info)
 
-nmap <leader>t <CMD>VimtexTocToggle<CR>
+nmap <leader>vt <CMD>VimtexTocToggle<CR>
 
 " Toggle shell escape on an off when using minted package
 " ---------------------------------------------
@@ -25,7 +25,7 @@ function! s:TexToggleShellEscape() abort
   VimtexClean
 endfunction
 
-nmap <leader>te <Plug>TexToggleShellEscape
+nmap <leader>ve <Plug>TexToggleShellEscape
 nnoremap <script> <Plug>TexToggleShellEscape <SID>TexToggleShellEscape
 nnoremap <SID>TexToggleShellEscape :call <SID>TexToggleShellEscape()<CR>
 

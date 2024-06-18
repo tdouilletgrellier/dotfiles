@@ -1,0 +1,168 @@
+\PassOptionsToPackage{obeyspaces}{url}
+\documentclass[10pt,aspectratio=169,english]{beamer}
+
+
+% Basics
+\usepackage{babel}
+\usepackage{tcolorbox}
+\usepackage{biblatex}
+\usepackage{cleveref}
+% \hypersetup{colorlinks=true}
+
+% Math
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathrsfs}  
+\usepackage{bm}
+\usepackage[squaren, Gray, cdot]{SIunits}
+\usepackage{empheq}
+\usepackage{relsize}
+\usepackage{cancel}
+
+% Highlighting
+\usepackage{xcolor}
+\usepackage{contour}
+\usepackage{soul}
+\newcommand{\hlfancy}[2]{\sethlcolor{#1}\hl{#2}}
+\usepackage{framed,color}
+\definecolor{shadecolor}{rgb}{1,0.8,0.3}
+\definecolor{shadecolor2}{RGB}{153,153,0}
+%\usepackage{enumitem}
+\usepackage{xparse}
+\usepackage{xfp}
+\usepackage{iftex}
+\usepackage{tcolorbox}
+\tcbuselibrary{listings,breakable}
+\tcbuselibrary{documentation}
+\tcbset{
+	color command=AmurmapleRed,
+	color environment=AmurmapleRed,
+	color option=AmurmapleGreen
+}
+%\def\boxitem#1{\setbox0=\vbox{#1}{\centering\makebox[0pt]{%
+%			\fboxrule=2pt\fboxsep=0.5pt\color{ExecusharesRed}\fbox{\hspace{\leftmargini}\color{black}\box0}}\par}}
+\def\boxitem#1{\setbox0=\vbox{#1}{\centering\makebox[0pt]{%
+			\fboxrule=2pt\fboxsep=0.5pt\color{ExecusharesRed}\fbox{\hspace{0pt}\color{black}\box0}}\par}}		
+
+% Figures
+\usepackage{subfig}
+\usepackage{wrapfig}
+\usepackage{alphalph}
+\renewcommand*{\thesubfigure}{%
+	\alphalph{\value{subfigure}}%
+}%
+\usepackage[export]{adjustbox}
+\usepackage{etoolbox}% http://ctan.org/pkg/etoolbox
+\AtBeginEnvironment{figure}{\setcounter{subfigure}{0}}% Resets subfigure counter at start of figure environment
+\usepackage{wasysym}
+\usepackage[labelformat=empty]{caption}
+
+% Tables and algorithms
+\usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{multirow}
+\newcommand{\specialcell}[2][l]{%
+	\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+\usepackage{algorithm,algorithmicx,algpseudocode}
+\renewcommand{\arraystretch}{1.2}
+
+% TikZ and pgf
+\usepackage{tikz}
+\usepackage{pgf}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.14}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{shapes,arrows,backgrounds,patterns,quotes,angles,positioning}
+\AtBeginDocument{\providecommand\tikzexternaldisable{\relax}} 
+\AtBeginDocument{\providecommand\tikzexternalenable{\relax}} 
+%If one wants to externalize tikz pictures
+\usepgfplotslibrary{external} 
+\tikzexternalize
+\newcommand{\includetikz}[1]{%
+	\tikzsetnextfilename{./LP_2023_BD/tikz_out/#1}%
+	\input{./LP_2023_BD/tikz_in/#1.tex}%
+}
+
+
+% GiF Animation
+\usepackage{animate}
+
+% Theme
+\tcbuselibrary{listings,breakable}
+\tcbuselibrary{documentation}
+\tcbset{
+	color command=ExecusharesRed,
+	color environment=ExecusharesRed,
+	color option=ExecusharesGreen
+}
+\usetheme[nomail,delaunay,amurmapleedf]{Amurmaple}
+
+% Lovely footnotes
+\makeatletter
+\renewcommand\@makefnmark{\hbox{\@textsuperscript{\normalfont\color{ExecusharesRed}~$\dagger$\@thefnmark}}}
+\makeatother
+
+
+\title[XXX]{\quad\newline \Large My Beamer}
+\author[XXX]{XXX}
+\titlegraphic{\includegraphics[width=4cm]{logo.png}}
+\institute{ \color{AmurmapleRed!60} xx xxxx xxxx}
+\date{}
+
+%\title[Amurmaple documentation]{Amurmaple Beamer Theme}
+%\author[M.~Chupin]{Maxime Chupin}
+\subtitle{\large xxx}
+
+%\institute[CNRS]{CNRS\\
+%University of Paris-Dauphine}
+%\date{January 30, 2023}
+%\titlegraphic{\includegraphics[width=4cm]{logo.png}}
+\mail{xxx@xxx.fr}
+\webpage{XXX}
+\collaboration{}
+
+%\bibliography{biblio.bib}
+\usefonttheme{serif}
+
+%\logo{\includegraphics[width=0.7cm]{logo.png}}
+
+\begin{document}
+
+\maketitle
+
+\sepframe[title={Sommaire}]
+
+\section{section}
+\begin{frame}
+	\sectionpage
+\end{frame}
+
+\begin{frame}
+	\frametitle{coucou}
+	\hfill
+
+
+Blabla
+	\begin{itemize}
+		\item coucou
+	\end{itemize}
+
+\end{frame}
+
+\thanksframe{Merci ! Des questions ?}
+
+
+
+\appendix
+
+\begin{frame}
+	\frametitle{slides de backup}
+	\hfill
+	
+	\begin{itemize}
+		\item blabla
+	\end{itemize}	
+\end{frame}
+
+\end{document}
