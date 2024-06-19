@@ -39,8 +39,8 @@ debian_apps=(
 	'lazygit'       # lazygit
 	'micro'         # micro
 	'tree-sitter'   # syntax hl
-	'xdotools'      # keys	
-	'grc'           # color	
+	'xdotools'      # keys
+	'grc'           # color
 	'zellij'        # term multiplexer
 	'ble.sh'        # bash syntax hl
 	'wmctrl'        # Window management
@@ -54,7 +54,7 @@ debian_apps=(
 	'zathura'
 
 	# Monitoring, management and stats
-	'bpytop'        # Live system resource monitoring
+	'bpytop'    # Live system resource monitoring
 	'conky-all' # Command line speed test utility
 
 	# CLI Fun
@@ -239,7 +239,9 @@ if [[ -f "${HOME}/paraview/bin/paraview" ]]; then
 fi
 if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
 	alias epxenv="source ${HOME}/dev/epx/devtools/env.sh"
-	epxenv
+	if [ -z "${TMUX}" ]; then
+		epxenv
+	fi
 fi
 if [[ -f "${HOME}/arm/forge/22.1.2/bin/ddt" ]]; then
 	alias ddt="${HOME}/arm/forge/22.1.2/bin/ddt &"
