@@ -6913,6 +6913,7 @@ fi
 # Install: git clone https://github.com/lincheney/fzf-tab-completion
 ###########################################################################
 
+if cmd-exists --strict fzf; then
 # Check if the fzf-bash-completion.sh script exists in known locations
 if [[ -f "/usr/share/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 	# Source the fzf bash completion script
@@ -6943,7 +6944,7 @@ elif [[ -f "$HOME/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 		alias node='node -r $HOME/fzf-tab-completion/node/fzf-node-completion.js'
 	fi
 fi
-
+fi
 #######################################################
 # Enable the "Command not found" hook
 # Link: https://github.com/falconindy/pkgfile
