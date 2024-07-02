@@ -156,11 +156,11 @@ function proxy() {
 	curl --silent --proxy-negotiate --user : http://www.gstatic.com/generate_204
 }
 function unset_proxy() {
-	export http_proxy
-	export https_proxy
-	export HTTP_PROXY
-	export HTTPS_PROXY
-	export no_proxy
+	unset http_proxy
+	unset https_proxy
+	unset HTTP_PROXY
+	unset HTTPS_PROXY
+	unset no_proxy
 }
 #-------------------------------------------------------------
 
