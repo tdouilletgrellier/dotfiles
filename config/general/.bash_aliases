@@ -165,7 +165,8 @@ function unset_proxy() {
 	git config --global --unset-all http.proxy
 	git config --global --unset-all http.https://github.com.proxy
 	git config --global --unset-all http.https://codev-tuleap.cea.fr.proxy
-	git config --global -l
+	git config --global --unset-all http.https://codev-tuleap.cea.fr.proxy
+	git config --global -l | grep proxy
 }
 #-------------------------------------------------------------
 
