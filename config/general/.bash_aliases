@@ -155,6 +155,13 @@ function proxy() {
 	export no_proxy='localhost,127.0.0.1,.edf.fr,.edf.com'
 	curl --silent --proxy-negotiate --user : http://www.gstatic.com/generate_204
 }
+function unset_proxy() {
+	export http_proxy
+	export https_proxy
+	export HTTP_PROXY
+	export HTTPS_PROXY
+	export no_proxy
+}
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -343,6 +350,7 @@ export SELECTED_EDITOR=$EDITOR
 
 #-------------------------------------------------------------
 # Fzf config
+if cmd-exists --strict fzf; then
 export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
 # export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # export FZF_ALT_C_COMMAND="fdfind --type=d --hidden --exclude .git"
@@ -354,21 +362,27 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --color=border:#2a2a2a,label:#666666,query:#bbbbbb
   --border="rounded" --border-label="" --preview-window="border-rounded" --prompt="> "
   --marker=">" --pointer="◆" --separator="─" --scrollbar="│"'
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # Fzf+fdfind
 # Use fd (https://github.com/sharkdp/fd) for listing path candidates.
+if cmd-exists --strict fzf; then
+if cmd-exists --strict fdfind; then
 _fzf_compgen_path() {
 	fdfind --hidden --exclude .git . "$1"
 }
 _fzf_compgen_dir() {
 	fdfind --type=d --hidden --exclude .git . "$1"
 }
+fi
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # Fzf-git
+if cmd-exists --strict fzf; then
 if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
 	source "$HOME/dotfiles/config/fzf-git/fzf-git.sh"
 	_fzf_git_fzf() {
@@ -379,6 +393,7 @@ if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
 			--preview-window='right,50%,border-left' \
 			--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
 	}
+fi
 fi
 #-------------------------------------------------------------
 
