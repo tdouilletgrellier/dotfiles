@@ -357,11 +357,13 @@ export SELECTED_EDITOR=$EDITOR
 #-------------------------------------------------------------
 # Fzf config
 if cmd-exists --strict fzf; then
-export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
-# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-# export FZF_ALT_C_COMMAND="fdfind --type=d --hidden --exclude .git"
-# --- setup fzf theme ---
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+	if cmd-exists --strict fdfind; then
+		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
+	# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+	# export FZF_ALT_C_COMMAND="fdfind --type=d --hidden --exclude .git"
+	fi
+	# --- setup fzf theme ---
+	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#000000
   --color=hl:#386bd7,hl+:#66ccff,info:#f3d64e,marker:#e7bf00
   --color=prompt:#cd0000,spinner:#db67e6,pointer:#b349be,header:#87afaf
@@ -375,31 +377,31 @@ fi
 # Fzf+fdfind
 # Use fd (https://github.com/sharkdp/fd) for listing path candidates.
 if cmd-exists --strict fzf; then
-if cmd-exists --strict fdfind; then
-_fzf_compgen_path() {
-	fdfind --hidden --exclude .git . "$1"
-}
-_fzf_compgen_dir() {
-	fdfind --type=d --hidden --exclude .git . "$1"
-}
-fi
+	if cmd-exists --strict fdfind; then
+		_fzf_compgen_path() {
+			fdfind --hidden --exclude .git . "$1"
+		}
+		_fzf_compgen_dir() {
+			fdfind --type=d --hidden --exclude .git . "$1"
+		}
+	fi
 fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # Fzf-git
 if cmd-exists --strict fzf; then
-if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
-	source "$HOME/dotfiles/config/fzf-git/fzf-git.sh"
-	_fzf_git_fzf() {
-		fzf-tmux --ansi -p80%,60% -- \
-			--layout=reverse --multi --height=50% --min-height=20 --border \
-			--border-label-pos=2 \
-			--color='header:italic:underline,label:blue' \
-			--preview-window='right,50%,border-left' \
-			--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
-	}
-fi
+	if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
+		source "$HOME/dotfiles/config/fzf-git/fzf-git.sh"
+		_fzf_git_fzf() {
+			fzf-tmux --ansi -p80%,60% -- \
+				--layout=reverse --multi --height=50% --min-height=20 --border \
+				--border-label-pos=2 \
+				--color='header:italic:underline,label:blue' \
+				--preview-window='right,50%,border-left' \
+				--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
+		}
+	fi
 fi
 #-------------------------------------------------------------
 
