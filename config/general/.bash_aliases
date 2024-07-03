@@ -252,8 +252,10 @@ if [[ -f "${HOME}/paraview/bin/paraview" ]]; then
 fi
 if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
 	alias epxenv="source ${HOME}/dev/epx/devtools/env.sh"
-	if [ -z "${TMUX}" ]; then
-		epxenv
+	if [[ "${SHLVL}" -lt 2 ]]; then
+		if [ -z "${TMUX}" ]; then
+			epxenv
+		fi
 	fi
 fi
 if [[ -f "${HOME}/arm/forge/22.1.2/bin/ddt" ]]; then
