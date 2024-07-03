@@ -40,7 +40,7 @@ syn match epxKeywords '\<\(ok\|successful\|success\|finished\|end of initializat
 
 " Europlexus equal and words
 syn match epxVariable '%[a-zA-Z_]\+'
-syn match epxVariable '%[a-zA-Z_][0-9a-za-z_]\+'
+syn match epxVariable '%[a-zA-Z_][0-9a-zA-Z_]\+'
 syn match epxEqual '=' 
 
 " Europlexus string
