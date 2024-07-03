@@ -1,10 +1,9 @@
 %YAML 1.2
 ---
-name: Zig
-scope: source.zig
+name: Plain Text (WIT)
+scope: source.wit
 hidden: true
 file_extensions:
-  - zig
-  - zon
+  - wit
 contexts:
   main: []

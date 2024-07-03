@@ -1,9 +1,9 @@
 %YAML 1.2
 ---
-name: Gleam
-scope: source.gleam
+name: Plain Text (WGSL)
+scope: source.wgsl
 hidden: true
 file_extensions:
-  - gleam
+  - wgsl
 contexts:
   main: []
