@@ -193,7 +193,7 @@ function cmd-exists() {
 }
 
 # Loop a list of common editors and check if installed
-_EDITORS=("micro" "ne" "helix" "tilde" "nvim" "vim" "nano" "emacs" "vi" "ed")
+_EDITORS=("nvim" "ne" "helix" "tilde" "vim" "micro" "nano" "emacs" "vi" "ed")
 for EDITOR in "${_EDITORS[@]}"; do
 	if cmd-exists $EDITOR &>/dev/null; then
 
