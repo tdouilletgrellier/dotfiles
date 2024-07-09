@@ -36,6 +36,9 @@
     #lazygit
     ~/.config/lazygit: config/lazygit
 
+    #ranger
+    ~/.config/ranger: config/ranger    
+
     #bpytop
     ~/.config/bpytop: config/bpytop    
 
