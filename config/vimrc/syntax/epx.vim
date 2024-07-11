@@ -25,8 +25,7 @@ syn match epxNumber '[-+]\=\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 syn match epxNumber '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+' 
 
 " All words
-syn match epxWord '[A-Z_][0-9A-Z_]\+' 
-syn match epxWord '[a-z_][0-9a-z_]\+' 
+syn match epxWord '[a-zA-Z_][0-9a-zA-Z_]\+'
 
 " Europlexus keywords
 syn match epxKeywords0 '\<\(ABAQ\|ADAP\|CALC\|CFIN\|CHAR\|CHCK\|COLL\|COMP\|COUP\|loi\|LOI\|DIAM\|DISQ\|ECHO\|ECRI\|EDEF\|EDIT\|ENDP\|EPAI\|RACC\|FESE\|FIN\|FONC\|FSS\|GEOM\|GEOP\|GLIS\|GRIL\|HORL\|IMPR\|INCL\|INIT\|INJE\|INTE\|LIAI\|LINK\|LOAD\|MASS\|MATE\|MEAS\|MORT\|MPEF\|NOEC\|OPTI\|PLAY\|PROF\|QUAL\|REGI\|REMA\|RETU\|ROBO\|RSOU\|SECT\|SORT\|SPHY\|STRU\|SUIT\|TYPL\|VALI\|VISU\|CLVF\|TEAU\|WAVE\|XFEM\)[a-zA-Z]*\>'
@@ -39,7 +38,6 @@ syn match epxKeywords '\<\(error\|attention\|has failed\|warning\|alert\|unknown
 syn match epxKeywords '\<\(ok\|successful\|success\|finished\|end of initializations\|normal end\|the final time is reached\)\>'
 
 " Europlexus equal and words
-syn match epxVariable '%[a-zA-Z_]\+'
 syn match epxVariable '%[a-zA-Z_][0-9a-zA-Z_]\+'
 syn match epxEqual '=' 
 
