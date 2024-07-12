@@ -68,7 +68,7 @@ hi def link epxKeywords0   String
 hi def link epxVariable    Operator
 hi def link epxEqual       PreProc
 hi def link epxString      Debug
-hi def link epxComment     VertSplit	
+hi def link epxComment     Comment
 hi def link epxTitle       Statement
 hi def link epxDescBlock   Comment
 
