@@ -7523,7 +7523,7 @@ for _BLESH_PATH in "${_BLESH_PATHS[@]}"; do
 		if [[ $_SKIP_BLESH = false ]]; then
 
 			# If found, source ble.sh from the located path
-			source "${_BLESH_PATH}"
+			source "${_BLESH_PATH}" --noattach
 
 			# Easier to read syntax highlighting for function names
 			ble-face argument_error=fg=#cd0000,bold 
@@ -7732,3 +7732,9 @@ fi
 if cmd-exists --strict zoxide; then
 	eval "$(zoxide init bash)"
 fi
+
+#######################################################
+# Blesh: Bash Line Editor replaces default GNU Readline (Do this step last)
+#######################################################
+# Add this line at the end of .bashrc:
+[[ ${BLE_VERSION-} ]] && ble-attach
