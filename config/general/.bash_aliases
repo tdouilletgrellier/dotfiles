@@ -119,7 +119,11 @@ function welcome_today() {
 	echo -e "$COLOR_S$(date '+🗓️  Date: %A, %B %d, %Y at %H:%M')"
 
 	# Print local weather
+	if ! [ -n "$SSH_CLIENT" ]; then
 	curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
+	else
+	echo -e "${COLOR_S}🌐 Host: $(hostname)"		
+	fi
 	# proxy && curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
 	echo -e "${RESET}"
 
@@ -316,7 +320,7 @@ if [[ "${SHLVL}" -lt 2 ]]; then
 			printf '\e[3J'
 		fi
 	else
-		echo "no ssh"
+		# echo "no ssh"
 		clear && printf '\e[3J'
 	fi
 	welcome
