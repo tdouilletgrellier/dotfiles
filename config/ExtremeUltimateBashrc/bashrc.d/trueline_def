@@ -4,8 +4,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1718214368"></script>
-<link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1718214368">
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1724785256"></script>
+<link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1724785256">
 <script>
         window.bizx.cmp.init({
             gam_gdpr_technical_delivery: true,
@@ -19,11 +19,11 @@
             if (!window.net.sf) { window.net.sf = {}; }
             SF.Ads = {};
             SF.cdn = '//a.fsdn.com/con';
-            SF.deploy_time = '1718214368';
+            SF.deploy_time = '1724785256';
             SF.sandiego = true;
             SF.sandiego_chrome = true;
             SF.variant = 'sf';
-            SF.fpid = '5afdf4c6-d0eb-4bfa-9bb7-7c6778b4910a';
+            SF.fpid = '2a952a13-a039-4a76-94fd-2edb9b28d61d';
             
             SF.Breakpoints = {
               small: 0,
@@ -43,8 +43,9 @@
             }
             
         </script>
-<link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1718214368">
-<link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1718214368">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1724785256">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1724785256">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/disallow.css?1724785256">
 <meta name="description" content="Free, secure and fast downloads from the largest Open Source applications and software directory - SourceForge.net">
 <meta name="keywords" content="Open Source, Open Source Software, Development, Community, Source Code, Secure,  Downloads, Free Software">
 <title>Page not found
@@ -57,13 +58,13 @@
             /*global unescape, window, console, jQuery, $, net, SF, DD_belatedPNG, bizx  */
             if (!window.SF) {
                 window.SF = {};
-            }SF.EU_country_codes = ["SE","ME","PN","DK","GP","LT","SI","PM","BL","KY","NO","GI","HR","VG","PT","BG","HU","EE","SK","PF","LI","GL","YT","MF","SX","TF","AX","MT","WF","FK","CY","IS","AW","TC","IO","FR","GB","JE","GR","NL","ES","SH","GS","IE","BM","BE","CW","AT","GF","RO","RE","NC","MS","FI","MQ","CZ","AI","LU","GG","IT","PL","CH","DE","LV"];
+            }SF.EU_country_codes = ["SH","LV","DE","AT","PN","GF","IO","RE","CH","MT","MF","MQ","GG","PF","GB","LT","SE","BG","PL","CY","SK","BL","PT","YT","AI","LI","CZ","GS","ES","HU","BE","LU","WF","MS","IS","NC","AW","FK","IT","AX","HR","EE","JE","DK","BM","GI","TF","FR","SI","ME","GL","CW","GR","GP","RO","TC","NO","KY","PM","NL","FI","SX","IE","VG"];
             SF.unknown_country_codes = ["","A1","A2","O1"];
         </script>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1718214368"></script>
-<style>.S7ae9d0be581747b9813eb8cedfd6d7f5cc7a8008 { display: none !important; }</style>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1724785256"></script>
+<style>.G2adc2cbff7502a097923da16f8e2c012ac0dc5ee { display: none !important; }</style>
 <script>SF.adblock = true;</script>
-<script src="//a.fsdn.com/con/js/adsbanner.js?1718214368"></script>
+<script src="//a.fsdn.com/con/js/adsbanner.js?1724785256"></script>
 <script>
         function initPiwik(){
             var _paq = window._paq = window._paq || [];
@@ -84,7 +85,7 @@
             var interval = 6 * 60 * 60 * 1000; // 6 hrs, expressed in ms
             var vid_date = new Date(localStorage.getItem('vid_date'));
             if (new Date() - vid_date >= interval) {
-                var data = {firstparty_id: "5afdf4c6-d0eb-4bfa-9bb7-7c6778b4910a", do_not_sell: false};
+                var data = {firstparty_id: "2a952a13-a039-4a76-94fd-2edb9b28d61d", do_not_sell: false};
                 bizx.cmp.ifConsent({ purposes: ['ads'], vendors: 'sdm'}, function() {},
                     function(){
                         // no consent (opt-out)
@@ -189,7 +190,7 @@
 <img src="//a.fsdn.com/con/images/sandiego/sf-logo-full.svg" alt="SourceForge logo" class="sf-logo-full" />
 </a>
 <div class="title-bar-right">
-<button type="button" class="menu-icon" data-toggle="offCanvas"></button>
+<button type="button" aria-label="Toggle Main Menu" class="menu-icon" data-toggle="offCanvas"></button>
 </div>
 </div>
 </section>
@@ -231,8 +232,8 @@ Menu
 </div>
 </div>
 <div class="search">
-<div class="main-nav-button">
-<a href="/p/import_project/github/" rel="nofollow" title="Sync your Github project to SourceForge" id="github-link">
+<div class="main-nav-button github-nav-button">
+<a href="/p/import_project/github/" rel="nofollow" title="Sync your Github project to SourceForge" id="main-nav-badge-link" data-label="GitHub Sync Tool">
 <img src="//a.fsdn.com/con/images/sandiego/github-sync.png" srcset="//a.fsdn.com/con/images/sandiego/github-sync_2x.png 2x" alt="GitHub sync" id="main-nav-badge" />
 </a>
 </div>
@@ -294,13 +295,13 @@ Whoops, we can't find that page.
 </li>
 <li id="social">
 <span></span>
-<a href="https://twitter.com/sourceforge" class="twitter" rel="nofollow" target="_blank">
+<a href="https://twitter.com/sourceforge" class="twitter" rel="nofollow" target="_blank" title="SourceForge on X">
 <svg class="vertical-icon-fix" data-name="twitter" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5t-115.5 248.5-184.5 210.5-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5t-114-159.5q33 5 61 5 43 0 85-11-112-23-185.5-111.5t-73.5-205.5v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5t371.5 99.5q-8-38-8-74 0-134 94.5-228.5t228.5-94.5q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z" /></svg></a>
-<a href="https://fosstodon.org/@sourceforge" rel="me nofollow" target="_blank">
+<a href="https://fosstodon.org/@sourceforge" rel="me nofollow" target="_blank" title="SourceForge on Mastodon">
 <svg class="vertical-icon-fix" data-name="mastodon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.54 102.54 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5zm-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z" /></svg></a>
-<a href="https://www.facebook.com/sourceforgenet/" class="facebook" rel="nofollow" target="_blank">
+<a href="https://www.facebook.com/sourceforgenet/" class="facebook" rel="nofollow" target="_blank" title="SourceForge on Facebook">
 <svg data-name="facebook" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759h-306v-759h-255v-296h255v-218q0-186 104-288.5t277-102.5q147 0 228 12z" /></svg></a>
-<a href="https://www.linkedin.com/company/sourceforge.net" class="linkedin" rel="nofollow" target="_blank">
+<a href="https://www.linkedin.com/company/sourceforge.net" class="linkedin" rel="nofollow" target="_blank" title="SourceForge on LinkedIn">
 <svg data-name="linkedin" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991h-330v-991h330zm21-306q1 73-50.5 122t-135.5 49h-2q-82 0-132-49t-50-122q0-74 51.5-122.5t134.5-48.5 133 48.5 51 122.5zm1166 729v568h-329v-530q0-105-40.5-164.5t-126.5-59.5q-63 0-105.5 34.5t-63.5 85.5q-11 30-11 81v553h-329q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5 114.5-15.5q171 0 275 113.5t104 332.5z" /></svg></a>
 <span></span>
 </li>
@@ -339,12 +340,12 @@ Whoops, we can't find that page.
 </section>
 </footer>
 </div>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1718214368"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1724785256"></script>
 <script>
         /* global Dropzone */
         Dropzone.options.blockthisForm = false;
     </script>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1718214368"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1724785256"></script>
 <script>
             /* global Foundation */
             $(document).foundation();
@@ -369,7 +370,7 @@ Whoops, we can't find that page.
 
         
         function loadimg(params, dimension_prefix) {
-            params = Object.assign({"idsite":1,"rec":1,"rand":82677,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
+            params = Object.assign({"idsite":1,"rec":1,"rand":74460,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
             for (var key in params) {
                 if (params.hasOwnProperty(key) && key.indexOf('dimension') === 0 && params[key] !== undefined) {
                     params[key] = (dimension_prefix||'') + params[key];
@@ -417,7 +418,7 @@ Whoops, we can't find that page.
             /*global _ml:true, window */
             _ml = window._ml || {};
             _ml.eid = '771';
-            _ml.fp = '5afdf4c6-d0eb-4bfa-9bb7-7c6778b4910a';  
+            _ml.fp = '2a952a13-a039-4a76-94fd-2edb9b28d61d';  
             var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');
             mltag.type = 'text/javascript';
             mltag.async = true;
@@ -428,6 +429,7 @@ Whoops, we can't find that page.
     })();
 </script>
 
+
 <div id="overlay-blockthis-wrapper" style="display: none;">
 <div id="overlay-blockthis">
 <div class="as-h2 title">Thanks for helping keep SourceForge clean.</div>
@@ -435,15 +437,15 @@ Whoops, we can't find that page.
 <form class="dropzone small-12" action="/api/instrumentation/gpt" id="blockthisForm" method="POST">
 <div class="row small-12">
 <div class="column description small-12">
-<input type="hidden" name="_visit_cookie" value="5afdf4c6-d0eb-4bfa-9bb7-7c6778b4910a" />
-<input type="hidden" name="timestamp" value="1718610254" />
-<input type="hidden" name="spinner" value="XYeq3mARNo35YjBh9ir1T97zyD4Q" />
-<p class="S7ae9d0be581747b9813eb8cedfd6d7f5cc7a8008"><label for="XZsKCw5jDtmE0wpNOwq5UwrkDwpwSbS7DgMOuRkY">You seem to have CSS turned off.
-Please don't fill out this field.</label><input id="XZsKCw5jDtmE0wpNOwq5UwrkDwpwSbS7DgMOuRkY" name="XZ8KCw5jDtmE0wpPCiMKALWZrJcKDworCi8KgwrvDjcOq" type="text" /></p>
-<p class="S7ae9d0be581747b9813eb8cedfd6d7f5cc7a8008"><label for="XZsKCw5jDtmE0wpNPwq5UwrkDwpwSbS7DgMOuRkY">You seem to have CSS turned off.
-Please don't fill out this field.</label><input id="XZsKCw5jDtmE0wpNPwq5UwrkDwpwSbS7DgMOuRkY" name="XZ8KCw5jDtmE0wpLCiMKALWZrJcKDworCi8KgwrvDjcOq" type="text" /></p>
+<input type="hidden" name="_visit_cookie" value="2a952a13-a039-4a76-94fd-2edb9b28d61d" />
+<input type="hidden" name="timestamp" value="1724918490" />
+<input type="hidden" name="spinner" value="XZh69Rw10R58fHqtPH9gBwj4_ShE" />
+<p class="G2adc2cbff7502a097923da16f8e2c012ac0dc5ee"><label for="XYXbDkiloDXfCrxBmwr7CowjCrsKyPsOiw77DnsO3">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XYXbDkiloDXfCrxBmwr7CowjCrsKyPsOiw77DnsO3" name="XYHbDkiloDXfCkGcLR1hpa8O9HsO_wqvCrMKJ" type="text" /></p>
+<p class="G2adc2cbff7502a097923da16f8e2c012ac0dc5ee"><label for="XYXbDkiloDXfCrhBmwr7CowjCrsKyPsOiw77DnsO3">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XYXbDkiloDXfCrhBmwr7CowjCrsKyPsOiw77DnsO3" name="XYHbDkiloDXbCkGcLR1hpa8O9HsO_wqvCrMKJ" type="text" /></p>
 Briefly describe the problem (required):
-<input name="XasKOw5LDq2c_w4oOLMOldxN8ZcOywonCql0xXQ" type="text" required>
+<input name="XbXrDmDRuBi7Dr2t3w4QhEMKgFC4pScO5w60" type="text" required>
 </div>
 </div>
 <div class="column small-12">
@@ -477,9 +479,9 @@ Right-click on the ad, choose "Copy Link", then paste here &rarr;<br>
 </div>
 <div class="column large-7 small-6">
 <p>Ad destination/click URL:
-<input name="XaMKJw5vDsWcmw7wLKsOgw67CpSvDg0VYwoIrc8KY" type="url" required>
+<input name="Xb33DkS5uHxjDqm1ywqQ3CjQWwrTCjcODwpbDkA" type="url" required>
 </p>
-<textarea id="gpt-info" name="XZcKOw5bDrGXCu3vDnybCmsK3Q1PDgU_Cvn7CnARc"></textarea>
+<textarea id="gpt-info" name="XYnrDnDNsez_CisOzCcOdw7zDowTDgFbDmMKnw5kh"></textarea>
 <input class="button" type="submit" id="btn-blockthis-submit" value="Submit Report">
 </div>
 </div>

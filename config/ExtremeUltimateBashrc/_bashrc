@@ -35,16 +35,17 @@
 # curl -L --output ~/.bashrc_help https://sourceforge.net/projects/ultimate-bashrc/files/_bashrc_help/download
 #######################################################
 # Supported Optional Applications/Dependencies:
-# 7z aria2 baca bash-completion bashmarks bashtop bat bc blesh bottom bpytop broot
-# btop btrfs bzip2 ccat cmatrix cod colordiff commacd curl delta doas dua dust dym
-# elinks enhancd exa exiftool eza fasd fd ffmpeg figlet fx fzf fzf-tab-completion
-# fzy gawk gcal gdu gio git git-commander git-completion git-delta gitalias gitui
-# glances glow grc grv gtop gzip hBlock hstr htop icdiff ifconfig iotop jless jp2a
-# jq lazygit links links2 lnav lolcat lscolors lsd lsof lsx lynx mc mcfly micro
-# mlocate moar multitail mysql-colorize nano ncdu neovim nmon nnn paru qfc rar rem
-# resh ripgrep rsync shellcheck shred silver_searcher skim source-highlight tar
-# terminology thefuck tig tmux toilet trash-cli tree tuifi ugit vivid vlock w3m
-# wget xsel youtube-dl yt-dlp ytfzf ytop zellij zf zip zoxide
+# 7z aria2 baca bash-completion bashmarks bashtop bat bc blesh bottom bpytop
+# broot btop btrfs bzip2 ccat cmatrix cod colordiff commacd curl delta doas dua
+# dust dym elinks enhancd exa exiftool eza fasd fd ffmpeg figlet frogmouth fx
+# fzf fzf-tab-completion fzy gawk gcal gdu gio git git-commander git-completion
+# git-delta gitalias gitui glances glow grc grv gtop gzip hBlock hstr htop
+# icdiff ifconfig iotop jless jp2a jq lazygit links links2 lnav lolcat lscolors
+# lsd lsof lsx lynx mc mcfly mdcat mdless micro mlocate moar multitail
+# mysql-colorize nano ncdu neovim nmon nnn paru qfc rar rem resh ripgrep rsync
+# shellcheck shred silver_searcher skim source-highlight tar terminology thefuck
+# tig tmux toilet trash-cli tree tuifi ugit vivid vlock w3m wget xsel youtube-dl
+# yt-dlp ytfzf ytop zellij zf zip zoxide
 #
 # Supported Optional Huds:
 # neofetch, fastfetch, screenFetch, linux_logo, archey, pfetch
@@ -455,7 +456,7 @@ function edit() {
 					echo -e "${BRIGHT_RED}Cannot edit the file without removing the immutable attribute.${RESET}"
 
 					# Exit the function with status 1 indicating an error
-					exit 1
+					return 1
 				fi
 			fi
 		fi
@@ -544,6 +545,17 @@ function edit() {
 	else
 		# If not a symlink, proceed with the original file
 		local ACTUAL_FILE="${1}"
+	fi
+
+	# If the it does not contain a path and is not a file
+	if [[ "$ACTUAL_FILE" != */* && ! -f "$ACTUAL_FILE" ]]; then
+		# Try to locate the full path using `which`
+		local FOUND_PATH=$(command which "$ACTUAL_FILE" 2>/dev/null)
+
+		# Update ACTUAL_FILE if a path was found
+		if [[ -n "$FOUND_PATH" ]]; then
+			ACTUAL_FILE="$FOUND_PATH"
+		fi
 	fi
 
 	# Check for special case of editing /etc/sudoers...
@@ -997,7 +1009,7 @@ function a() {
 
 	# Combine the output of list_aliases and list_functions and pass to less.
 	# The output is piped into less with several options for improved viewing.
-	{ list_aliases; echo; list_functions; } | less --line-numbers --no-init
+	{ list_aliases; echo; list_functions; } | \less --line-numbers --no-init
 }
 
 #######################################################
@@ -1005,6 +1017,7 @@ function a() {
 #######################################################
 
 declare -A ALIASES=(
+	["autostart"]="$HOME/.config/autostart"
 	["bashrc"]="$HOME"
 	["bashrc"]="$HOME/.config/bashrc"
 	["bin"]="$HOME/.local/bin"
@@ -1270,6 +1283,49 @@ if cmd-exists git; then
 
 		# Printing the total count in purple and green
 		echo -e "${MAGENTA}Total files:${RESET} ${count}"
+	}
+
+	# Update all Git repositories in the current directory
+	function gitupdaterepos() {
+		# Check if the necessary commands (git, sed, sort) are available in the environment
+		if cmd-exists git && cmd-exists sed && cmd-exists sort; then
+			# Save the current directory to a variable
+			local current_dir=$(\pwd)
+
+			# Alert the user to the current directory and the action to be taken
+			echo -e "${BRIGHT_YELLOW}=>${RESET} You are about to update Git repositories in: ${current_dir}"
+			echo -e "${BRIGHT_BLUE}=>${RESET} Listed repositories:"
+
+			# Find all directories within one to two levels that contain a '.git' folder
+			local repos=( $(\find "$current_dir" -mindepth 1 -maxdepth 2 -type d -name '.git' | \sed 's|/.git||' | \sort -u) )
+
+			# Display the directories to be updated
+			for repo in "${repos[@]}"; do
+				echo "${repo}"
+			done
+
+			# Prompt the user for confirmation to proceed with updating
+			read -p "Are you sure you want to proceed? (y/N): " response
+			if [[ "${response,,}" != "y" ]]; then
+				echo -e "${BRIGHT_RED}=>${RESET} Update canceled"
+				return
+			fi
+
+			# Iterate over each repository directory and attempt a 'git pull' operation
+			for REPO_DIR in "${repos[@]}"; do
+				\cd "$REPO_DIR" || { echo -e "${BRIGHT_RED}=>${RESET} Error entering $REPO_DIR"; continue; }
+				echo -e "${BRIGHT_YELLOW}=>${RESET} Updating Git repo in $REPO_DIR..."
+
+				# Execute a git pull and display success or failure messages
+				git pull && echo -e "${BRIGHT_GREEN}=>${RESET} Successfully updated $REPO_DIR" || echo -e "${BRIGHT_RED}=>${RESET} Failed to update $REPO_DIR"
+
+				# Return to the original directory after each update
+				\cd - > /dev/null
+			done
+		else
+			# If required commands are not available, alert the user
+			echo -e "${BRIGHT_RED}=>${RESET} Required commands Git, sed, and/or sort are not installed"
+		fi
 	}
 
 	# Change the Git branch - If no branch is specified as an argument, then
@@ -2122,7 +2178,7 @@ alias free='free -h'
 # u = user-oriented format providing detailed information
 # x = list the processes without a controlling terminal
 # f = display a tree view of parent to child processes
-alias ps='ps auxf'
+#alias ps='ps auxf'
 
 # Show top ten processes
 alias cpu='ps aux | sort -r -nk +4 | head | $PAGER'
@@ -2201,7 +2257,7 @@ alias flushcache="sudo free -h && \\
 # yt-dlp fork of youtube-dl - Set the default download folder
 # Link: https://github.com/yt-dlp/yt-dlp
 if cmd-exists --strict yt-dlp; then
-	alias yt-dlp='yt-dlp --paths ~/Desktop/'
+	alias yt-dlp='yt-dlp'
 	alias ytd='yt-dlp'
 # Youtube-dl - Use best settings
 # Link: https://github.com/ytdl-org/youtube-dl
@@ -2289,6 +2345,83 @@ if cmd-exists --strict teamviewer; then
 	alias teamviewerstart='sudo teamviewer --daemon start'
 	alias teamviewerstop='sudo teamviewer --daemon stop'
 fi
+
+# Automatically downloads based on URL by dynamically choosing the appropriate command
+# Detects the domain from the URL and chooses the appropriate download command
+# ---
+# IMPORTANT: Always ensure that you have the legal right and ethical justification
+# to download media from various services. Respect copyright laws and terms of service
+# agreements. Use of this script should comply with all applicable regulations.
+function d() {
+	local URL="$1"
+	local DOWNLOAD_PATH="."
+
+	# Check if we are in a graphical environment and Desktop exists
+	if [[ (-n "$DISPLAY" || -n "$WAYLAND_DISPLAY") && -d "${HOME}/Desktop" ]]; then
+		DOWNLOAD_PATH="${HOME}/Desktop"
+	fi
+
+	# Display help if no URL provided
+	if [[ -z "${URL}" ]]; then
+		echo -e "Automatically downloads based on URL by dynamically choosing the appropriate command"
+		echo -en "Supports ${BRIGHT_CYAN}axel${RESET}, ${BRIGHT_CYAN}aria2c${RESET}, ${BRIGHT_CYAN}wget${RESET}, ${BRIGHT_CYAN}curl${RESET},"
+		echo -e " and common tools for ${BRIGHT_BLUE}Youtube${RESET}, ${BRIGHT_BLUE}Spotify${RESET}, ${BRIGHT_BLUE}Tidal${RESET}, and ${BRIGHT_BLUE}SoundCloud${RESET}"
+		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}d ${BRIGHT_YELLOW}[URL]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET} ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
+		return 1
+
+	# YouTube URLs
+	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be)/ ]]; then
+		if cmd-exists yt-dlp; then
+			echo -e "${BRIGHT_GREEN}Using yt-dlp for YouTube URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && yt-dlp "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+		elif cmd-exists youtube-dl; then
+			echo -e "${BRIGHT_GREEN}Using youtube-dl for YouTube URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && youtube-dl --format 'best[vcodec*=avc]' "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable YouTube download tool found${RESET}"
+			return 1
+		fi
+
+	# Spotify URLs
+	elif [[ "${URL}" =~ ^https://open.spotify.com/ ]]; then
+		if cmd-exists spotdl; then
+			echo -e "${BRIGHT_GREEN}Using spotdl for Spotify URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && spotdl --bitrate 320k "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable Spotify download tool found${RESET}"
+			return 1
+		fi
+
+	# Tidal URLs
+	elif [[ "${URL}" =~ ^https://tidal.com/ ]]; then
+		if cmd-exists tidal-dl-ng; then
+			echo -e "${BRIGHT_GREEN}Using tidal-dl-ng for Tidal URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && tidal-dl-ng dl "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+		elif cmd-exists tidal-dl; then
+			echo -e "${BRIGHT_GREEN}Using tidal-dl for Tidal URL (ensure logged in)...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && tidal-dl "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable Tidal download tool found${RESET}"
+			return 1
+		fi
+
+	# SoundCloud URLs
+	elif [[ "${URL}" =~ ^https?://(www\.)?soundcloud.com/ ]]; then
+		if cmd-exists scdl; then
+			echo -e "${BRIGHT_GREEN}Using scdl for SoundCloud URL...${RESET}"
+			(scdl -l "${URL}" --path "${DOWNLOAD_PATH}" --onlymp3) || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable SoundCloud download tool found${RESET}"
+			return 1
+		fi
+
+	# Download using the detected tool
+	else
+		echo -e "${BRIGHT_GREEN}Downloading...${RESET}"
+		(cd "${DOWNLOAD_PATH}" && download "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+	fi
+}
 
 #######################################################
 ### VISUAL
@@ -2460,6 +2593,27 @@ fi
 # Alias to show the current TTY (CTRL+ALT+1 through 7)
 alias whichtty='tty | sed -e "s:/dev/::"'
 
+# Conditionally set alias for checking failed login attempts
+if cmd-exists aureport; then
+	# Use aureport to generate a report of failed authentication attempts
+	alias check-login-failures='sudo \aureport -au --failed | \less'
+elif cmd-exists lastb; then
+	# If aureport is not available, check for the lastb command
+	alias check-login-failures='sudo \lastb | \less'
+else
+	# If neither executable command is available, check for system log files
+	if [[ -f /var/log/auth.log ]]; then
+		# Use grep to search for 'FAILED LOGIN' entries in auth.log
+		alias check-login-failures="sudo \grep 'FAILED LOGIN' /var/log/auth.log | \less"
+	elif [[ -f /var/log/secure ]]; then
+		# Use grep to search for 'FAILED LOGIN' entries in secure
+		alias check-login-failures="sudo \grep 'FAILED LOGIN' /var/log/secure | \less"
+	else
+		# Provide feedback if no methods are available for checking login failures
+		echo "Error: No common methods or logs found for checking login failures"
+	fi
+fi
+
 # Spell check a word with DidYouMean
 # Link: https://github.com/hisbaan/didyoumean
 if cmd-exists --strict dym; then
@@ -2511,7 +2665,7 @@ fi
 # Link: https://w3m.sourceforge.net/
 # Link: http://www.aboutlinux.info/2007/02/links2-cross-platform-console-based-web.html
 # Link: https://www.tecmint.com/command-line-web-browsers/
-for TERMINAL_BROWSER in "lynx" "elinks" "w3m" "links2" "links"; do
+for TERMINAL_BROWSER in "w3m" "lynx" "elinks" "links2" "links"; do
 	if cmd-exists "${TERMINAL_BROWSER}"; then
 		# Show the Extreme Ultimate .bashrc README file in the available browser
 		if [[ -f "${HOME}/.config/bashrc/README.html" ]]; then
@@ -2524,27 +2678,42 @@ for TERMINAL_BROWSER in "lynx" "elinks" "w3m" "links2" "links"; do
 	fi
 done
 
-# Glow is one of the best CLI markdown viewers with pager support
-# Add pager support and a local-only option for security
+# If the readme alias is still not set, try markdown readers
+if [[ $(type -t readme) != 'alias' ]]; then
+	# Check for the availability of markdown viewers
+	# Link: https://github.com/Textualize/frogmouth
+	# Link: https://github.com/charmbracelet/glow
+	# Link: https://github.com/swsnr/mdcat
+	# Link: https://github.com/ttscoff/mdless
+	for TERMINAL_MARKDOWN_VIEWER in "frogmouth" "glow" "mdcat" "mdless"; do
+		if cmd-exists "${TERMINAL_MARKDOWN_VIEWER}"; then
+			# If README.md exists in .config/bashrc, set 'readme' alias
+			if [[ -f "${HOME}/.config/bashrc/README.md" ]]; then
+				alias readme="${TERMINAL_MARKDOWN_VIEWER} ~/.config/bashrc/README.md"
+				break  # Exit the loop once the first available browser is found
+			# If README.md exists in home, set 'readme' alias
+			elif [[ -f "${HOME}/README.md" ]]; then
+				alias readme="${TERMINAL_MARKDOWN_VIEWER} ~/README.md"
+				break  # Exit the loop once the first available browser is found
+			fi
+		fi
+	done
+fi
+
+# If glow is installed, set up some aliases for it
 # Link: https://github.com/charmbracelet/glow
-# If 'readme' alias is still empty, try glow
 if cmd-exists glow; then
 	# Use glow's pager option
 	alias glow='glow --all --pager'
 
 	# Local only version for security
 	alias glowsafe='glow --all --pager --local'
+fi
 
-	# If the readme alias is not set
-	if [[ $(type -t readme) != 'alias' ]]; then
-		# If README.md exists in .config/bashrc, set 'readme' alias
-		if [[ -f "${HOME}/.config/bashrc/README.md" ]]; then
-			alias readme='glow ~/.config/bashrc/README.md'
-		# If README.md exists in home, set 'readme' alias
-		elif [[ -f "${HOME}/README.md" ]]; then
-			alias readme='glow ~/README.md'
-		fi
-	fi
+# If mdcat is installed, use pagination
+# Link: https://github.com/swsnr/mdcat
+if cmd-exists mdcat; then
+	alias mdcat='mdcat --paginate'
 fi
 
 # fx is a JavaScript Object Notation (JSON) viewer
@@ -3108,7 +3277,7 @@ if cmd-exists --strict pacman && [[ -d /etc/pacman.d/ ]]; then
 
 		# Use a much more detailed package listing with descriptions (AUR separated)
 		# pkglist [search] will search for all installed packages instead
-		unalias pkglist &>/dev/null
+		alias pkglist &>/dev/null && unalias pkglist
 		function pkglist() {
 			if [ $# -eq 0 ]; then
 				# In order to make this accurate, lets get a basic list of all the main repositories (minus the AUR) to check against
@@ -6832,7 +7001,7 @@ if [[ $_SKIP_GRC = false ]] && cmd-exists --strict grc; then
 			alias mtr='colourify mtr'
 			alias netstat='colourify netstat'
 			alias ping='colourify ping -c 5'
-			alias ps='colourify ps auxf'
+			#alias ps='colourify ps auxf'
 			alias semanage='colourify semanage'
 			alias sockstat='colourify sockstat'
 			alias ss='colourify ss'
@@ -6841,9 +7010,17 @@ if [[ $_SKIP_GRC = false ]] && cmd-exists --strict grc; then
 			alias traceroute='colourify traceroute'
 		fi
 	fi
+
+	# Aliasing ps causes issues with some scripts
+	alias ps &>/dev/null && unalias ps
+
+	# Create another alias for ps color instead
+	alias pss='colourify ps auxf'
+
 	# Override lsblk to enhance the color output
 	#alias lsblk='colourify lsblk --exclude 1,7 --output NAME,MAJ:MIN,RM,SIZE,RO,TYPE,MOUNTPOINTS'
 	alias lsblk='colourify lsblk --exclude 1,7 --output NAME,MAJ:MIN,TYPE,FSTYPE,RM,MOUNTPOINTS,LABEL,SIZE,FSUSE%,RO,UUID 2> /dev/null || colourify lsblk --exclude 1,7'
+
 else
 	# List block devices but show more info including the files systems and permissions
 	# and removes all mem and loopback devices (like snap packages) from the list
@@ -7612,7 +7789,7 @@ fi
 
 if [[ -n "$(ps $PPID | grep -w [m]c)" ]]; then
 	# The Midnight Commander subshell doesn't like aliases for pwd
-	unalias pwd >/dev/null 2>/dev/null
+	alias pwd &>/dev/null && unalias pwd
 
 	# Exit here
 	return
