@@ -4,9 +4,7 @@ import fcntl
 import io
 import os
 import pty
-# import resource
-# as sublime text doesn't ship with resource module, use our mock version of `resource`
-from . import resource
+import resource
 import signal
 import struct
 import sys
@@ -21,7 +19,7 @@ except ImportError:
 # Constants
 from pty import (STDIN_FILENO, CHILD)
 
-from .util import which
+from .util import which, PtyProcessError
 
 _platform = sys.platform.lower()
 
@@ -44,7 +42,7 @@ if PY3:
 else:
     def _byte(i):
         return chr(i)
-
+    
     class FileNotFoundError(OSError): pass
     class TimeoutError(OSError): pass
 
@@ -52,7 +50,7 @@ _EOF, _INTR = None, None
 
 def _make_eof_intr():
     """Set constants _EOF and _INTR.
-
+    
     This avoids doing potentially costly operations on module load.
     """
     global _EOF, _INTR
@@ -62,11 +60,18 @@ def _make_eof_intr():
     # inherit EOF and INTR definitions from controlling process.
     try:
         from termios import VEOF, VINTR
-        try:
-            fd = sys.__stdin__.fileno()
-        except ValueError:
-            # ValueError: I/O operation on closed file
-            fd = sys.__stdout__.fileno()
+        fd = None
+        for name in 'stdin', 'stdout':
+            stream = getattr(sys, '__%s__' % name, None)
+            if stream is None or not hasattr(stream, 'fileno'):
+                continue
+            try:
+                fd = stream.fileno()
+            except ValueError:
+                continue
+        if fd is None:
+            # no fd, raise ValueError to fallback on CEOF, CINTR
+            raise ValueError("No stream has a fileno")
         intr = ord(termios.tcgetattr(fd)[6][VINTR])
         eof = ord(termios.tcgetattr(fd)[6][VEOF])
     except (ImportError, OSError, IOError, ValueError, termios.error):
@@ -79,18 +84,15 @@ def _make_eof_intr():
         except ImportError:
             #                         ^C, ^D
             (intr, eof) = (3, 4)
-
+    
     _INTR = _byte(intr)
     _EOF = _byte(eof)
 
-class PtyProcessError(Exception):
-    """Generic error class for this package."""
-
 # setecho and setwinsize are pulled out here because on some platforms, we need
 # to do this from the child before we exec()
-
+    
 def _setecho(fd, state):
-    errmsg = 'setecho() may not be called on this platform'
+    errmsg = 'setecho() may not be called on this platform (it may still be possible to enable/disable echo when spawning the child process)'
 
     try:
         attr = termios.tcgetattr(fd)
@@ -125,7 +127,7 @@ def _setwinsize(fd, rows, cols):
 
 class PtyProcess(object):
     '''This class represents a process running in a pseudoterminal.
-
+    
     The main constructor is the :meth:`spawn` classmethod.
     '''
     string_type = bytes
@@ -146,7 +148,7 @@ class PtyProcess(object):
         write_to_stdout = sys.stdout.write
 
     encoding = None
-
+    
     argv = None
     env = None
     launch_dir = None
@@ -176,7 +178,7 @@ class PtyProcess(object):
     @classmethod
     def spawn(
             cls, argv, cwd=None, env=None, echo=True, preexec_fn=None,
-            dimensions=(24, 80)):
+            dimensions=(24, 80), pass_fds=()):
         '''Start the given command in a child process in a pseudo terminal.
 
         This does all the fork/exec type of stuff for a pty, and returns an
@@ -188,6 +190,10 @@ class PtyProcess(object):
 
         Dimensions of the psuedoterminal used for the subprocess can be
         specified as a tuple (rows, cols), or the default (24, 80) will be used.
+
+        By default, all file descriptors except 0, 1 and 2 are closed. This
+        behavior can be overridden with pass_fds, a list of file descriptors to
+        keep open between the parent and the child.
         '''
         # Note that it is difficult for this method to fail.
         # You cannot detect if the child process cannot start.
@@ -253,9 +259,14 @@ class PtyProcess(object):
 
             # Do not allow child to inherit open file descriptors from parent,
             # with the exception of the exec_err_pipe_write of the pipe
-            max_fd = resource.getrlimit(resource.RLIMIT_NOFILE)[0]
-            os.closerange(3, exec_err_pipe_write)
-            os.closerange(exec_err_pipe_write+1, max_fd)
+            # and pass_fds.
+            # Impose ceiling on max_fd: AIX bugfix for users with unlimited
+            # nofiles where resource.RLIMIT_NOFILE is 2^63-1 and os.closerange()
+            # occasionally raises out of range error
+            max_fd = min(1048576, resource.getrlimit(resource.RLIMIT_NOFILE)[0])
+            spass_fds = sorted(set(pass_fds) | {exec_err_pipe_write})
+            for pair in zip([2] + spass_fds, spass_fds + [max_fd]):
+                os.closerange(pair[0]+1, pair[1])
 
             if cwd is not None:
                 os.chdir(cwd)
@@ -290,7 +301,7 @@ class PtyProcess(object):
 
         # Parent
         inst = cls(pid, fd)
-
+        
         # Set some informational attributes
         inst.argv = argv
         if env is not None:
@@ -340,9 +351,9 @@ class PtyProcess(object):
                 args.append("env=%r" % self.env)
             if self.launch_dir is not None:
                 args.append("cwd=%r" % self.launch_dir)
-
+            
             return "{}.spawn({})".format(clsname, ", ".join(args))
-
+        
         else:
             return "{}(pid={}, fd={})".format(clsname, self.pid, self.fd)
 
@@ -500,7 +511,7 @@ class PtyProcess(object):
 
         Can block if there is nothing to read. Raises :exc:`EOFError` if the
         terminal was closed.
-
+        
         Unlike Pexpect's ``read_nonblocking`` method, this doesn't try to deal
         with the vagaries of EOF on platforms that do strange things, like IRIX
         or older Solaris systems. It handles the errno=EIO pattern used on
@@ -551,7 +562,7 @@ class PtyProcess(object):
 
     def write(self, s, flush=True):
         """Write bytes to the pseudoterminal.
-
+        
         Returns the number of bytes written.
         """
         return self._writeb(s, flush=flush)

@@ -4,8 +4,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1724785256"></script>
-<link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1724785256">
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1727812111"></script>
+<link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1727812111">
 <script>
         window.bizx.cmp.init({
             gam_gdpr_technical_delivery: true,
@@ -19,11 +19,11 @@
             if (!window.net.sf) { window.net.sf = {}; }
             SF.Ads = {};
             SF.cdn = '//a.fsdn.com/con';
-            SF.deploy_time = '1724785256';
+            SF.deploy_time = '1727812111';
             SF.sandiego = true;
             SF.sandiego_chrome = true;
             SF.variant = 'sf';
-            SF.fpid = '2a952a13-a039-4a76-94fd-2edb9b28d61d';
+            SF.fpid = '28833258-6fd7-40fc-b09c-4edc0a46fec8';
             
             SF.Breakpoints = {
               small: 0,
@@ -43,9 +43,9 @@
             }
             
         </script>
-<link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1724785256">
-<link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1724785256">
-<link rel="stylesheet" href="//a.fsdn.com/con/css/disallow.css?1724785256">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1727812111">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1727812111">
+<link rel="stylesheet" href="//a.fsdn.com/con/css/disallow.css?1727812111">
 <meta name="description" content="Free, secure and fast downloads from the largest Open Source applications and software directory - SourceForge.net">
 <meta name="keywords" content="Open Source, Open Source Software, Development, Community, Source Code, Secure,  Downloads, Free Software">
 <title>Page not found
@@ -58,13 +58,13 @@
             /*global unescape, window, console, jQuery, $, net, SF, DD_belatedPNG, bizx  */
             if (!window.SF) {
                 window.SF = {};
-            }SF.EU_country_codes = ["SH","LV","DE","AT","PN","GF","IO","RE","CH","MT","MF","MQ","GG","PF","GB","LT","SE","BG","PL","CY","SK","BL","PT","YT","AI","LI","CZ","GS","ES","HU","BE","LU","WF","MS","IS","NC","AW","FK","IT","AX","HR","EE","JE","DK","BM","GI","TF","FR","SI","ME","GL","CW","GR","GP","RO","TC","NO","KY","PM","NL","FI","SX","IE","VG"];
+            }SF.EU_country_codes = ["LV","GL","ES","FI","WF","PF","NC","BE","GS","DE","YT","MF","SX","NO","KY","CY","RO","MQ","VG","IT","MT","LU","GG","GF","SK","PT","MS","CH","AI","LI","ME","AX","RE","BM","PN","TC","NL","CW","PL","DK","BG","EE","HU","BL","IO","GB","CZ","SI","JE","GI","PM","LT","FK","SH","AW","GP","IE","AT","GR","SE","TF","IS","HR","FR"];
             SF.unknown_country_codes = ["","A1","A2","O1"];
         </script>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1724785256"></script>
-<style>.G2adc2cbff7502a097923da16f8e2c012ac0dc5ee { display: none !important; }</style>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1727812111"></script>
+<style>.d99ccb0d3da89fc9605bba5c740b031cb78449d7e { display: none !important; }</style>
 <script>SF.adblock = true;</script>
-<script src="//a.fsdn.com/con/js/adsbanner.js?1724785256"></script>
+<script src="//a.fsdn.com/con/js/adsbanner.js?1727812111"></script>
 <script>
         function initPiwik(){
             var _paq = window._paq = window._paq || [];
@@ -85,7 +85,7 @@
             var interval = 6 * 60 * 60 * 1000; // 6 hrs, expressed in ms
             var vid_date = new Date(localStorage.getItem('vid_date'));
             if (new Date() - vid_date >= interval) {
-                var data = {firstparty_id: "2a952a13-a039-4a76-94fd-2edb9b28d61d", do_not_sell: false};
+                var data = {firstparty_id: "28833258-6fd7-40fc-b09c-4edc0a46fec8", do_not_sell: false};
                 bizx.cmp.ifConsent({ purposes: ['ads'], vendors: 'sdm'}, function() {},
                     function(){
                         // no consent (opt-out)
@@ -207,13 +207,15 @@
 <a href="/software/">Business Software</a>
 </div>
 <div class="nav-dropdown">
+<a href="https://sourceforge.net/articles/category/sourceforge-podcast/">SourceForge Podcast</a>
+</div>
+<div class="nav-dropdown">
 <a>Resources</a>
 <ul class="nav-dropdown-menu">
 <li><a href="/articles/">Articles</a></li>
 <li><a href="/software/case-studies/">Case Studies</a></li>
 <li><a href="/learn/">Learn</a></li>
 <li><a href="/blog/">Blog</a></li>
-<li><a href="https://sourceforge.net/articles/category/sourceforge-podcast/">SourceForge Podcast</a></li>
 </ul>
 </div>
 <div class="dev-menu-when-stuck">
@@ -315,6 +317,7 @@ Whoops, we can't find that page.
 <li><a href="/support" title="Support Section">Support</a></li>
 <li><a href="/p/forge/documentation/Docs%20Home/" title="Site Documentation">Site Documentation</a></li>
 <li><a href="https://fosstodon.org/@sourceforgestatus" title="Site Status" rel="me nofollow">Site Status</a></li>
+<li><a href="/reviews" title="Reviews" rel="me nofollow">SourceForge Reviews</a></li>
 </ul>
 </section>
 </nav>
@@ -340,12 +343,12 @@ Whoops, we can't find that page.
 </section>
 </footer>
 </div>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1724785256"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1727812111"></script>
 <script>
         /* global Dropzone */
         Dropzone.options.blockthisForm = false;
     </script>
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1724785256"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1727812111"></script>
 <script>
             /* global Foundation */
             $(document).foundation();
@@ -370,7 +373,7 @@ Whoops, we can't find that page.
 
         
         function loadimg(params, dimension_prefix) {
-            params = Object.assign({"idsite":1,"rec":1,"rand":74460,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
+            params = Object.assign({"idsite":1,"rec":1,"rand":19011,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
             for (var key in params) {
                 if (params.hasOwnProperty(key) && key.indexOf('dimension') === 0 && params[key] !== undefined) {
                     params[key] = (dimension_prefix||'') + params[key];
@@ -418,7 +421,7 @@ Whoops, we can't find that page.
             /*global _ml:true, window */
             _ml = window._ml || {};
             _ml.eid = '771';
-            _ml.fp = '2a952a13-a039-4a76-94fd-2edb9b28d61d';  
+            _ml.fp = '28833258-6fd7-40fc-b09c-4edc0a46fec8';  
             var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');
             mltag.type = 'text/javascript';
             mltag.async = true;
@@ -437,15 +440,15 @@ Whoops, we can't find that page.
 <form class="dropzone small-12" action="/api/instrumentation/gpt" id="blockthisForm" method="POST">
 <div class="row small-12">
 <div class="column description small-12">
-<input type="hidden" name="_visit_cookie" value="2a952a13-a039-4a76-94fd-2edb9b28d61d" />
-<input type="hidden" name="timestamp" value="1724918490" />
-<input type="hidden" name="spinner" value="XZh69Rw10R58fHqtPH9gBwj4_ShE" />
-<p class="G2adc2cbff7502a097923da16f8e2c012ac0dc5ee"><label for="XYXbDkiloDXfCrxBmwr7CowjCrsKyPsOiw77DnsO3">You seem to have CSS turned off.
-Please don't fill out this field.</label><input id="XYXbDkiloDXfCrxBmwr7CowjCrsKyPsOiw77DnsO3" name="XYHbDkiloDXfCkGcLR1hpa8O9HsO_wqvCrMKJ" type="text" /></p>
-<p class="G2adc2cbff7502a097923da16f8e2c012ac0dc5ee"><label for="XYXbDkiloDXfCrhBmwr7CowjCrsKyPsOiw77DnsO3">You seem to have CSS turned off.
-Please don't fill out this field.</label><input id="XYXbDkiloDXfCrhBmwr7CowjCrsKyPsOiw77DnsO3" name="XYHbDkiloDXbCkGcLR1hpa8O9HsO_wqvCrMKJ" type="text" /></p>
+<input type="hidden" name="_visit_cookie" value="28833258-6fd7-40fc-b09c-4edc0a46fec8" />
+<input type="hidden" name="timestamp" value="1727962276" />
+<input type="hidden" name="spinner" value="XB3bes3Ign1SHlDMJbYyplbNViuU" />
+<p class="d99ccb0d3da89fc9605bba5c740b031cb78449d7e"><label for="XAB7CscOdF1nCr2QHw70Iw5xCwoxYJMKGRMO1cg">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XAB7CscOdF1nCr2QHw70Iw5xCwoxYJMKGRMO1cg" name="XAR7CscOdF1nCr8OUw67Cr8OmJm19GMKgwqIqHXo" type="text" /></p>
+<p class="d99ccb0d3da89fc9605bba5c740b031cb78449d7e"><label for="XAB7CscOdF1nCr2UHw70Iw5xCwoxYJMKGRMO1cg">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XAB7CscOdF1nCr2UHw70Iw5xCwoxYJMKGRMO1cg" name="XAR7CscOdF1nCrsOUw67Cr8OmJm19GMKgwqIqHXo" type="text" /></p>
 Briefly describe the problem (required):
-<input name="XbXrDmDRuBi7Dr2t3w4QhEMKgFC4pScO5w60" type="text" required>
+<input name="XDBLCu8OAEVLDtiTDs8O9XGfDrcOlwpJAwpxVe1Q" type="text" required>
 </div>
 </div>
 <div class="column small-12">
@@ -479,9 +482,9 @@ Right-click on the ad, choose "Copy Link", then paste here &rarr;<br>
 </div>
 <div class="column large-7 small-6">
 <p>Ad destination/click URL:
-<input name="Xb33DkS5uHxjDqm1ywqQ3CjQWwrTCjcODwpbDkA" type="url" required>
+<input name="XDhXCssOaEUvDgCHDtcO4wrNgVlnChsKVQsOkwr_DtA" type="url" required>
 </p>
-<textarea id="gpt-info" name="XYnrDnDNsez_CisOzCcOdw7zDowTDgFbDmMKnw5kh"></textarea>
+<textarea id="gpt-info" name="XAxLCv8OHE8Kgw7ZvUsK7M8O4w5zCucK4w6okw4oqw4s"></textarea>
 <input class="button" type="submit" id="btn-blockthis-submit" value="Submit Report">
 </div>
 </div>
