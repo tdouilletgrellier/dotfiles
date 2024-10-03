@@ -211,15 +211,15 @@ function cmd-exists() {
 
 # Loop a list of common editors and check if installed
 for EDITOR in \
-	nvim \
-	vim \
-	nano \
 	micro \
 	ne \
 	helix \
 	tilde \
 	jed \
+	nano \
 	vile \
+	nvim \
+	vim \
 	emacs \
 	zile \
 	joe \
@@ -681,7 +681,7 @@ _SKIP_HELP_KEYBIND=true
 # Link: https://github.com/KittyKatt/screenFetch
 # Link: https://github.com/deater/linux_logo
 # Link: https://github.com/dylanaraps/pfetch
-_SKIP_SYSTEM_INFO=true
+_SKIP_SYSTEM_INFO=false
 
 # If not skipped, shows pending updates (only in Arch, Manjaro, and Ubuntu)
 # WARNING: This check for updates takes several seconds so the default is true
@@ -757,7 +757,7 @@ _SKIP_GRC=false
 # Choose your preferred picker to use with menus
 # You can choose any picker like fzy, sk, fzf, peco, percol, pick, icepick,
 # selecta, sentaku, zf, or even dmenu, rofi, or wofi UI pickers
-_PREFERRED_PICKER=fzf
+_PREFERRED_PICKER=
 
 # If set to true, will not source bash completion scripts
 _SCRIPT_BASH_COMPLETION=false
@@ -780,7 +780,7 @@ _GCAL_COUNTRY_CODE=US_AK
 # Toilet application is an optional dependency
 # Install Arch/Manjaro:  sudo pacman -S toilet
 # Install Ubuntu/Debian: sudo apt-get install toilet
-_SKIP_BDAY_REMINDER=true
+_SKIP_BDAY_REMINDER=false
 
 # Set the location for the birthday/anniversary reminder CSV file
 # The default location is "~/.config/birthdays.csv"
@@ -803,7 +803,7 @@ fi
 # download the optional .bashrc_prompt script file and place it in either your
 # home directory or as the file ~/.config/bashrc/prompt
 # You will also need to make sure this setting is set to false
-_SKIP_PROMPT_ORIGINAL=true
+_SKIP_PROMPT_ORIGINAL=false
 
 # If false, the built-in prompt will be one single line with an abbreviated path
 # If true, the built-in prompt will split into two lines with a full path
@@ -856,7 +856,7 @@ _SKIP_PROMPT_BASH_POWERLINE=false
 # Sexy Bash Prompt (supports git, 256 color)
 # Link: https://github.com/twolfson/sexy-bash-prompt
 # Install: (cd /tmp && ([[ -d sexy-bash-prompt ]] || git clone --depth 1 --config core.autocrlf=false https://github.com/twolfson/sexy-bash-prompt) && cd sexy-bash-prompt && make install)
-_SKIP_PROMPT_SEXY_BASH_PROMPT=true
+_SKIP_PROMPT_SEXY_BASH_PROMPT=false
 
 # Liquid Prompt (adaptive prompt with low color and no glyphs)
 # Link: https://github.com/nojhan/liquidprompt
@@ -872,9 +872,6 @@ _SKIP_PROMPT_POWERLINE=false
 
 # Determine our kernel name
 _KERNEL_NAME=$(printf '%.5s' "$(command uname -s)")
-
-# No alias diff to gui tools
-_SKIP_DIFF_GUI_TOOLS_ALIAS=true
 
 #######################################################
 # Add Common Binary Directories to Path
@@ -904,7 +901,7 @@ function pathprepend() {
 
 # Add the most common personal binary paths located inside the home folder
 # (these directories are only added if they exist)
-pathprepend "${HOME}/bin" "${HOME}/sbin" "${HOME}/.local/bin" "${HOME}/local/bin" "${HOME}/.bin" "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmux/"
+pathprepend "${HOME}/bin" "${HOME}/sbin" "${HOME}/.local/bin" "${HOME}/local/bin" "${HOME}/.bin"
 
 # Check for the Rust package manager binary install location
 # Link: https://doc.rust-lang.org/cargo/index.html
@@ -1252,7 +1249,7 @@ if cmd-exists git; then
 	alias ggac='git add --all && git commit --verbose -m' # Add "commit message"
 	alias ggc='git commit --verbose -m' # Add "commit message"
 	alias ggm='git commit --amend --verbose'
-	alias ggl='git log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --graph'
+	alias ggl='git log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short'
 	alias ggls='git ls-files'
 	alias ggd='git diff'
 	alias ggds='git diff --stat'
@@ -7240,6 +7237,17 @@ elif [[ -f /usr/share/bashmarks/bashmarks.sh ]]; then
 fi
 
 #######################################################
+# Zoxide is a smarter cd command (inspired by z and autojump)
+# Link: https://github.com/ajeetdsouza/zoxide
+# Install: curl -sS https://webinstall.dev/zoxide | bash
+#######################################################
+
+# If Zoxide is installed, run it's initialization
+if cmd-exists --strict zoxide; then
+	eval "$(zoxide init bash)"
+fi
+
+#######################################################
 # commacd Improved cd
 # Link: https://github.com/shyiko/commacd
 # Install: curl -sSL https://github.com/shyiko/commacd/raw/v1.0.0/commacd.sh -o ~/.commacd.sh
@@ -7669,26 +7677,24 @@ if ([[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]) && [[ -n "$XDG_CURRENT_D
 	fi
 
 	# If a gui diff/merge application is installed, use that instead
-	if [[ $_SKIP_DIFF_GUI_TOOLS_ALIAS = false ]]; then
-		for _DIFF_APP_GUI in \
-			kdiff3 \
-			meld \
-			kompare \
-			xxdiff
-		do
-			if cmd-exists --strict ${_DIFF_APP_GUI}; then
-				# Create a function to use the diff tool with parameters
-				gdiff() {
-					# Pass all parameters and run in background
-					"${_DIFF_APP_GUI}" "$@" > /dev/null 2>&1 & disown
-				}
-	
-				# Optionally, set DIFFPROG
-				# export DIFFPROG="${_DIFF_APP_GUI}"
-				break
-			fi
-		done
-	fi
+	for _DIFF_APP_GUI in \
+		meld \
+		kompare \
+		kdiff3 \
+		xxdiff
+	do
+		if cmd-exists --strict ${_DIFF_APP_GUI}; then
+			# Create a function to use the diff tool with parameters
+			gdiff() {
+				# Pass all parameters and run in background
+				"${_DIFF_APP_GUI}" "$@" > /dev/null 2>&1 & disown
+			}
+
+			# Optionally, set DIFFPROG
+			# export DIFFPROG="${_DIFF_APP_GUI}"
+			break
+		fi
+	done
 
 	# Loop through potential file managers and set alias for the first found
 	for _FILE_MANAGER in \
@@ -7772,7 +7778,6 @@ fi
 # Install: git clone https://github.com/lincheney/fzf-tab-completion
 ###########################################################################
 
-if cmd-exists --strict fzf; then
 # Check if the fzf-bash-completion.sh script exists in known locations
 if [[ -f "/usr/share/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 	# Source the fzf bash completion script
@@ -7802,7 +7807,6 @@ elif [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 	if cmd-exists node; then
 		alias node='node -r ${HOME}/fzf-tab-completion/node/fzf-node-completion.js'
 	fi
-fi
 fi
 
 #######################################################
@@ -8163,14 +8167,11 @@ function _pwd() {
 export PROMPT_COMMAND=''
 
 # Set the prompt
-
-# Extra line for clarity
-export PS1="________________________________________________________________________________\n"
 # If using Git Bash or Cygwin...
 if [[ "$_KERNEL_NAME" = "MINGW" ]] || [[ "$_KERNEL_NAME" = "CYGWI" ]]; then
 
 	# Prompt using faster and less intensive functions on Git Bash
-	export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %d} \[\033[0;36m\]\A \[\033[0;33m\]\w\[\033[0;31m\]\`_fast_git_ps1\`\[\033[0m\]\n\\$ "
+	export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %d} \[\033[0;36m\]\A \[\033[0;33m\]\w\[\033[0;31m\]\`_fast_git_ps1\`\[\033[0m\]\n\\$ "
 
 else # Standard default prompt
 
@@ -8189,22 +8190,21 @@ else # Standard default prompt
 	if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 		if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 			# Remote SSH with short path (1 line)
-			export PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]\[\033[0m\] "
+			export PS1="\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
 		else
 			# Remote SSH with full path (2 lines)
-			export PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]\[\033[0m\] "
+			export PS1="\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
 		fi
 	else # Otherwise, only show the name
 		if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 			# Local with short path (1 line)
-			export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]\[\033[0m\] "
+			export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
 		else
 			# Local with full path (2 lines)
-			export PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]\[\033[0m\] "
+			export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
 		fi
 	fi
 fi
-PS1=${PS1}"\n| =>\[\033[0m\] "
 
 #######################################################
 # Attempt to find and load some of the top installed prompts
@@ -8384,104 +8384,13 @@ for _BLESH_PATH in "${_BLESH_PATHS[@]}"; do
 			# If found, source ble.sh from the located path
 			builtin source "${_BLESH_PATH}"
 
-# Easier to read syntax highlighting for function names
-			ble-face argument_error=fg=#cd0000,bold 
-			ble-face argument_option=fg=#66ccff,italic
-			ble-face auto_complete=fg=#2a2a2a 
-			ble-face cmdinfo_cd_cdpath=fg=#386bd7,italic 
-			ble-face command_alias=fg=#66ccff
-			ble-face command_builtin=fg=#cd0000
-			ble-face command_builtin_dot=fg=#cd0000,bold
-			ble-face command_directory=fg=#386bd7
-			ble-face command_file=fg=#66ff66
-			ble-face command_function=fg=#db67e6
-			ble-face command_jobs=fg=#cd0000,bold
-			ble-face command_keyword=fg=#709aed
-			ble-face command_suffix=fg=#ffffff 
-			ble-face command_suffix_new=fg=#ffffff 
-			ble-face disabled=fg=#666666
-			ble-face filename_block=fg=#e7bf00,bold
-			ble-face filename_character=fg=#ffffff
-			ble-face filename_directory=fg=#386bd7,bold
-			ble-face filename_directory_sticky=fg=#ffffff
-			ble-face filename_executable=fg=#66ff66
-			ble-face filename_link=fg=#66ccff
-			ble-face filename_ls_colors=none
-			ble-face filename_orphan=fg=#66ccff
-			ble-face filename_other=underline
-			ble-face filename_pipe=fg=#66ff66
-			ble-face filename_setgid=fg=#bbbbbb
-			ble-face filename_setuid=fg=#bbbbbb
-			ble-face filename_socket=fg=#79dff2
-			ble-face filename_url=fg=#386bd7
-			ble-face filename_warning=fg=#cd0000
-			ble-face menu_desc_default=none
-			ble-face menu_desc_quote=ref:syntax_quoted
-			ble-face menu_desc_type=ref:syntax_delimiter
-			ble-face menu_filter_fixed=bold
-			ble-face menu_filter_input=fg=#e7bf00 
-			ble-face overwrite_mode=fg=#bbbbbb 
-			ble-face prompt_status_line=fg=#ffffff 
-			ble-face region=fg=#ffffff 
-			ble-face region_insert=fg=#709aed 
-			ble-face region_match=fg=#ffffff 
-			ble-face region_target=fg=#bbbbbb 
-			ble-face syntax_brace=fg=#79dff2,bold
-			ble-face syntax_command=fg=#cd0000
-			ble-face syntax_comment=fg=#bbbbbb
-			ble-face syntax_default=none
-			ble-face syntax_delimiter=bold
-			ble-face syntax_document=fg=#ffbd5e
-			ble-face syntax_document_begin=fg=#ffbd5e,bold
-			ble-face syntax_error=fg=#ffffff 
-			ble-face syntax_escape=fg=#ff5ef1
-			ble-face syntax_expr=fg=#386bd7
-			ble-face syntax_function_name=fg=#db67e6,bold
-			ble-face syntax_glob=fg=#ff5ea0,bold
-			ble-face syntax_history_expansion=fg=#ffffff,italic 
-			ble-face syntax_param_expansion=fg=#db67e6
-			ble-face syntax_quotation=fg=#79ff0f,bold
-			ble-face syntax_quoted=fg=#66ff66
-			ble-face syntax_tilde=fg=#709aed,bold
-			ble-face syntax_varname=fg=#f3d64e
-			ble-face varname_array=fg=#f3d64e,bold
-			ble-face varname_empty=fg=#386bd7
-			ble-face varname_export=fg=#ff5ef1,bold
-			ble-face varname_expr=fg=#db67e6,bold
-			ble-face varname_hash=fg=#79ff0f,bold
-			ble-face varname_number=fg=#66ff66
-			ble-face varname_readonly=fg=#ff5ef1
-			ble-face varname_transform=fg=#79ff0f,bold
-			ble-face varname_unset=fg=#cd0000
-			ble-face vbell=reverse
-			ble-face vbell_erase=fg=#cd0000
-			ble-face vbell_flash=fg=#79ff0f,reverse
+			# Set the prompt end-of-line mark to a specific character
+			bleopt prompt_eol_mark='⏎'
 
-			# Integration with fzf-completion and fzf-git
-			ble-import -d integration/fzf-completion
-			ble-import -d integration/fzf-key-bindings
-			_ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
-			ble-import -d integration/fzf-git
-
-			# Disable EOF marker like "[ble: EOF]"
-			bleopt prompt_eol_mark=''
-			
-			# Disable error exit marker like "[ble: exit %d]"
-			bleopt exec_errexit_mark=
-			
-			# Disable elapsed-time marker like "[ble: elapsed 1.203s (CPU 0.4%)]"
-			bleopt exec_elapsed_mark=
-			
-			# Disable exit marker like "[ble: exit]"
-			bleopt exec_exit_mark=
-			
-			# Disable some other markers like "[ble: ...]"
-			bleopt edit_marker=
-			bleopt edit_marker_error=		
-
-			# The setting "filename_ls_colors" can be used to import the filename coloring
-			# scheme by the environment variable LS_COLORS.
-			bleopt filename_ls_colors="$LS_COLORS"
+			# Easier to read syntax highlighting for function names
+			ble-face -s syntax_function_name  fg=171,bold
+			ble-face -s command_function      fg=171
+			ble-face -s varname_expr          fg=171,bold
 
 			# Bind 'C-d' to exit in ble.sh and suppress any output or error
 			ble-bind -x 'C-d' 'exit' > /dev/null 2>&1 # CTRL+d to exit
@@ -8579,20 +8488,3 @@ if [[ $TILIX_ID ]] || [[ $VTE_VERSION ]]; then
 		source /etc/profile.d/vte.sh
 	fi
 fi
-
-#######################################################
-# Zoxide is a smarter cd command (inspired by z and autojump)
-# Link: https://github.com/ajeetdsouza/zoxide
-# Install: curl -sS https://webinstall.dev/zoxide | bash
-#######################################################
-
-# If Zoxide is installed, run it's initialization
-if cmd-exists --strict zoxide; then
-	eval "$(zoxide init bash)"
-fi
-
-#######################################################
-# Blesh: Bash Line Editor replaces default GNU Readline (Do this step last)
-#######################################################
-# Add this line at the end of .bashrc:
-[[ ${BLE_VERSION-} ]] && ble-attach

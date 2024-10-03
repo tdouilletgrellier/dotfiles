@@ -23,7 +23,7 @@
             SF.sandiego = true;
             SF.sandiego_chrome = true;
             SF.variant = 'sf';
-            SF.fpid = '28833258-6fd7-40fc-b09c-4edc0a46fec8';
+            SF.fpid = '79cac1b0-eac6-4c60-b2db-682fce32e823';
             
             SF.Breakpoints = {
               small: 0,
@@ -58,11 +58,11 @@
             /*global unescape, window, console, jQuery, $, net, SF, DD_belatedPNG, bizx  */
             if (!window.SF) {
                 window.SF = {};
-            }SF.EU_country_codes = ["LV","GL","ES","FI","WF","PF","NC","BE","GS","DE","YT","MF","SX","NO","KY","CY","RO","MQ","VG","IT","MT","LU","GG","GF","SK","PT","MS","CH","AI","LI","ME","AX","RE","BM","PN","TC","NL","CW","PL","DK","BG","EE","HU","BL","IO","GB","CZ","SI","JE","GI","PM","LT","FK","SH","AW","GP","IE","AT","GR","SE","TF","IS","HR","FR"];
+            }SF.EU_country_codes = ["FK","IS","PF","EE","GI","GL","AW","BL","AI","MS","GG","YT","RO","KY","LU","GF","CH","LI","CZ","GP","BM","LT","VG","GS","SH","FR","RE","BE","DK","SI","FI","MF","PM","TC","HR","DE","AT","PL","SK","IT","PN","NC","IO","NO","NL","CY","PT","MQ","ME","ES","MT","SX","CW","SE","WF","LV","GB","BG","TF","IE","HU","AX","GR","JE"];
             SF.unknown_country_codes = ["","A1","A2","O1"];
         </script>
 <script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1727812111"></script>
-<style>.d99ccb0d3da89fc9605bba5c740b031cb78449d7e { display: none !important; }</style>
+<style>.e0b3623a8929f1a6c4a8ed925dc7ab85569a7271d { display: none !important; }</style>
 <script>SF.adblock = true;</script>
 <script src="//a.fsdn.com/con/js/adsbanner.js?1727812111"></script>
 <script>
@@ -85,7 +85,7 @@
             var interval = 6 * 60 * 60 * 1000; // 6 hrs, expressed in ms
             var vid_date = new Date(localStorage.getItem('vid_date'));
             if (new Date() - vid_date >= interval) {
-                var data = {firstparty_id: "28833258-6fd7-40fc-b09c-4edc0a46fec8", do_not_sell: false};
+                var data = {firstparty_id: "79cac1b0-eac6-4c60-b2db-682fce32e823", do_not_sell: false};
                 bizx.cmp.ifConsent({ purposes: ['ads'], vendors: 'sdm'}, function() {},
                     function(){
                         // no consent (opt-out)
@@ -373,7 +373,7 @@ Whoops, we can't find that page.
 
         
         function loadimg(params, dimension_prefix) {
-            params = Object.assign({"idsite":1,"rec":1,"rand":19011,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
+            params = Object.assign({"idsite":1,"rec":1,"rand":30461,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
             for (var key in params) {
                 if (params.hasOwnProperty(key) && key.indexOf('dimension') === 0 && params[key] !== undefined) {
                     params[key] = (dimension_prefix||'') + params[key];
@@ -421,7 +421,7 @@ Whoops, we can't find that page.
             /*global _ml:true, window */
             _ml = window._ml || {};
             _ml.eid = '771';
-            _ml.fp = '28833258-6fd7-40fc-b09c-4edc0a46fec8';  
+            _ml.fp = '79cac1b0-eac6-4c60-b2db-682fce32e823';  
             var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');
             mltag.type = 'text/javascript';
             mltag.async = true;
@@ -440,15 +440,15 @@ Whoops, we can't find that page.
 <form class="dropzone small-12" action="/api/instrumentation/gpt" id="blockthisForm" method="POST">
 <div class="row small-12">
 <div class="column description small-12">
-<input type="hidden" name="_visit_cookie" value="28833258-6fd7-40fc-b09c-4edc0a46fec8" />
-<input type="hidden" name="timestamp" value="1727962276" />
-<input type="hidden" name="spinner" value="XB3bes3Ign1SHlDMJbYyplbNViuU" />
-<p class="d99ccb0d3da89fc9605bba5c740b031cb78449d7e"><label for="XAB7CscOdF1nCr2QHw70Iw5xCwoxYJMKGRMO1cg">You seem to have CSS turned off.
-Please don't fill out this field.</label><input id="XAB7CscOdF1nCr2QHw70Iw5xCwoxYJMKGRMO1cg" name="XAR7CscOdF1nCr8OUw67Cr8OmJm19GMKgwqIqHXo" type="text" /></p>
-<p class="d99ccb0d3da89fc9605bba5c740b031cb78449d7e"><label for="XAB7CscOdF1nCr2UHw70Iw5xCwoxYJMKGRMO1cg">You seem to have CSS turned off.
-Please don't fill out this field.</label><input id="XAB7CscOdF1nCr2UHw70Iw5xCwoxYJMKGRMO1cg" name="XAR7CscOdF1nCrsOUw67Cr8OmJm19GMKgwqIqHXo" type="text" /></p>
+<input type="hidden" name="_visit_cookie" value="79cac1b0-eac6-4c60-b2db-682fce32e823" />
+<input type="hidden" name="timestamp" value="1727964486" />
+<input type="hidden" name="spinner" value="XZVjMzYCrGEzL_vyrgYz3:py7LK4" />
+<p class="e0b3623a8929f1a6c4a8ed925dc7ab85569a7271d"><label for="XYjDCo8Kjw6XDkih8ZEbDjSHDsR09wocAXgMP">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XYjDCo8Kjw6XDkih8ZEbDjSHDsR09wocAXgMP" name="XYzDCo8Kjw6XDkijDo3PDj3bDmxBGwopmecKUwo09" type="text" /></p>
+<p class="e0b3623a8929f1a6c4a8ed925dc7ab85569a7271d"><label for="XYjDCo8Kjw6XDkih9ZEbDjSHDsR09wocAXgMP">You seem to have CSS turned off.
+Please don't fill out this field.</label><input id="XYjDCo8Kjw6XDkih9ZEbDjSHDsR09wocAXgMP" name="XYzDCo8Kjw6XDkinDo3PDj3bDmxBGwopmecKUwo09" type="text" /></p>
 Briefly describe the problem (required):
-<input name="XDBLCu8OAEVLDtiTDs8O9XGfDrcOlwpJAwpxVe1Q" type="text" required>
+<input name="XbjzCqcK:w6PDmXE8wr_Cl8KTw4UuNMOGcMOsKsOmw5M" type="text" required>
 </div>
 </div>
 <div class="column small-12">
@@ -482,9 +482,9 @@ Right-click on the ad, choose "Copy Link", then paste here &rarr;<br>
 </div>
 <div class="column large-7 small-6">
 <p>Ad destination/click URL:
-<input name="XDhXCssOaEUvDgCHDtcO4wrNgVlnChsKVQsOkwr_DtA" type="url" required>
+<input name="XbDvCoMKkw6PDgEc5wrnCklMTwrAGwodrVsOGwrBL" type="url" required>
 </p>
-<textarea id="gpt-info" name="XAxLCv8OHE8Kgw7ZvUsK7M8O4w5zCucK4w6okw4oqw4s"></textarea>
+<textarea id="gpt-info" name="XYTzCrcK5w6EEwqB9QcKObWHDvBASw5U9KMOEDg"></textarea>
 <input class="button" type="submit" id="btn-blockthis-submit" value="Submit Report">
 </div>
 </div>
