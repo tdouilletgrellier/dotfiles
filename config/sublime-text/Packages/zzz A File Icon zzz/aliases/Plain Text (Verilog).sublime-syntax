@@ -5,6 +5,5 @@ scope: source.verilog
 hidden: true
 file_extensions:
   - v
-  - V
 contexts:
   main: []

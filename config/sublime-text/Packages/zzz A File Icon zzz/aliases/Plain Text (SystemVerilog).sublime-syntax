@@ -5,7 +5,6 @@ scope: source.systemverilog
 hidden: true
 file_extensions:
   - sv
-  - v
   - svh
   - vh
 contexts:

@@ -120,9 +120,9 @@ function welcome_today() {
 
 	# Print local weather
 	if ! [ -n "$SSH_CLIENT" ]; then
-	curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
+		curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
 	else
-	echo -e "${COLOR_S}🌐 Host: $(hostname)"		
+		echo -e "${COLOR_S}🌐 Host: $(hostname)"
 	fi
 	# proxy && curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
 	echo -e "${RESET}"
@@ -253,6 +253,7 @@ if [[ -f "/opt/sublime_text/sublime_text" ]]; then
 fi
 if [[ -f "${HOME}/paraview/bin/paraview" ]]; then
 	alias paraview="${HOME}/paraview/bin/paraview &"
+	export PATH=${HOME}/paraview/bin/:${PATH}
 fi
 if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
 	alias epxenv="source ${HOME}/dev/epx/devtools/env.sh"

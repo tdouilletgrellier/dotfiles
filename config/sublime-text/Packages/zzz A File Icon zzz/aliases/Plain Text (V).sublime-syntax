@@ -4,7 +4,6 @@ name: Plain Text (V)
 scope: source.v
 hidden: true
 file_extensions:
-  - v
   - vlang
 contexts:
   main: []
