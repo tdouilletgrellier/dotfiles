@@ -412,6 +412,9 @@ if hascommand --strict fzf; then
 fi
 #-------------------------------------------------------------
 
+# Path prepend
+pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmux/"
+
 #-------------------------------------------------------------
 # Sync with cronos to back up my data
 #rsync -ravP ~/Documents/ ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/
