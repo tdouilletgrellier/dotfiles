@@ -1,7 +1,83 @@
 # Configuration for Alacritty, the GPU enhanced terminal emulator
 
 # Live config reload (changes require restart)
-live_config_reload = true
+general.live_config_reload = true
+
+# Window settings
+[window]
+decorations = "full" # Window decorations (full, none, transparent, buttonless)
+dynamic_padding = false # Spread additional padding evenly around terminal content
+#opacity = 0.74 # Background opacity
+opacity = 1.0
+startup_mode = "Windowed" # Startup mode (Windowed, Maximized, Fullscreen)
+
+# Window dimensions
+[window.dimensions]
+columns = 155 # Number of columns
+lines = 40 # Number of lines
+
+# Window padding
+[window.padding]
+x = 1 # Horizontal padding in pixels
+y = 1 # Vertical padding in pixels
+
+# Font configuration (changes require restart)
+[font]
+size = 12 # Point size of the font
+
+# The normal (roman) font face
+[font.normal]
+#family = "CartographCF Nerd Font"
+#family = "Cascursive Nerd Font"
+family = "Cascadia Code PL"
+#family = "CaskaydiaCovePL Nerd Font"
+#family = "CasmataPro Nerd Font"
+#family = "CodeliaLigatures Nerd Font"
+#family = "DankMono Nerd Font"
+#family = "Exosevka Nerd Font"
+#family = "FantasqueSansM Nerd Font"
+#family = "FiraCode Nerd Font"
+#family = "Hacked Nerd Font"
+#family = "iMWritingMono Nerd Font"
+#family = "InputMono Nerd Font"
+#family = "IosevkaCustom Nerd Font"
+#family = "JetBrainsMono Nerd Font"
+#family = "JuliaMono Nerd Font"
+#family = "Lilex Nerd Font"
+#family = "M+CodeLat Nerd Font"
+#family = "Monoid Nerd Font"
+#family = "MonoLisa Nerd Font"
+#family = "Mononoki Nerd Font"
+#family = "PragmataProMonoLiga Nerd Font"
+#family = "SpaceMono Nerd Font"
+#family = "Sudo Nerd Font"
+#family = "VictorMono Nerd Font"
+#style = "Normal"
+style = "SemiLight"
+#style = "SemiBold"
+
+# The bold font face
+[font.bold]
+style = "Bold"
+
+# The italic font face
+[font.italic]
+style = "Italic"
+
+# Offset settings (extra space around each character)
+[font.offset]
+x = 0
+y = 0
+
+# Glyph offset settings
+[font.glyph_offset]
+x = 0
+y = 0
+
+# Scrolling settings
+[scrolling]
+history = 100000 # How many lines of scrollback to keep
+multiplier = 3 # Number of lines the viewport moves for every line scrolled
 
 # Visual Bell
 # Any time the BEL code is received, Alacritty "rings" the visual bell.
@@ -44,7 +120,7 @@ yellow = "0xf7be13"
 
 # Default colors
 [colors.primary]
-background = "0x101010"
+background = "0x181818"
 foreground = "0xcfd8d3"
 
 # Cursor settings
@@ -59,65 +135,14 @@ persistent_logging = false
 print_events = false
 render_timer = false
 
-# Font configuration (changes require restart)
-[font]
-size = 12 # Point size of the font
-
-# The bold font face
-[font.bold]
-family = "CaskaydiaCove Nerd Font"
-style = "Bold"
-
-# Glyph offset settings
-[font.glyph_offset]
-x = 0
-y = 0
-
-# The italic font face
-[font.italic]
-family = "VictorMono Nerd Font"
-style = "Italic"
-
-# The normal (roman) font face
-[font.normal]
-family = "CaskaydiaCove Nerd Font"
-style = "SemiLight"
-
-# Offset settings (extra space around each character)
-[font.offset]
-x = 0
-y = 1
-
-# Scrolling settings
-[scrolling]
-history = 100000 # How many lines of scrollback to keep
-multiplier = 3 # Number of lines the viewport moves for every line scrolled
-
 # Selection settings
 [selection]
 save_to_clipboard = true # Copy selected text to clipboard
 semantic_escape_chars = ",│`|:\"' ()[]{}<>$" # Characters to treat as separate words
 
 # Shell settings
-[shell]
+[terminal.shell]
 program = "/usr/bin/bash" # Path to the shell
-
-# Window settings
-[window]
-decorations = "full" # Window decorations (full, none, transparent, buttonless)
-dynamic_padding = false # Spread additional padding evenly around terminal content
-opacity = 0.74 # Background opacity
-startup_mode = "Maximized" # Startup mode (Windowed, Maximized, Fullscreen)
-
-# Window dimensions
-[window.dimensions]
-columns = 148 # Number of columns
-lines = 40    # Number of lines
-
-# Window padding
-[window.padding]
-x = 1 # Horizontal padding in pixels
-y = 1 # Vertical padding in pixels
 
 # Mouse settings
 [mouse]

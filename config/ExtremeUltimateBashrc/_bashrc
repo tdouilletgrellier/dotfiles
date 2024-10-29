@@ -44,8 +44,8 @@
 # lsd lsof lsx lynx mc mcfly mdcat mdless micro mlocate moar multitail
 # mysql-colorize nano ncdu neovim nmon nnn paru qfc rar rem resh rhvoice ripgrep
 # rsync shellcheck shred silver_searcher skim source-highlight tar terminology
-# thefuck tig tmux toilet trash-cli tree tuifi ugit vivid vlock w3m wget xsel
-# youtube-dl yt-dlp ytfzf ytop zellij zf zip zoxide
+# thefuck tig tmux toilet trash-cli tree tuifi ugit vivid vizex vlock w3m wget
+# xsel youtube-dl yt-dlp ytfzf ytop zellij zf zip zoxide
 #
 # Supported Optional Huds:
 # neofetch, fastfetch, screenFetch, linux_logo, archey, pfetch
@@ -174,19 +174,19 @@ unset _TEMP_DIR_PATH
 #######################################################
 
 # Check if a command or alias exists
-function cmd-exists() {
+function hascommand() {
 	# If no arguments or just '--strict' is provided, show help message
 	if [[ -z "${1}" || (${#} -eq 1 && "${1}" == "--strict") ]]; then
-		echo -e "${BRIGHT_WHITE}cmd-exists:${RESET} Checks if a command or alias exists"
+		echo -e "${BRIGHT_WHITE}hascommand:${RESET} Checks if a command or alias exists"
 		echo -e "${BRIGHT_WHITE}Options:${RESET}"
 		echo -e "  ${BRIGHT_YELLOW}--strict${RESET} or ${BRIGHT_YELLOW}-s${RESET} checks for executable commands only ${BRIGHT_RED}excluding aliases${RESET}"
 		echo -e "${BRIGHT_WHITE}Usage examples:${RESET}"
 		echo -e "  Check any command or alias:"
-		echo -e "    ${BRIGHT_GREEN}cmd-exists ${BRIGHT_YELLOW}ls${RESET}"
+		echo -e "    ${BRIGHT_GREEN}hascommand ${BRIGHT_YELLOW}ls${RESET}"
 		echo -e "  Check executable only ${BRIGHT_RED}(strict mode)${RESET}:"
-		echo -e "    ${BRIGHT_GREEN}cmd-exists ${BRIGHT_YELLOW}--strict ${BRIGHT_YELLOW}grep${RESET}"
+		echo -e "    ${BRIGHT_GREEN}hascommand ${BRIGHT_YELLOW}--strict ${BRIGHT_YELLOW}grep${RESET}"
 		echo -e "  Display this help message:"
-		echo -e "    ${BRIGHT_GREEN}cmd-exists${RESET}"
+		echo -e "    ${BRIGHT_GREEN}hascommand${RESET}"
 		return 2  # Return code 2 to indicate incorrect usage
 	fi
 
@@ -228,7 +228,7 @@ for EDITOR in \
 	mg \
 	ed
 do
-	if cmd-exists "${EDITOR}" &>/dev/null; then
+	if hascommand "${EDITOR}" &>/dev/null; then
 
 		# Default text editor for various command-line utilities
 		# (fallback if VISUAL is not set)
@@ -263,22 +263,22 @@ done
 # NOTE: vi is POSIX compliant but vim has more features and Neovim is more extensible
 # http://www.viemu.com/a-why-vi-vim.html
 # https://www.linuxfordevices.com/tutorials/linux/vim-vs-neovim
-if cmd-exists --strict nvim; then
+if hascommand --strict nvim; then
 	alias {v,vi,vim}='nvim'
 	alias svi='sudo nvim'
 	alias vis='nvim "+set si"'
-elif cmd-exists --strict vim; then
+elif hascommand --strict vim; then
 	alias {v,vi}='vim'
 	alias svi='sudo vim'
 	alias vis='vim "+set si"'
-elif cmd-exists --strict vi; then
+elif hascommand --strict vi; then
 	alias v='vi'
 	alias svi='sudo vi'
 fi
 
 # Set some defaults for nano
 # NOTE: Depending on the version of nano you have, --linenumbers and --suspend is helpful
-if cmd-exists --strict nano; then
+if hascommand --strict nano; then
 	alias {n,nano}='nano --smarthome --multibuffer --const --autoindent'
 fi
 
@@ -291,7 +291,7 @@ export MICRO_TRUECOLOR=1
 # See hx --tutor or :tutor for a vimtutor-like introduction
 # Link: https://github.com/helix-editor/helix
 # Link: https://docs.helix-editor.com/title-page.html
-if cmd-exists --strict helix; then
+if hascommand --strict helix; then
 	alias hx='helix'
 fi
 
@@ -318,7 +318,7 @@ function edit() {
 
 			/etc/default/grub)
 				# Check if grub-mkconfig exists before updating grub configuration
-				if cmd-exists grub-mkconfig; then
+				if hascommand grub-mkconfig; then
 					if ask "${BRIGHT_YELLOW}Update grub configuration?${RESET}" Y; then
 						sudo grub-mkconfig -o /boot/grub/grub.cfg
 						echo -e "${BRIGHT_GREEN}Grub configuration updated${RESET}"
@@ -329,7 +329,7 @@ function edit() {
 			# Apache Configuration
 			/etc/httpd/conf/httpd.conf|/etc/apache2/apache2.conf)
 				# Validate Apache Configuration
-				if cmd-exists apachectl; then
+				if hascommand apachectl; then
 					if apachectl configtest; then
 						if ask "${BRIGHT_YELLOW}Restart Apache to apply changes?${RESET}" Y; then
 							apacherestart
@@ -343,7 +343,7 @@ function edit() {
 			# Nginx Configuration
 			/etc/nginx/nginx.conf)
 				# Validate Nginx Configuration
-				if cmd-exists nginx; then
+				if hascommand nginx; then
 					if nginx -t; then
 						if ask "${BRIGHT_YELLOW}Restart Nginx to apply changes?${RESET}" Y; then
 							ngrestart
@@ -357,12 +357,12 @@ function edit() {
 			$(php -r 'echo php_ini_loaded_file();'))
 				if ask "${BRIGHT_YELLOW}Restart web servers to apply PHP changes?${RESET}" Y; then
 					# Try to restart Apache and suppress errors
-					if cmd-exists --strict apachectl || cmd-exists --strict httpd || cmd-exists --strict apache2; then
+					if hascommand --strict apachectl || hascommand --strict httpd || hascommand --strict apache2; then
 						apacherestart
 					fi
 
 					# Try to restart Nginx and suppress errors
-					if cmd-exists --strict nginx; then
+					if hascommand --strict nginx; then
 						ngrestart
 					fi
 
@@ -372,7 +372,7 @@ function edit() {
 
 			/etc/ssh/sshd_config)
 				# Check if systemd is installed and systemctl is available
-				if cmd-exists --strict systemctl; then
+				if hascommand --strict systemctl; then
 					if ask "${BRIGHT_YELLOW}Restart SSH service to apply changes?${RESET}" Y; then
 						# Directly execute the commands to restart and enable the SSH service
 						sudo systemctl restart sshd.service && sudo systemctl enable sshd.service
@@ -383,7 +383,7 @@ function edit() {
 
 			/etc/vconsole.conf)
 				# Check if mkinitcpio exists before rebuilding the initial ramdisk environment
-				if cmd-exists mkinitcpio; then
+				if hascommand mkinitcpio; then
 					if ask "${BRIGHT_YELLOW}Rebuild initial ramdisk environment for vconsole?${RESET}" Y; then
 						sudo mkinitcpio -P
 						echo -e "${BRIGHT_GREEN}Initial ramdisk environment rebuilt${RESET}"
@@ -410,7 +410,7 @@ function edit() {
 			"${HOME}/.tmux.conf"|"${HOME}/.config/tmux/tmux.conf"|/etc/tmux.conf)
 				# If editing .tmux.conf, refresh tmux configuration
 				# Check if tmux is installed and running
-				if cmd-exists tmux && tmux info &> /dev/null; then
+				if hascommand tmux && tmux info &> /dev/null; then
 					tmux source-file "${1}"
 					echo -e "${BRIGHT_GREEN}Reloaded Tmux configuration from ${BRIGHT_MAGENTA}${1}${RESET}"
 				fi
@@ -418,7 +418,7 @@ function edit() {
 
 			"${HOME}/.Xresources"|/etc/X11/Xresources)
 				# Check if xrdb exists and we are in X11 before merging .Xresources
-				if [[ $DISPLAY ]] && [[ $XDG_SESSION_TYPE == "x11" ]] && cmd-exists --strict xrdb; then
+				if [[ $DISPLAY ]] && [[ $XDG_SESSION_TYPE == "x11" ]] && hascommand --strict xrdb; then
 					if ask "${BRIGHT_YELLOW}Merge X resources from ${ABSOLUTE_PATH}?${RESET}" Y; then
 						xrdb -merge "${1}"
 						echo -e "${BRIGHT_GREEN}Merged X resources from ${BRIGHT_MAGENTA}${1}${RESET}"
@@ -440,7 +440,7 @@ function edit() {
 		rename_tab "${1}"
 
 		# Check if the directory is writable...
-		if [[ -w "${DIRNAME}" ]] || ! cmd-exists sudoedit; then
+		if [[ -w "${DIRNAME}" ]] || ! hascommand sudoedit; then
 			# Edit as root keeping environment variables (like default editor)
 			sudo --preserve-env "${EDITOR}" "${1}" && post_edit_action "${1}"
 		else
@@ -457,12 +457,12 @@ function edit() {
 	#   $1 - The filename to check and potentially modify the immutable attribute
 	function immutable_remove() {
 		# Check if required commands exist
-		if ! cmd-exists chattr || ! cmd-exists lsattr; then
+		if ! hascommand chattr || ! hascommand lsattr; then
 			return
 		fi
 
 		# Check if the file and commands exists
-		if [[ -f "${1}" ]] && cmd-exists chattr && cmd-exists lsattr; then
+		if [[ -f "${1}" ]] && hascommand chattr && hascommand lsattr; then
 
 			# Extract file attributes using lsattr
 			local ATTRIBUTES=$(lsattr "${1}" 2>/dev/null | cut -d' ' -f1)
@@ -496,7 +496,7 @@ function edit() {
 	# Reapply the immutable attribute if it was previously removed
 	function immutable_restore() {
 		# Check if the file and commands exists
-		if [[ -f "${1}" ]] && cmd-exists chattr; then
+		if [[ -f "${1}" ]] && hascommand chattr; then
 
 			# If we changed the immutable attribute
 			if [[ "${IMMUTABLE_SET}" == "true" ]]; then
@@ -521,7 +521,7 @@ function edit() {
 		local _EDITING_FILENAME=$(basename "${1}")
 
 		# If in a Tmux session...
-		if [[ -n "${TMUX}" ]] && cmd-exists tmux; then
+		if [[ -n "${TMUX}" ]] && hascommand tmux; then
 			# Save the current tab text
 			_CURRENT_TAB_NAME=$(tmux display-message -p '#W')
 
@@ -545,7 +545,7 @@ function edit() {
 	# Helper function to restore the Tmux or Konsole tab name
 	function restore_tab() {
 		# If we are inside a Tmux session...
-		if [[ -n "${TMUX}" ]] && [[ -n "${_CURRENT_TAB_NAME}" ]] && cmd-exists tmux; then
+		if [[ -n "${TMUX}" ]] && [[ -n "${_CURRENT_TAB_NAME}" ]] && hascommand tmux; then
 			# Restore Tmux tab name
 			tmux rename-window "${_CURRENT_TAB_NAME}"
 			unset _CURRENT_TAB_NAME
@@ -590,7 +590,7 @@ function edit() {
 	fi
 
 	# Check for special case of editing /etc/sudoers...
-	if [[ "${ACTUAL_FILE}" == "/etc/sudoers" ]] && cmd-exists visudo; then
+	if [[ "${ACTUAL_FILE}" == "/etc/sudoers" ]] && hascommand visudo; then
 		echo -ne "${BRIGHT_RED}Security alert:"
 		echo -e "${BRIGHT_YELLOW} Using visudo to edit ${BRIGHT_CYAN}${ACTUAL_FILE}${RESET}"
 		if ! immutable_remove "${1}"; then
@@ -754,13 +754,16 @@ _SKIP_EXA=false
 # Link: https://github.com/garabik/grc
 _SKIP_GRC=false
 
+# Use built-in aliases for grc Generic Colouriser instead of it's own includes
+_GRC_USE_BASHRC_BUILTIN=false
+
 # Choose your preferred picker to use with menus
 # You can choose any picker like fzy, sk, fzf, peco, percol, pick, icepick,
 # selecta, sentaku, zf, or even dmenu, rofi, or wofi UI pickers
 _PREFERRED_PICKER=
 
 # If set to true, will not source bash completion scripts
-_SCRIPT_BASH_COMPLETION=false
+_SKIP_BASH_COMPLETION=false
 
 # If set to true, will show a calendar when Bash is started
 _SHOW_BASH_CALENDAR=false
@@ -899,6 +902,33 @@ function pathprepend() {
 	done
 }
 
+# Function to append to an existing alias or otherwise create the new alias
+aliasappend() {
+	# Display help if less than two arguments are provided
+	if [ "$#" -lt 2 ]; then
+		echo -e "${BRIGHT_WHITE}aliasappend:${RESET} Appends an argument to an existing alias or creates a new one if the alias does not exist"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "    ${BRIGHT_GREEN}aliasappend ${BRIGHT_YELLOW}[alias_name] [argument_to_append]${RESET}"
+		echo -e "${BRIGHT_WHITE}Example:${RESET}"
+		echo -e "    ${BRIGHT_GREEN}aliasappend ${BRIGHT_YELLOW}grep '--color=auto'${RESET}"
+		return 2
+	fi
+
+	if alias "${1}" &>/dev/null; then
+		# Extract the alias value, ensuring it is correctly handled
+		ALIAS_VALUE=$(alias "${1}" | sed -E "s/^alias ${1}='(.*)'$/\1/")
+
+		# Check if the alias already contains the argument we want to append
+		if [[ "${ALIAS_VALUE}" != *"${2}"* ]]; then
+			# Correctly append the argument and redefine the alias with proper quoting
+			alias "${1}"="${ALIAS_VALUE} ${2}"
+		fi
+	else
+		# If the command is not an alias, create a new one with the provided argument
+		alias "${1}"="${1} ${2}"
+	fi
+}
+
 # Add the most common personal binary paths located inside the home folder
 # (these directories are only added if they exist)
 pathprepend "${HOME}/bin" "${HOME}/sbin" "${HOME}/.local/bin" "${HOME}/local/bin" "${HOME}/.bin"
@@ -907,8 +937,9 @@ pathprepend "${HOME}/bin" "${HOME}/sbin" "${HOME}/.local/bin" "${HOME}/local/bin
 # Link: https://doc.rust-lang.org/cargo/index.html
 pathappend "${HOME}/.cargo/bin" "/root/.cargo/bin" "${HOME}/go/bin"
 
-# If the GOPATH environment variable is not set, set it to the default
-if cmd-exists --strict go && [[ -z ${GOPATH+x} ]] && [[ -d "${HOME}/go" ]]; then
+# If the GOPATH environment variable is not set and the go command exists...
+if hascommand --strict go && [[ -z ${GOPATH+x} ]] && [[ -d "${HOME}/go" ]]; then
+	# Set GOPATH to the default directory
 	export GOPATH="${HOME}/go"
 fi
 
@@ -932,9 +963,82 @@ fi
 # Bashrc Support
 #######################################################
 
-# Alias to edit and reload  this .bashrc file
-alias {ebrc,editbashrc}='edit ~/.bashrc'
-alias {rbrc,reloadbashrc}='command clear; builtin source ~/.bashrc'
+# Searches for text inside within the ~/.bashrc file
+function findbashrc() {
+	# Display help if no arguments are provided
+	if [ "$#" -eq 0 ]; then
+		echo -e "${BRIGHT_WHITE}findbashrc:${RESET} Searches for text inside within the ~/.bashrc file"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  Search for a pattern:"
+		echo -e "    ${BRIGHT_GREEN}findbashrc ${BRIGHT_YELLOW}[pattern]${RESET}"
+		echo -e "  Search for multiple patterns:"
+		echo -e "    ${BRIGHT_GREEN}findbashrc ${BRIGHT_YELLOW}[pattern1] [pattern2] ...${RESET}"
+		echo -e "  Display this help message:"
+		echo -e "    ${BRIGHT_GREEN}findbashrc${RESET}"
+		return 2
+	fi
+
+	# Start with the initial grep with a case-insensitive search
+	local RESULT="$(grep --color=always -n -i -e "$1" "${HOME}/.bashrc")"
+
+	# Loop through all additional arguments to further filter the results
+	local ARGUMENT
+	for ARGUMENT in "${@:2}"; do
+		RESULT="$(echo "${RESULT}" | grep --color=always -i -e "${ARGUMENT}")"
+	done
+
+	# Output the results
+	if [ -z "${RESULT}" ]; then
+		echo -e "${BRIGHT_RED}Error:${BRIGHT_CYAN} No matches found for specified patterns${RESET}"
+		return 1
+	else
+		echo "${RESULT}"
+	fi
+}
+
+# Opens ~/.bashrc in the default editor or searches it for provided patterns
+alias ebrc='editbashrc'
+function editbashrc() {
+	if [ $# -eq 0 ]; then
+		# If no arguments, open ~/.bashrc with the default editor
+		edit "${HOME}/.bashrc"
+	else
+		# Call findbashrc with all arguments passed to editbashrc
+		findbashrc "$@"
+	fi
+}
+
+# Change into the bashrc directory
+function bashrc() {
+	if [ $# -eq 0 ]; then
+		# Set the target directory
+		local target_dir="${HOME}/.config/bashrc"
+
+		# Check if target directory exists
+		if [ -d "${target_dir}" ]; then
+			# Check for the presence of specific files or a non-empty subdirectory
+			if [ -f "${target_dir}/aliases" ] || \
+			[ -f "${target_dir}/bashhelp" ] || \
+			[ -f "${target_dir}/config" ] || \
+			[ -f "${target_dir}/help" ] || \
+			[ -f "${target_dir}/README.md" ] || \
+			[ -f "${target_dir}/README.html" ] || \
+			( [ -d "${target_dir}/bashrc.d" ] && [ "$(ls -A "${target_dir}/bashrc.d")" ] ); then
+				cd "${target_dir}"
+			else
+				cd "${HOME}"
+			fi
+		else
+			cd "${HOME}"
+		fi
+	else
+		# Call findbashrc with all passed parameters
+		findbashrc "$@"
+	fi
+}
+
+# Create an alias to reload this .bashrc file
+alias {rbrc,reloadbashrc,bashrcreload}='command clear; builtin source ~/.bashrc'
 
 # Find the help file for this .bashrc file (type hlp or press CONTROL-H)
 if [[ -f "${HOME}/.config/bashrc/help" ]]; then
@@ -971,6 +1075,7 @@ alias bashrccheckprotect='if [[ $(lsattr -R -l ~/.bashrc | grep " Immutable") ]]
 #######################################################
 
 # Update the main .bashrc file and supporting files
+alias bashrcupdateforce="download 'https://sourceforge.net/projects/ultimate-bashrc/files/_bashrc/download' '${HOME}' && command mv --interactive '${HOME}/_bashrc' '${HOME}/.bashrc'"
 function bashrcupdate() {
 
 	# Files to update
@@ -984,12 +1089,12 @@ function bashrcupdate() {
 		["${HOME}/.config/bashrc/README.html"]="https://sourceforge.net/projects/ultimate-bashrc/files/README.html/download"
 	)
 
-	if ! cmd-exists axel && ! cmd-exists aria2c && ! cmd-exists curl && ! cmd-exists wget; then
-		if cmd-exists --strict xdg-open; then
+	if ! hascommand axel && ! hascommand aria2c && ! hascommand curl && ! hascommand wget; then
+		if hascommand --strict xdg-open; then
 			xdg-open "https://sourceforge.net/projects/ultimate-bashrc/files/" > /dev/null 2>&1 & disown
-		elif cmd-exists --strict open; then  # For macOS
+		elif hascommand --strict open; then  # For macOS
 			open "https://sourceforge.net/projects/ultimate-bashrc/files/" > /dev/null 2>&1 & disown
-		elif cmd-exists --strict start; then  # For Windows
+		elif hascommand --strict start; then  # For Windows
 			start "" "https://sourceforge.net/projects/ultimate-bashrc/files/"
 		else
 			echo -e "${BRIGHT_YELLOW}Please install either wget, curl, aria2, or visit ${BRIGHT_CYAN}https://sourceforge.net/projects/ultimate-bashrc/${BRIGHT_YELLOW} to update.${RESET}"
@@ -1001,14 +1106,14 @@ function bashrcupdate() {
 	echo -e "${BRIGHT_YELLOW}Backing up your .bashrc file to ${BRIGHT_CYAN}${BASHRC_BACKUP_FILE}${RESET}"
 	command cp "${HOME}/.bashrc" "${BASHRC_BACKUP_FILE}" || {
 		echo -e "${BRIGHT_RED}Backup of .bashrc failed. Please check your permissions and disk space.${RESET}"
-		exit 1
+		return 1
 	}
 
 	# Create a temporary directory for downloads
 	local TMPDIR=$(mktemp -d)
 	if [[ ! -d "${TMPDIR}" ]] || [[ -z "${TMPDIR}" ]]; then
 		echo -e "${BRIGHT_RED}Failed to create a temporary directory. Check your system's temporary storage settings.${RESET}"
-		exit 1
+		return 1
 	fi
 	trap 'rm -rf "${TMPDIR}"' EXIT
 
@@ -1023,7 +1128,7 @@ function bashrcupdate() {
 
 			# Remove immutable attribute if set
 			local IS_IMMUTABLE=false
-			if cmd-exists lsattr && cmd-exists chattr && command lsattr -R -l "${FILE}" 2>/dev/null | command  grep -q "Immutable"; then
+			if hascommand lsattr && hascommand chattr && command lsattr -R -l "${FILE}" 2>/dev/null | command  grep -q "Immutable"; then
 				echo -e "${BRIGHT_YELLOW}Removing immutable attribute from ${FILE}${RESET}"
 				sudo chattr -i "${FILE}"
 				IS_IMMUTABLE=true
@@ -1056,7 +1161,7 @@ function bashrcupdate() {
 				if [ $? -ne 0 ]; then
 					echo -e "${BRIGHT_RED}New .bashrc contains errors, reverting backup.${RESET}"
 					command mv "${BASHRC_BACKUP_FILE}" "${HOME}/.bashrc"
-					exit 1
+					return 1
 				fi
 			fi
 
@@ -1073,17 +1178,16 @@ function bashrcupdate() {
 
 #######################################################
 # Change the default file and directory permissions for newly created files
-# in the home directory
-# The default is usually 022 blocking writes for non-users
-# umask 022 # u=rwX,g=rX,o=rX
+# in the home directory for security (also see fixuserhome function)
 #######################################################
 
 # Only if we are not the root user...
 if [[ $_SKIP_UMASK_HOME = false ]] && [[ $EUID -ne 0 ]]; then
-	# Grant full access to the user, block write for group, and
-	# block read write for others. Leave execute for directories.
-	# (Also see fixuserhome function)
-	umask u=rwx,g=rx,o=x # umask 026
+	# Set to umask 027 while leaving execute for directories
+	# - Grant full permissions to the user (owner)
+	# - Grant read and execute permissions to the group
+	# - Remove all permissions for others
+	umask u=rwx,g=rx,o=
 fi
 
 #######################################################
@@ -1142,7 +1246,6 @@ shopt -s cdable_vars
 #       directory and upper case is the global system directory
 declare -A ALIASES=(
 	["autostart"]="${HOME}/.config/autostart"
-	["bashrc"]="${HOME}/.config/bashrc ${HOME}"
 	["bin"]="${HOME}/.local/bin"
 	["BIN"]="/usr/bin"
 	["cache"]="${HOME}/.cache"
@@ -1153,15 +1256,17 @@ declare -A ALIASES=(
 	["documents"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir DOCUMENTS || echo "${HOME}/Documents")"
 	["DOCS"]="/usr/local/man /usr/local/share/man /usr/share/man"
 	["downloads"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir DOWNLOAD || echo "${HOME}/Downloads")"
-	["fonts"]="${HOME}/.fonts ${HOME}/.local/share/fonts"
+	["fonts"]="${XDG_DATA_HOME:-$HOME/.local/share}/fonts ${HOME}/.local/share/fonts ${HOME}/.fonts"
 	["FONTS"]="/usr/share/fonts"
-	["icons"]="${HOME}/.icons ${HOME}/.local/share/icons"
+	["icons"]="${XDG_DATA_HOME:-$HOME/.local/share}/icons ${HOME}/.local/share/icons ${HOME}/.icons"
 	["ICONS"]="/usr/share/icons"
 	["music"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir MUSIC || echo "${HOME}/Music")"
 	["pics"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir PICTURES || echo "${HOME}/Pictures")"
 	["pictures"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir PICTURES || echo "${HOME}/Pictures")"
 	["share"]="${HOME}/.local/share"
 	["SHARE"]="/usr/share"
+	["shortcuts"]="${HOME}/.local/share/applications ${HOME}/.gnome/apps"
+	["SHORTCUTS"]="/usr/share/applications /usr/local/share/applications"
 	["themes"]="${HOME}/.themes ${HOME}/.local/share/themes"
 	["THEMES"]="/usr/share/themes"
 	["tmp"]="${HOME}/tmp ${HOME}/.cache/tmp ${HOME}/.cache"
@@ -1181,7 +1286,7 @@ for ALIAS in "${!ALIASES[@]}"; do
 	read -ra ADDR <<< "${ALIASES[$ALIAS]}"
 	for DIRECTORY in "${ADDR[@]}"; do
 		if [[ -d $DIRECTORY ]]; then
-			alias "${ALIAS}"="cd '${DIRECTORY}'"
+			alias "${ALIAS}"="cd \"${DIRECTORY}\""
 			export "${ALIAS}"="${DIRECTORY}"
 			break # Only set the first found directory
 		fi
@@ -1199,7 +1304,7 @@ unset OLD_IFS DIRECTORY ADDR ALIAS ALIASES
 #######################################################
 
 # If git is installed...
-if cmd-exists git; then
+if hascommand git; then
 
 	# Git Alias: Provides many useful Git alias commands
 	# This alias will install/update the Git alias commands file
@@ -1239,29 +1344,71 @@ if cmd-exists git; then
 	# All Git aliases start with gg for speed
 	alias ggg='git status'
 	alias ggs='git status --short --branch'
-	alias ggp='git pull' # Fetch and merge
 	alias ggf='git fetch'
-	alias ggm='git merge'
+	alias ggprune='git fetch --prune'
+	alias ggp='git pull' # Fetch and merge
 	alias ggpu='git push'
-	alias ggr='git reset' # Specify a file to un-add or no file to unstage all
-	alias gga='git add'
-	alias ggap='git add -p' # Interactively choose hunks
-	alias ggac='git add --all && git commit --verbose -m' # Add "commit message"
-	alias ggc='git commit --verbose -m' # Add "commit message"
-	alias ggm='git commit --amend --verbose'
-	alias ggl='git log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short'
-	alias ggls='git ls-files'
-	alias ggd='git diff'
-	alias ggds='git diff --stat'
-	alias ggdc='git diff --cached'
+	alias ggm='git merge'
+	alias ggri='git rebase --interactive'
+	alias ggsquash='git reset $(git merge-base master $(git branch --show-current)) && git add --all && git commit --message "Squashed commits"'
 	alias ggb='gitbranch' # Change branch
-	alias ggcb='git checkout -b' # Create new branch
+	alias gg-='git checkout -'
+	alias ggcb='git checkout --branch' # Create new branch
+	#alias gglb='git branch --verbose'
+	alias {gglb,ggbl}='git for-each-ref --sort=-committerdate refs/heads/ --format="%(committerdate:short) %(refname:short)" | head -n 25'
+	alias gga='git add'
+	alias ggaa='git add --patch' # Interactively choose hunks
+	alias ggac='git add --all && git commit --verbose --message' # Add "commit message"
+	alias ggua='git reset' # Specify a file to "un-add" or no file to unstage all
+	alias ggr='git restore' # Specify a file to restore
+	alias ggrm='git rm' # Remove files and stage the deletion
+	alias ggc='git commit --verbose -m' # Add "commit message"
+	alias ggca='git commit --amend --verbose' # Modified most recent commit
+	alias ggd='git diff'
+	alias ggdc='git diff --cached'
+	alias ggdd='git remote update > /dev/null 2>&1 && git status -uno | grep -q "Your branch is behind" && git fetch origin; git diff origin/master..HEAD'
+	alias ggds='git diff --stat'
 	alias ggst='git stash'
+	alias ggsta='git stash --patch'
 	alias ggpop='git stash pop'
+	alias ggstlist='git stash list'
+	alias ggls='git ls-files'
+	alias ggrv='git remote --verbose'  # List all remote repositories and URLs
+	alias gglast='git show --stat'
+
+	# Git alias for log tailored for local projects or office use
+	# Reference for Git Pretty Formats:
+	# - %h:  Abbreviated commit hash
+	# - %ad: Author date (format can be customized)
+	# - %s:  Commit summary
+	# - %b:  Body of the commit message.
+	# - %an: Author name
+	# - %ae: Author email
+	# - %cn: Committer's name (the person who applied the commit)
+	# - %ce: Committer's email
+	# - %d:  Ref names (branches or tags associated with the commit)
+	# - %H:  Commit hash
+	# - %h:  Abbreviated commit hash
+	# - %p:  Parent hashes of a commit (useful for merge commits)
+	# - %G?: GPG signature status code
+	# - %GS: GPG signature’s signer
+	alias ggl='git log --oneline --date=short --graph --decorate --pretty=format:"%C(magenta)%h%C(reset) - %C(green)(%cr)%C(reset) %s%C(auto)%d%C(reset) %C(bold brightblue)<%an>%C(reset)"'
+
+	# Git alias for more detailed list log that is better for online collaberation
+	# The last 1 character field is the GPG signature for the commit
+	# - G: Good signature
+	# - B: Bad signature
+	# - U: Good signature with unknown validity
+	# - X: Good signature that has expired
+	# - Y: Good signature made by an expired key
+	# - R: Good signature made by a revoked key
+	# - E: Signature cannot be checked (e.g., missing key)
+	# - N: No signature
+	alias ggll='git log --graph --topo-order --date=iso8601-strict --no-abbrev-commit --decorate --all --boundary --pretty=format:"%C(green)%ad %C(magenta)%h%Creset -%C(auto)%d%Creset %s %C(brightblue)[%aN <%aE>]%C(cyan)(%cN)%C(reset) %C(brightyellow)%G?%C(reset)"'
 
 	# Vacuum the local Git repository database, reduce it's size, and clean out logs
 	# Link: https://stackoverflow.com/questions/2116778/reduce-git-repository-size
-	alias gitclean='git reflog expire --all --expire=now && git gc --prune=now --aggressive'
+	alias ggclean='git reflog expire --all --expire=now && git gc --prune=now --aggressive'
 
 	# Find all Git repos in the current directory recursively
 	# Note: Excludes hidden and temp directories
@@ -1275,60 +1422,79 @@ if cmd-exists git; then
 		builtin source "${HOME}/git-completion.bash"
 	fi
 
-	# If exa (with Git support) is installed...
-	# Link: https://github.com/ogham/exa
-	if cmd-exists exa; then
-		# Add icons if unicode and the icon paramter is supported
-		if [[ ! $_SKIP_EXA = false ]] && [[ $(locale charmap) == 'UTF-8' ]] && [[ -n $(command exa --help | grep -e '--icons' 2> /dev/null) ]]; then
-			alias exa='exa --icons'
+	# If eza with Git support is installed...
+	# Link: https://eza.rocks
+	if hascommand --strict eza; then
+
+		# If Git is not slow, always use the eza Git repo flag globally
+		if [[ $_GIT_IS_SLOW = false ]]; then
+			alias {eza,exa}='command eza --git --git-repos-no-status'
+		else
+			alias {eza,exa}='command eza --git'
 		fi
-		alias lsg='exa --long --all --links --group --modified --classify --git --group-directories-first --color=auto --color-scale'
+
+		if [[ $_SKIP_EXA = false ]]; then
+			alias lsg='eza --long --all --links --group --modified --classify --group-directories-first --color=auto --color-scale'
+		fi
+
+	# If exa with Git support is installed...
+	# Link: https://github.com/ogham/exa
+	elif hascommand --strict exa; then
+
+		# Add Git support to Exa only if Git is not slow
+		if [[ $_GIT_IS_SLOW = false ]]; then
+			alias exa='command exa --git'
+		fi
+
+		if [[ $_SKIP_EXA = false ]]; then
+			alias lsg='exa --long --all --links --group --modified --classify --group-directories-first --color=auto --color-scale'
+		fi
 	fi
 
-	# If lsd (with Git support) is installed...
+	# If lsd with Git support is installed...
 	# Link: https://github.com/Peltoche/lsd
-	if cmd-exists lsd; then
+	if hascommand --strict lsd; then
 		# Add icons if unicode and the icon paramter is supported
-		if [[ -n $(command lsd --help | grep -e '\-\-git\s' 2> /dev/null) ]]; then
-			alias lsd='lsd --git'
+		if [[ -n $(command lsd --help | grep -e '--git\s' 2> /dev/null) ]]; then
+			alias lsd='command lsd --git'
 		fi
 	fi
 
 	# Nearly everything you can do in Git but in a terminal UI
 	# Link: https://github.com/Extrawurst/gitui
-	if cmd-exists gitui; then
+	if hascommand gitui; then
 		alias ggu='gitui'
 	fi
 
 	# Tig ncurses-based text-mode interface for git
 	# Link: https://jonas.github.io/tig/
-	if cmd-exists tig; then
+	if hascommand tig; then
 		alias gitt='tig'
 	fi
 
 	# Git Commander
 	# Link: https://github.com/golbin/git-commander
 	# Install: npm install -g git-commander
-	if cmd-exists git-commander; then
+	if hascommand git-commander; then
 		alias gitc='git-commander'
 	fi
 
 	# GRV - Git Repository Viewer
 	# Link: https://github.com/rgburke/grv
-	if cmd-exists grv; then
+	if hascommand grv; then
 		alias gitrv='grv'
 	fi
 
 	# LazyGit - Terminal UI for git commands
 	# Link: https://github.com/jesseduffield/lazygit
-	if cmd-exists lazygit; then
+	if hascommand lazygit; then
 		alias lg='lazygit'
 	fi
 
 	# Ugit - Git Undo
 	# Link: https://github.com/Bhupesh-V/ugit
 	# Install: sh -c "$(curl -fsSL https://raw.githubusercontent.com/Bhupesh-V/ugit/master/install)"
-	if cmd-exists ugit; then
+	if hascommand ugit; then
 		alias {gitundo,ggundo}='ugit'
 	fi
 
@@ -1433,7 +1599,7 @@ if cmd-exists git; then
 		local depth_level=${1:-1}
 
 		# Check if the necessary commands (git, sed, sort) are available in the environment
-		if cmd-exists git && cmd-exists sed && cmd-exists sort; then
+		if hascommand git && hascommand sed && hascommand sort; then
 			# Save the current directory to a variable
 			local current_dir=$(command pwd)
 
@@ -1605,6 +1771,196 @@ if cmd-exists git; then
 		fi
 	}
 
+	# Helper to create git branch names
+	gitbranchhelp() {
+		local branch_prefixes=(
+			"bugfix/"
+			"develop/"
+			"feature/"
+			"hotfix/"
+			"master/"
+			"main/"
+			"release/"
+			"support/"
+			"wip/"
+		)
+
+		local branch_descriptions=(
+			"Non-critical bug fixes."
+			"Ongoing development work."
+			"New features or enhancements."
+			"Critical production bug fixes."
+			"Stable, production-ready code."
+			"Stable, production-ready code."
+			"Pre-release preparations."
+			"Support for older releases."
+			"Work in progress."
+		)
+
+		# Prompt the user to select the type of branch from the list
+		echo -e "${BRIGHT_YELLOW}Select the type of branch:${RESET}"
+		for i in "${!branch_prefixes[@]}"; do
+			echo -e "$((i+1)). ${BRIGHT_CYAN}${branch_prefixes[$i]}${RESET} - ${branch_descriptions[$i]}"
+		done
+
+		# Read the user's selection for the branch type
+		echo -ne "${BRIGHT_YELLOW}Enter the number corresponding to the branch type:${RESET} "
+		read -r branch_type_number
+
+		# Validate the selection
+		if ! [[ "$branch_type_number" =~ ^[1-9]$ ]]; then
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}Invalid selection${RESET}"
+			return 1
+		fi
+
+		local branch_prefix="${branch_prefixes[$((branch_type_number-1))]}"
+
+		# Get the project code
+		echo -ne "${BRIGHT_YELLOW}Enter the project code ${BRIGHT_CYAN}(e.g., PROJ)${BRIGHT_YELLOW} or press return to skip${RESET}: "
+		read -r project_code
+
+		# Get the ticket number
+		echo -ne "${BRIGHT_YELLOW}Enter the ticket number ${BRIGHT_CYAN}(e.g., 12345)${BRIGHT_YELLOW} or press return to skip${RESET}: "
+		read -r ticket_number
+
+		# Get the description
+		echo -ne "${BRIGHT_YELLOW}Enter the description ${BRIGHT_CYAN}(use spaces or dashes, will be formatted automatically)${RESET}: "
+		read -r description
+
+		# Format the description: replace spaces with dashes, remove duplicate dashes
+		description=$(echo "$description" | tr '[:space:]' '-' | tr -s '-')
+
+		# Construct the branch name parts
+		local branch_name="$branch_prefix"
+
+		# Append project code if provided
+		if [[ -n "$project_code" ]]; then
+			branch_name+="$project_code"
+		fi
+
+		# Append ticket number with a dash if project code is present or ticket number is provided
+		if [[ -n "$ticket_number" ]]; then
+			if [[ -n "$project_code" ]]; then
+				branch_name+="-$ticket_number"
+			else
+				branch_name+="$ticket_number"
+			fi
+		fi
+
+		# Append description with a dash if previous parts are present
+		if [[ -n "$description" ]]; then
+			if [[ -n "$project_code" || -n "$ticket_number" ]]; then
+				branch_name+="-${description,,}"
+			else
+				branch_name+="${description,,}"
+			fi
+		fi
+
+		# Remove any trailing dashes
+		branch_name=$(echo "$branch_name" | sed 's/-$//')
+
+		# Copy the commit message to the clipboard
+		echo "${branch_name}" | clipboard
+
+		# Display the final branch name
+		echo -e "${BRIGHT_GREEN}Your branch name is:${RESET}\n${branch_name}"
+	}
+
+	# Helper to create git commit messages
+	gitcommithelp() {
+		local full_commit_message
+
+		# Define commit types with colored labels
+		local commit_types=(
+			"🔧 ${BRIGHT_CYAN}chore${RESET}: updating grunt tasks etc; no production code change"
+			"📝 ${BRIGHT_CYAN}docs${RESET}: changes to the documentation"
+			"✨ ${BRIGHT_CYAN}feat${RESET}: new feature for the user, not a new feature for build script"
+			"🐛 ${BRIGHT_CYAN}fix${RESET}: bug fix for the user, not a fix to a build script"
+			"♻️ ${BRIGHT_CYAN}refactor${RESET}: refactoring production code, eg. renaming a variable"
+			"💅 ${BRIGHT_CYAN}style${RESET}: formatting, missing semi colons, etc; no production code change"
+			"🧪 ${BRIGHT_CYAN}test${RESET}: adding missing tests, refactoring tests; no production code change"
+			"🔀 ${BRIGHT_CYAN}merge${RESET}: choose this if this is a merge"
+		)
+
+		# Corresponding commit prefixes
+		local commit_prefixes=(
+			"🔧 chore: "
+			"📝 docs: "
+			"✨ feat: "
+			"🐛 fix: "
+			"♻️ refactor: "
+			"💅 style: "
+			"🧪 test: "
+		)
+
+		# Prompt the user to select the type of commit from the list
+		echo -e "${BRIGHT_YELLOW}What type of commit is this?${RESET}"
+		for i in "${!commit_types[@]}"; do
+			echo -e "$((i+1)). ${commit_types[$i]}"
+		done
+
+		# Read the user's selection
+		echo -ne "${BRIGHT_YELLOW}Enter the number corresponding to the commit type${RESET}: "
+		read -r commit_type_number
+
+
+		# Validate the selection
+		if ! [[ "$commit_type_number" =~ ^[1-8]$ ]]; then
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}Invalid selection${RESET}"
+			return 1
+		fi
+
+		# If this is a git merge
+		if [[ "$commit_type_number" -eq 8 ]]; then
+
+			echo -ne "${BRIGHT_YELLOW}Enter the ${BRIGHT_CYAN}source branch${BRIGHT_YELLOW} you are merging ${BRIGHT_CYAN}from${BRIGHT_YELLOW}${RESET}: "
+			read -r source_branch
+
+			# Ensure the branch was provided
+			if [[ -z "$source_branch" ]]; then
+				echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No source branch specified${RESET}"
+				return 1
+			fi
+
+			echo -ne "${BRIGHT_YELLOW}Enter the ${BRIGHT_CYAN}destination branch${BRIGHT_YELLOW} you are merging ${BRIGHT_CYAN}into${BRIGHT_YELLOW}${RESET}: "
+			read -r destination_branch
+
+			# Ensure the branch was provided
+			if [[ -z "$destination_branch" ]]; then
+				echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No destination branch specified${RESET}"
+				return 1
+			fi
+
+			# Construct the merge commit message
+			full_commit_message="🔀 Merged branch ${source_branch} into ${destination_branch}"
+
+		else
+
+			# Get the corresponding commit prefix
+			local commit_prefix="${commit_prefixes[$((commit_type_number-1))]}"
+
+			# Prompt the user for a commit message
+			echo -e "${BRIGHT_YELLOW}Enter a commit message ${BRIGHT_MAGENTA}(use present tense and do not capitalize the first letter)${RESET}:"
+			echo -ne "${BRIGHT_GREEN}>${RESET} "
+			read -r commit_message
+
+			# Ensure a commit message was provided
+			if [[ -z "$commit_message" ]]; then
+				echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No commit message was specified${RESET}"
+				return 1
+			fi
+
+			# Combine the prefix and message
+			full_commit_message="${commit_prefix}${commit_message}"
+		fi
+
+		# Copy the commit message to the clipboard
+		echo "${full_commit_message}" | clipboard
+
+		# Display the final commit message
+		echo -e "${BRIGHT_GREEN}Your commit message is:${RESET}\n${full_commit_message}"
+	}
+
 	# Set defaults for Git (~/.gitconfig)
 	function gitfixsettings() {
 		local checkmark="\r${BRIGHT_GREEN}✓${RESET}"
@@ -1614,6 +1970,13 @@ if cmd-exists git; then
 			# Tell Git to include this file
 			git config --global include.path "gitalias.txt"
 			echo -e "${checkmark} Found gitalias.txt"
+		fi
+
+		# If a global ignore file exists...
+		if [[ -f "${HOME}/.gitignore_global" ]]; then
+			# Globally exclude common files that you don’t want to track
+			git config --global core.excludesfile ~/.gitignore_global
+			echo -e "${checkmark} Found .gitignore_global"
 		fi
 
 		# Set the user name
@@ -1635,6 +1998,33 @@ if cmd-exists git; then
 		# You should add this manually with your own information
 		# git config --global user.signingkey <gpg-key-id>
 
+		# Set the default branch name to be main (instead of master) in new repos
+		# git config --global init.defaultBranch main
+
+		# Enable colorful output for better readability
+		git config --global color.ui auto
+
+		# Check integrity of objects during operations like fetching or receiving
+		git config --global transfer.fsckobjects true
+		git config --global fetch.fsckobjects true
+		git config --global receive.fsckobjects true
+
+		# Automatically fix minor mistakes when you mistype a command
+		# 0         - No autocorrection; only provides suggestions
+		# 30        - Executes after 3 seconds
+		# immediate - Executes immediately without confirmation
+		# prompt    - Asks for confirmation before executing the suggestion
+		git config --global help.autocorrect prompt
+
+		# Automatically set up a tracking branch (upstream branch) when you push
+		# a local branch to a remote for the first time, so you will not have
+		# to manually run "git push --set-upstream origin <branch>" each time
+		git config --global push.autoSetupRemote true
+
+		# Speed up git status in large repositories by using Git fsmonitor
+		# Note: This can cause issues on much older out of date Git versions
+		git config --global core.fsmonitor true
+
 		# Set the default Git editor to your default Bash editor
 		git config --global core.editor "${EDITOR}"
 		echo -e "${checkmark} Default editor set to ${EDITOR}"
@@ -1655,20 +2045,19 @@ if cmd-exists git; then
 		git config --global diff.colorMoved "default"
 
 		# Set this if icdiff is installed
-		if cmd-exists --strict icdiff; then
+		if hascommand --strict icdiff; then
 			git config --global icdiff.options '--highlight --line-numbers --strip-trailing-cr'
 			echo -e "${checkmark} Found icdiff"
 		fi
 
 		# If delta is installed...
-		if cmd-exists delta; then
+		if hascommand delta; then
+
 			# delta - Beautiful side by side colored diff with Git support and syntax highlighting
 			# This diff tool also uses more advanced diff algorithms with more features
 			# Link: https://github.com/dandavison/delta
 			# Info: Add listed settings to your ~/.gitconfig
 			# NOTE: use n and N to move between diff sections
-
-			# Use delta as the default pager for Git (replaces 'less')
 			git config --global core.pager "delta"
 
 			# Enable delta for interactive diffs
@@ -1716,8 +2105,34 @@ if cmd-exists git; then
 
 			echo -e "${checkmark} Found delta"
 
-		# If delta is not available, check for diff-so-fancy
-		elif cmd-exists diff-so-fancy; then
+		# Check for Difftastic
+		elif hascommand difft; then
+
+			# Difftastic supports over 30 languages and compares based on syntax
+			# git -c diff.external=difft diff # View uncommitted changes
+			# git -c diff.external=difft show --ext-diff # Most recent commit
+			# git -c diff.external=difft log -p --ext-diff # Recent commits current branch
+			# Link: https://github.com/Wilfred/difftastic
+			# Link: https://difftastic.wilfred.me.uk/git.html?highlight=page#difftool
+			git config --global diff.external difft
+
+			# Define difftastic as a custom difftool with the necessary command
+			git config --global difftool.difftastic.cmd 'difft "$MERGED" "$LOCAL" "abcdef1" "100644" "$REMOTE" "abcdef2" "100644"'
+
+			# Additional configurations for difftastic
+			git config --global difftool.prompt false
+			git config --global pager.difftool true
+			git config --global diff.tool difftastic
+
+			# Set up aliases "git dlog", "git dshow", and "git ddiff"
+			git config --global alias.dlog '-c diff.external=difft log -p --ext-diff'
+			git config --global alias.dshow '-c diff.external=difft show --ext-diff'
+			git config --global alias.ddiff '-c diff.external=difft diff'
+
+			echo -e "${checkmark} Found Difftastic"
+
+		# Check for diff-so-fancy
+		elif hascommand diff-so-fancy; then
 
 			# Configure diff-so-fancy for Git diff outputs
 			# diff-so-fancy simplifies Git diff outputs, making them easier to read
@@ -1754,12 +2169,12 @@ if cmd-exists git; then
 			# You will be prompted when you launch UltraCompare to automatically set up
 			# Git, so just skip the other diff configurations since this app is paid
 			# Link: https://www.ultraedit.com/products/ultracompare-linux/
-			if cmd-exists --strict ucx; then
+			if hascommand --strict ucx; then
 				echo -e "${checkmark} Found UltraCompare"
 
 			# If Meld is installed...
 			# Link: https://meldmerge.org/
-			elif cmd-exists --strict meld; then
+			elif hascommand --strict meld; then
 				# These settings will not alter the behaviour of "git diff"
 				# Link: https://stackoverflow.com/questions/34119866/setting-up-and-using-meld-as-your-git-difftool-and-mergetool
 				# You use "git difftool" in exactly the same way as you use git diff
@@ -1790,7 +2205,7 @@ if cmd-exists git; then
 
 			# If KDiff3 is installed...
 			# Link: https://kdiff3.sourceforge.net/
-			elif cmd-exists --strict kdiff3; then
+			elif hascommand --strict kdiff3; then
 				git config --global diff.guitool kdiff3
 				git config --global difftool.kdiff3.path "$(command which kdiff3)"
 				git config --global difftool.kdiff3.trustExitCode false
@@ -1800,6 +2215,22 @@ if cmd-exists git; then
 				echo -e "${checkmark} Found KDiff3"
 			fi
 		fi
+
+		# Create an alias s for the git status command
+		git config --global alias.s "status"
+
+		# Create an alias l for a compact log format:
+		# --oneline  : shows each commit as a single line
+		# --graph    : adds an ASCII graph of branch and merge history
+		# --decorate : adds extra information such as branch names, tags, etc.
+		git config --global alias.l "log --oneline --date=short --graph --decorate --pretty=format:'%C(red)%h%C(reset) - %C(green)(%cr)%C(reset) %s%C(yellow)%d%C(reset) %C(bold blue)<%an>%C(reset)'"
+
+		# Stage git commits with an interactive prompt
+		git config --global alias.aa "add -p"
+
+		# Make an empty commit with no content
+		# (to trigger kick off a CI build or some other integration)
+		git config --global alias.empty "commit --allow empty -m"
 	}
 fi
 
@@ -1807,7 +2238,7 @@ fi
 ### SYSTEMD ALIASES
 #######################################################
 
-if cmd-exists --strict systemctl; then
+if hascommand --strict systemctl; then
 	# Get a list of all services
 	alias services='systemctl list-units --type=service --state=running,failed'
 	alias servicesall='systemctl list-units --type=service'
@@ -1843,7 +2274,7 @@ if cmd-exists --strict systemctl; then
 	alias {clearsystemlogs,cleansystemlogs}='echo -ne "${BRIGHT_BLUE}Before${RESET}: "; journalctl --disk-usage; sudo journalctl --rotate; sudo journalctl --vacuum-time=1s; echo -ne "${BRIGHT_BLUE}After${RESET}: "; journalctl --disk-usage'
 
 	# If SSH is installed...
-	if cmd-exists --strict ssh; then
+	if hascommand --strict ssh; then
 		# Create aliases to start/enable and stop/disable the SSH server
 		alias sshstatus='systemctl status sshd.service'
 		alias sshstart='sudo systemctl start sshd.service && sudo systemctl enable sshd.service'
@@ -1853,7 +2284,7 @@ if cmd-exists --strict systemctl; then
 
 	# If gpm is installed...
 	# Link: https://github.com/telmich/gpm
-	if cmd-exists --strict gpm; then
+	if hascommand --strict gpm; then
 		alias ttymouseon='sudo systemctl enable --now gpm'
 		alias ttymouseoff='sudo systemctl stop gpm && sudo systemctl disable gpm'
 		alias ttymousestatus='sudo systemctl status gpm'
@@ -1862,7 +2293,7 @@ if cmd-exists --strict systemctl; then
 	# Flushing and restart the DNS cache if installed and running
 	function flushdns() {
 		# Check if systemd-resolved is available
-		if cmd-exists --strict systemd-resolve; then
+		if hascommand --strict systemd-resolve; then
 			# Check if systemd-resolved service is active
 			if systemctl is-active systemd-resolved >/dev/null; then
 				# Flush DNS cache and restart systemd-resolved
@@ -1873,7 +2304,7 @@ if cmd-exists --strict systemctl; then
 				echo "systemd-resolved is not active, unable to flush DNS cache"
 			fi
 		# Check if dnsmasq is available
-		elif cmd-exists --strict dnsmasq; then
+		elif hascommand --strict dnsmasq; then
 			# Check if dnsmasq process is running
 			if pgrep -x "dnsmasq" >/dev/null; then
 				# Restart dnsmasq to flush DNS cache
@@ -1915,7 +2346,7 @@ alias dirs='dirs -v'
 #  u - undo
 #  M - linemode
 #  +, -, = for setting access rights to files
-if cmd-exists --strict ranger; then
+if hascommand --strict ranger; then
 	# Override ranger to change to the most recently selected directory
 	function ranger() {
 		# If the temporary directory location is set...
@@ -1949,7 +2380,7 @@ fi
 # The following command installs or updates all plugins:
 # Install: curl -Ls https://raw.githubusercontent.com/jarun/nnn/master/plugins/getplugs | sh
 # Plugins are installed to ${XDG_CONFIG_HOME:-$HOME/.config}/nnn/plugins
-if cmd-exists --strict nnn; then
+if hascommand --strict nnn; then
 	if [[ -f "${HOME}/.config/nnn/plugins/finder" ]]; then
 		export NNN_PLUG='f:finder;o:fzopen;p:mocplay;d:diffs;t:nmount;v:imgview'
 		alias nnnplugins='curl -Ls https://raw.githubusercontent.com/jarun/nnn/master/plugins/getplugs | sh'
@@ -1961,7 +2392,7 @@ fi
 # TUIFI Manager
 # Link: https://github.com/GiorgosXou/TUIFIManager
 # Install: pip3 install tuifimanager --upgrade
-if cmd-exists tuifi; then
+if hascommand tuifi; then
 	alias ff="tuifi"
 fi
 
@@ -1971,9 +2402,9 @@ if [[ -f "${HOME}/.config/lsx/lsx.sh" ]]; then
 	builtin source ~/.config/lsx/lsx.sh
 
 	# If lsx is installed, alias it to see hidden directories
-	if cmd-exists lsx; then
+	if hascommand lsx; then
 		alias l='lsx -a'
-	elif cmd-exists ls-x; then
+	elif hascommand ls-x; then
 		alias l="ls-x -a"
 		alias lsx="${GOPATH}/bin/ls-x"
 	elif [[ -x "${GOPATH}/bin/ls-x" ]]; then
@@ -1983,12 +2414,12 @@ if [[ -f "${HOME}/.config/lsx/lsx.sh" ]]; then
 fi
 
 # List folders recursively in a tree
-if cmd-exists --strict tree; then
+if hascommand --strict tree; then
 	alias treed='command tree -CAFd'
 fi
 
 # List files recursively in a tree
-if cmd-exists broot; then
+if hascommand broot; then
 	# If broot is installed...
 	# Link: https://github.com/Canop/broot
 	# Link: https://computingforgeeks.com/broot-easy-directory-trees-navigation-in-linux/
@@ -1999,29 +2430,29 @@ if cmd-exists broot; then
 		builtin source "${HOME}/.config/broot/launcher/bash/br"
 
 		# If Git is installed, enable the Git functionality
-		if cmd-exists git; then
+		if hascommand git; then
 			alias {lb,tree}='br --sizes --dates --show-root-fs --hidden --show-git-info'
 		else
 			alias {lb,tree}='br --sizes --dates --show-root-fs --hidden'
 		fi
 	else
 		# If Git is installed, enable the Git functionality
-		if cmd-exists git; then
+		if hascommand git; then
 			alias {lb,tree}='broot --sizes --dates --show-root-fs --hidden --show-git-info'
 		else
 			alias {lb,tree}='broot --sizes --dates --show-root-fs --hidden'
 		fi
 	fi
 
-elif [[ $_SKIP_LSD = false ]] && cmd-exists lsd; then
+elif [[ $_SKIP_LSD = false ]] && hascommand lsd; then
 	# If lsd is installed...
 	# Link: https://github.com/Peltoche/lsd
 	alias tree='command lsd --all --blocks permission,user,size,date,name --group-dirs first --header --long --tree'
-elif [[ $_SKIP_EXA = false ]] && cmd-exists exa; then
+elif [[ $_SKIP_EXA = false ]] && hascommand exa; then
 	# If exa is installed...
 	# Link: https://github.com/ogham/exa
-	alias tree='command exa --all --git --group-directories-first --header --long --tree'
-elif cmd-exists tree; then
+	alias tree='exa --all --git --group-directories-first --header --long --tree'
+elif hascommand tree; then
 	# If tree is installed...
 	# Link: https://www.tecmint.com/linux-tree-command-examples/
 	alias tree='command tree -CAhF --dirsfirst'
@@ -2041,20 +2472,14 @@ if [[ $_SKIP_LS_COLORIZED = false ]]; then
 	# If eza (with Git support) is installed...
 	# Eza is the fastest ls replacements with so many features
 	# Link: https://eza.rocks
-	if [[ $_SKIP_EXA = false ]] && cmd-exists eza; then
-
-		# If Git is not slow, use the eza Git repo flag
-		if [[ $_GIT_IS_SLOW = false ]]; then
-			_EZA_GIT_FLAGS="--git --git-repos-no-status"
-		else
-			_EZA_GIT_FLAGS="--git"
-		fi
+	if [[ $_SKIP_EXA = false ]] && hascommand eza; then
 
 		# Flags for nearly all directory listings
 		_EZA_COMMON_FLAGS="--all --classify --color=auto --color-scale=all --icons=auto"
 
 		# Flags for all long listings (which include common and Git flags)
-		_EZA_LONG_FLAGS="${_EZA_COMMON_FLAGS} ${_EZA_GIT_FLAGS} --group-directories-first --long --links --smart-group --modified"
+		#_EZA_LONG_FLAGS="${_EZA_COMMON_FLAGS} --group-directories-first --long --links --group --modified"
+		_EZA_LONG_FLAGS="${_EZA_COMMON_FLAGS} --group-directories-first --long --links --smart-group --modified"
 
 		alias ls="eza ${_EZA_COMMON_FLAGS} --group-directories-first"
 		alias labc="eza ${_EZA_COMMON_FLAGS} --grid --sort name"
@@ -2066,14 +2491,14 @@ if [[ $_SKIP_LS_COLORIZED = false ]]; then
 		alias lu="eza ${_EZA_LONG_FLAGS} --accessed --sort accessed"
 		alias new="eza ${_EZA_LONG_FLAGS} --sort modified | tail -10 | tac"
 		alias lr="eza ${_EZA_COMMON_FLAGS} --grid --group-directories-first --recurse"
-		alias ltree="command eza --icons=auto --all ${_EZA_GIT_FLAGS} --group-directories-first --header --long --tree"
+		alias ltree="command eza --icons=auto --all --group-directories-first --header --long --tree"
 
 		# Cleanup variables to avoid leaking them into the environment
-		unset _EZA_GIT_FLAGS _EZA_COMMON_FLAGS _EZA_LONG_FLAGS
+		unset _EZA_COMMON_FLAGS _EZA_LONG_FLAGS
 
 	# If lsd is installed, use it instead
 	# Link: https://github.com/Peltoche/lsd
-	elif [[ $_SKIP_LSD = false ]] && cmd-exists lsd; then
+	elif [[ $_SKIP_LSD = false ]] && hascommand lsd; then
 		alias ls='lsd -AF --group-dirs first'
 		alias ll='lsd --almost-all --header --long --group-dirs first'
 		alias labc='lsd -lAv --header'
@@ -2087,27 +2512,20 @@ if [[ $_SKIP_LS_COLORIZED = false ]]; then
 
 	# If exa (depreciated but still on some older distros) is installed...
 	# Link: https://github.com/ogham/exa
-	elif [[ $_SKIP_EXA = false ]] && cmd-exists exa; then
+	elif [[ $_SKIP_EXA = false ]] && hascommand exa; then
 
 		# Add icons to exa if unicode and the icon paramter is supported
 		if [[ $(locale charmap) == 'UTF-8' ]]; then
 			if command exa --help | grep -q -- "--icons" &> /dev/null; then
-				alias exa='exa --icons'
+				aliasappend 'exa' '--icons'
 			fi
-		fi
-
-		# If Git is not slow, use the exa Git feature
-		if [[ $_GIT_IS_SLOW = false ]]; then
-			_EXA_GIT_FLAGS="--git"
-		else
-			_EXA_GIT_FLAGS=""
 		fi
 
 		# Flags for nearly all directory listings
 		_EXA_COMMON_FLAGS="--all --classify --color=auto --color-scale"
 
 		# Flags for all long listings (which include common and Git flags)
-		_EXA_LONG_FLAGS="${_EXA_COMMON_FLAGS} ${_EXA_GIT_FLAGS} --group-directories-first --long --links --group --modified"
+		_EXA_LONG_FLAGS="${_EXA_COMMON_FLAGS} --group-directories-first --long --links --group --modified"
 
 		alias ls="exa ${_EXA_COMMON_FLAGS} --group-directories-first"
 		alias labc="exa ${_EXA_COMMON_FLAGS} --grid --sort name"
@@ -2119,15 +2537,15 @@ if [[ $_SKIP_LS_COLORIZED = false ]]; then
 		alias lu="exa ${_EXA_LONG_FLAGS} --accessed --sort accessed"
 		alias new="exa ${_EXA_LONG_FLAGS} --sort modified | tail -10 | tac"
 		alias lr="exa ${_EXA_COMMON_FLAGS} --grid --group-directories-first --recurse"
-		alias ltree="command exa --all ${_EXA_GIT_FLAGS} --group-directories-first --header --long --tree"
+		alias ltree="command exa --all --group-directories-first --header --long --tree"
 
 		# Clean up variables to avoid leaking them into the environment
-		unset _EXA_GIT_FLAGS _EXA_COMMON_FLAGS _EXA_LONG_FLAGS
+		unset _EXA_COMMON_FLAGS _EXA_LONG_FLAGS
 
 	# If Natls is installed, use it instead
 	# Link: https://github.com/willdoescode/nat
 	# Install: cargo install natls
-	elif cmd-exists natls; then
+	elif hascommand natls; then
 		alias ls='natls --gdf --name'
 		alias ll='natls --gdf --name --long'
 		alias labc='natls --name'
@@ -2151,7 +2569,7 @@ if [[ $_SKIP_LS_COLORIZED = false ]]; then
 		alias new='ls -latr | tail -10 | tac' # list recently created/updated files
 		alias ltree='command tree -CAhF --dirsfirst' # tree view
 
-		if [[ $_SKIP_GRC = false ]] && cmd-exists grc; then
+		if [[ $_SKIP_GRC = false ]] && hascommand grc; then
 			# If grc Generic Colouriser is installed
 			# Link: https://github.com/garabik/grc
 			alias ll='grc ls -l --all --classify --group-directories-first --human-readable --color=always'
@@ -2177,7 +2595,7 @@ fi
 alias llfs='_llfs(){ find . -type f -size "$1" -exec ls --color --classify --human-readable -l {} \; ; }; _llfs'
 
 # Show colors with the dir command
-if cmd-exists --strict dir; then
+if hascommand --strict dir; then
 	alias dir='dir --color=auto  --almost-all --human-readable --group-directories-first -F'
 	alias vdir='vdir --color=auto'
 fi
@@ -2242,9 +2660,9 @@ alias countfiles='find . -type f | wc -l'
 alias check="type -t"
 
 # If the mlocate package is installed
-if cmd-exists locate; then
+if hascommand locate; then
 	# Case insensitive search and display only files present in your system
-	alias locate='locate -i -e'
+	alias locate='sudo \locate -i -e'
 
 	# Update the locate database before locating a file
 	# --require-visibility 0 ensures only accessible files are indexed
@@ -2254,7 +2672,7 @@ if cmd-exists locate; then
 	alias updatedb='sudo updatedb --require-visibility 0'
 
 	# Display the number of matching entries
-	alias locount='locate -c'
+	alias locount='sudo \locate -c'
 fi
 
 #######################################################
@@ -2302,7 +2720,7 @@ alias typefile='echo "Press CTRL+d when done:" && echo "$(</dev/stdin)" >'
 # ExifTool removes embedded Exif data (like location) from images, videos, and docs
 # https://exiftool.org/
 # https://linuxhandbook.com/remove-exif-data/
-if cmd-exists --strict exiftool; then
+if hascommand --strict exiftool; then
 	alias cleanmeta='exiftool -overwrite_original -all='
 fi
 
@@ -2317,17 +2735,26 @@ alias um='umount'
 alias fstab='sudo cp /etc/fstab /etc/fstab.backup; edit /etc/fstab'
 
 # Display disk space available and show file system type
-if cmd-exists duf; then
+if hascommand --strict duf; then
 	# duf Disk Usage/Free Utility
 	# Link: https://github.com/muesli/duf
 	# Link: https://linuxhint.com/use-duf-command-in-linux/
-	alias df='duf -hide-fs squashfs'
-	alias ds='duf -only local'
+	#alias df='duf -hide-fs squashfs'
+	alias lll='duf -only local'
+
+elif hascommand --strict vizex; then
+	# Visualize disk space usage for every partition and media on the user's machine
+	# Link: https://github.com/bexxmodd/vizex
+	alias lll='vizex'
+
 else
 	# df provides valuable information on disk space utilization
 	# Link: https://www.geeksforgeeks.org/df-command-linux-examples/
-	alias df='df --human-readable --print-type --exclude-type=squashfs'
-	alias ds='df --human-readable --print-type --exclude-type=squashfs --exclude-type=tmpfs --exclude-type=devtmpfs'
+	if hascommand --strict grc; then
+		alias lll='colourify \df --human-readable --print-type --exclude-type=squashfs --exclude-type=tmpfs --exclude-type=devtmpfs --exclude-type=efivarfs'
+	else
+		alias lll='command df --human-readable --print-type --exclude-type=squashfs --exclude-type=tmpfs --exclude-type=devtmpfs --exclude-type=efivarfs'
+	fi
 fi
 
 # Get the block size for a partition
@@ -2339,24 +2766,24 @@ alias blocksize='sudo blockdev --getbsz'
 # Install: curl -LSfs https://raw.githubusercontent.com/byron/dua-cli/master/ci/install.sh | \sh -s -- --git byron/dua-cli --target x86_64-unknown-linux-musl --crate dua
 if [[ -f "${HOME}/.cargo/bin/dua" ]]; then
 	alias diskspace="${HOME}/.cargo/bin/dua i"
-elif cmd-exists dua; then
+elif hascommand dua; then
 	alias diskspace='dua i'
 # gdu fast parallel disk usage analyzer written in Go
 # Link: https://github.com/dundee/gdu
 # Install: go install github.com/dundee/gdu/v5/cmd/gdu@latest
-elif cmd-exists gdu; then
+elif hascommand gdu; then
 	alias diskspace='gdu'
 # Ncdu is a disk usage analyzer with an ncurses interface
 # Link: https://dev.yorhel.nl/ncdu
-elif cmd-exists ncdu; then
+elif hascommand ncdu; then
 	alias diskspace='ncdu'
 # diskonaut gives a visual treemap of what is taking up your disk space
 # Link: https://github.com/imsnif/diskonaut
-elif cmd-exists diskonaut; then
+elif hascommand diskonaut; then
 	alias diskspace='diskonaut'
 # Dust is like du written in Rust and more intuitive
 # Link: https://github.com/bootandy/dust
-elif cmd-exists dust; then
+elif hascommand dust; then
 	alias diskspace='dust -xd1'
 # List all folders disk space sorted by largest space
 else
@@ -2372,12 +2799,12 @@ alias folders='du -kh --max-depth=1'
 # f3 - test and check real capacity for USB devices (backup your drive first)
 # Link: https://github.com/AltraMayor/f3
 # Link: https://www.linuxbabe.com/command-line/f3-usb-capacity-fake-usb-test-linux
-if cmd-exists --strict f3probe; then
+if hascommand --strict f3probe; then
 	alias usbtest='sudo f3probe --destructive --time-ops'
 fi
 
 # Alias to show MySQL's data directory location
-if cmd-exists --strict mysqld; then
+if hascommand --strict mysqld; then
 	alias mysqldatadir='mysqld --verbose --help 2>/dev/null | grep ^datadir | column --table'
 fi
 
@@ -2390,12 +2817,12 @@ alias mktar='tar -cvf' # [filename.tar] [files_or_directories_to_compress]
 alias untar='tar -xvf'
 
 # Alias to use zip recursively with maximum compression
-if cmd-exists --strict zip; then
+if hascommand --strict zip; then
 	alias mkzip='zip -r9' # [filename.zip] [files_or_directories_to_compress]
 fi
 
 # Alias to launch a document, file, or URL in it's default X application
-if cmd-exists --strict xdg-open; then
+if hascommand --strict xdg-open; then
 	alias open='runfree xdg-open'
 fi
 
@@ -2403,9 +2830,9 @@ fi
 [ -f ~/.fzf.bash ] && builtin source ~/.fzf.bash # Source if installed via Git
 
 # Alias to fuzzy find files in the current folder(s), preview them, and launch in an editor
-if cmd-exists --strict fzf; then
+if hascommand --strict fzf; then
 	# Preview text files in a directory
-	if cmd-exists --strict xdg-open; then
+	if hascommand --strict xdg-open; then
 		preview() {
 			open $(fzf --info=inline --query="${1}" --preview="$PAGER {}")
 		}
@@ -2417,40 +2844,50 @@ if cmd-exists --strict fzf; then
 
 	# Find log files using file previews
 	if [[ -d /var/log ]]; then
-		if cmd-exists bat; then
+		# Alias to find and view log files
+		if hascommand bat; then
 			# Use bat for preview if available for better syntax highlighting
-			alias findlog='(cd /var/log && sudo realpath $(sudo find . -maxdepth 10 -iname "*.log" | sort -f | sudo fzf --layout=reverse-list --info=inline --preview="sudo bat --color=always {}") 2>/dev/null)'
+			alias findlog='(cd /var/log && _LOG_SELECTED=$(sudo \find . -maxdepth 10 -iname "*.log" | \sort -f | sudo fzf --layout=reverse-list --info=inline --preview="sudo bat --color=always {}"); if [ -n "${_LOG_SELECTED}" ]; then echo -e "${BRIGHT_CYAN}Log file: ${BRIGHT_YELLOW}$(sudo \realpath "${_LOG_SELECTED}")${RESET}"; logview "$(sudo \realpath "${_LOG_SELECTED}")"; fi)'
 		else
 			# Fall back to the default PAGER
-			alias findlog='(cd /var/log && sudo realpath $(sudo find . -maxdepth 10 -iname "*.log" | sort -f | sudo -E fzf --layout=reverse-list --info=inline --preview="sudo $PAGER {}") 2>/dev/null)'
+			alias findlog='(cd /var/log && _LOG_SELECTED=$(sudo \find . -maxdepth 10 -iname "*.log" | \sort -f | sudo -E fzf --layout=reverse-list --info=inline --preview="sudo ${PAGER} {}"); if [ -n "${_LOG_SELECTED}" ]; then echo -e "${BRIGHT_CYAN}Log file: ${BRIGHT_YELLOW}$(sudo \realpath "${_LOG_SELECTED}")${RESET}"; logview "$(sudo \realpath "${_LOG_SELECTED}")"; fi)'
 		fi
 	fi
 fi
 
 # Alias for Midnight Commander (mc) to exit into current directory
+# NOTE: Use mcc for the shell command line features as the subshell is very slow
 # https://stackoverflow.com/questions/39017391/how-to-make-midnight-commander-exit-to-its-current-directory
+# https://unix.stackexchange.com/questions/57439/slow-start-of-midnight-commander
+# https://midnight-commander.org/ticket/3580
 if [[ -f "/usr/lib/mc/mc-wrapper.sh" ]]; then
-	alias mc='builtin source /usr/lib/mc/mc-wrapper.sh'
+	alias mcc='builtin source /usr/lib/mc/mc-wrapper.sh'
+	alias mc='builtin source /usr/lib/mc/mc-wrapper.sh --nosubshell'
+elif hascommand --strict mc; then
+	alias mcc='command mc'
+	alias mc='command mc --nosubshell'
 fi
 
 # Check shell script syntax
-if cmd-exists --strict shellcheck; then
+if hascommand --strict shellcheck; then
 	alias schk='shellcheck'
 fi
 
 # Alias to view log files in real time (usually in /var/log)
 # Check for lnav (The Log File Navigator)
-if cmd-exists --strict lnav; then
+# Link: https://lnav.org
+if hascommand --strict lnav; then
 	alias logview='sudo \lnav -r -t'
 	alias logs='sudo \lnav -r -t /var/log/*.log' # All logs in /var/log
 
 # Check for multitail (Multiple Tail)
-elif cmd-exists --strict multitail; then
+# Link: https://www.vanheusden.com/multitail/
+elif hascommand --strict multitail; then
 	alias logview='sudo \multitail -c -s 2'
 	alias logs='sudo \multitail -c -s 2 /var/log/*.log'
 
 # Check for tail
-elif cmd-exists --strict tail; then
+elif hascommand --strict tail; then
 	alias logview='sudo tail -f'
 	alias logs="find /var/log -type f -exec file {} \; | grep 'text' | cut -d' ' -f1 | sed -e's/:$//g' | grep -v '[0-9]$' | xargs tail -f"
 
@@ -2460,7 +2897,7 @@ else
 fi
 
 # Show logs in color
-if cmd-exists --strict multitail; then
+if hascommand --strict multitail; then
 	alias multitail='command multitail -c'
 fi
 
@@ -2481,7 +2918,7 @@ alias stopwatch='date && echo "Press CTRL+D to stop" && time read'
 # Link: https://github.com/trehn/termdown
 # Fonts: banner3, big, computer, doh, letters, roman, small, standard, univers
 # Link: http://www.figlet.org/examples.html
-if cmd-exists --strict termdown; then
+if hascommand --strict termdown; then
 	alias termdown='termdown --blink --end --critical 10 --font doh'
 	alias countdown="termdown --help | sed -n '/Options\:/q;p'"
 	alias timer='termdown'
@@ -2513,12 +2950,12 @@ alias cpu='ps aux | sort -r -nk +4 | head | $PAGER'
 alias cpuinfo='lscpu | $PAGER'
 
 # Show the USB device tree
-if cmd-exists --strict lsusb; then
+if hascommand --strict lsusb; then
 	alias usb='lsusb -t'
 fi
 
 # Show the PCI device tree
-if cmd-exists --strict lspci; then
+if hascommand --strict lspci; then
 	alias pci='lspci -tv'
 fi
 
@@ -2531,7 +2968,7 @@ fi
 _TOP_COMMANDS=("btop" "bpytop" "bashtop" "nmon" "glances" "ytop" "gtop" "htop")
 for _TOP_COMMAND in "${_TOP_COMMANDS[@]}"; do
 	# Check if the command exists and is executable
-	if cmd-exists --strict "${_TOP_COMMAND}"; then
+	if hascommand --strict "${_TOP_COMMAND}"; then
 		# Create an alias for the 'top' command using the found command
 		alias top="${_TOP_COMMAND}"
 		# Exit the loop once the first matching command is found
@@ -2544,13 +2981,13 @@ unset _TOP_COMMAND
 
 # Alias bottom
 # Link: https://github.com/ClementTsang/bottom
-if cmd-exists --strict btm; then
+if hascommand --strict btm; then
 	alias bottom='btm'
 fi
 
 # nvtop is a task monitor for NVIDIA, AMD and Intel GPUs
 # Link: https://github.com/Syllo/nvtop
-if cmd-exists --strict nvtop; then
+if hascommand --strict nvtop; then
 	alias gpu='nvtop'
 fi
 
@@ -2558,12 +2995,12 @@ fi
 alias j='jobs -l'
 
 # Change the cursor to a crosshair to select a window (requires xprop)
-if cmd-exists --strict xprop; then
+if hascommand --strict xprop; then
 	alias windowinfo='xprop'
 fi
 
 # Get active X-window process ID after a 3 second delay (requires xdotool)
-if cmd-exists --strict xdotool; then
+if hascommand --strict xdotool; then
 	alias activewinpid='sleep 3 && xdotool getactivewindow getwindowpid'
 fi
 
@@ -2582,12 +3019,12 @@ alias flushcache="sudo free -h && \\
 
 # yt-dlp fork of youtube-dl - Set the default download folder
 # Link: https://github.com/yt-dlp/yt-dlp
-if cmd-exists --strict yt-dlp; then
+if hascommand --strict yt-dlp; then
 	alias yt-dlp='yt-dlp'
 	alias ytd='yt-dlp'
 # Youtube-dl - Use best settings
 # Link: https://github.com/ytdl-org/youtube-dl
-elif cmd-exists --strict youtube-dl; then
+elif hascommand --strict youtube-dl; then
 	alias youtube-dl="youtube-dl --format 'best[vcodec*=avc]'"
 	alias ytd='youtube-dl'
 fi
@@ -2595,34 +3032,34 @@ fi
 # Checking for the presence of download utilities to create a download alias
 # and an optional alias for downloading the LS_COLORS file to ~/.dircolors
 # that requires the dircolors command used by ls to set color directory output
-if cmd-exists aria2c; then
+if hascommand aria2c; then
 	# aria2c is a lightweight multi-protocol & multi-source command-line
 	# download utility that supports HTTP/HTTPS, FTP, SFTP, BitTorrent, and
 	# Metalink with multiple connections and enhanced control over connections
 	# Link: https://aria2.github.io/
 	alias aria2c='aria2c --max-connection-per-server=5 --continue=true --async-dns=false'
 
-	if cmd-exists --strict dircolors; then
+	if hascommand --strict dircolors; then
 		alias download-dircolors='aria2c --max-connection-per-server=5 --continue=true --async-dns=false -d ${HOME} -o .dircolors https://raw.githubusercontent.com/ahmadassaf/dircolors/master/LS_COLORS'
 	fi
-elif cmd-exists --strict wget; then
+elif hascommand --strict wget; then
 	# wget is a non-interactive command-line file downloader for HTTP, HTTPS,
 	# and FTP that supports resuming downloads on more unstable connections
 	# Link: https://www.gnu.org/software/wget/
-	if cmd-exists --strict dircolors; then
+	if hascommand --strict dircolors; then
 		alias download-dircolors='wget --continue -O ${HOME}/.dircolors https://raw.githubusercontent.com/ahmadassaf/dircolors/master/LS_COLORS'
 	fi
-elif cmd-exists --strict curl; then
+elif hascommand --strict curl; then
 	# curl supports data transfer from or to a server using multiple protocols
 	# like HTTP, HTTPS, and FTP, and features resuming and redirect following
 	# Link: https://curl.se/
-	if cmd-exists --strict dircolors; then
+	if hascommand --strict dircolors; then
 		alias download-dircolors='curl -C - -L -o ${HOME}/.dircolors https://raw.githubusercontent.com/ahmadassaf/dircolors/master/LS_COLORS'
 	fi
 fi
 
 # Resume wget by default
-if cmd-exists --strict wget; then
+if hascommand --strict wget; then
 	alias wget='wget -c'
 fi
 
@@ -2637,7 +3074,7 @@ alias ports='netstat -tulanp'
 
 # Display and monitor the disk IO usage
 # Link: https://www.geeksforgeeks.org/iotop-command-in-linux-with-examples/
-if cmd-exists iotop; then
+if hascommand iotop; then
 	alias iotop='sudo iotop -o -a'
 fi
 
@@ -2645,12 +3082,12 @@ fi
 # Scan delay slows things down but reduces throttling, anti-ddos, auto-block
 # Link: https://nmap.org/
 # Example: netscan localhost
-if cmd-exists nmap; then
+if hascommand nmap; then
 	alias netscan='sudo nmap --scan-delay 1.1s -v --resolve-all -A -sTUV'
 fi
 
 # Get local IP addresses
-if cmd-exists --strict ip; then
+if hascommand --strict ip; then
 	alias iplocal="ip -br -c a"
 else
 	alias iplocal="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'"
@@ -2663,144 +3100,10 @@ alias ipexternal='wget -O - -q icanhazip.com && echo'
 
 # Make it easy to disable and reenable the Teamviewer service
 # so that it's not constantly running and only when you need it
-if cmd-exists --strict teamviewer; then
+if hascommand --strict teamviewer; then
 	alias teamviewerstart='sudo teamviewer --daemon start'
 	alias teamviewerstop='sudo teamviewer --daemon stop'
 fi
-
-# Automatically downloads based on URL by dynamically choosing the appropriate command
-# Detects the domain from the URL and chooses the appropriate download command
-# ---
-# IMPORTANT: Always ensure that you have the legal right and ethical justification
-# to download media from various services. Respect copyright laws and terms of service
-# agreements. Use of this script should comply with all applicable regulations.
-alias d='download'
-function download() {
-	local URL="${1}"
-	local DOWNLOAD_PATH="${2:-.}"
-
-	# Check if we are in a graphical environment and Desktop exists
-	if [[ "${DOWNLOAD_PATH}" == "." ]] && ([[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]) && [[ -n "$XDG_CURRENT_DESKTOP" ]] && cmd-exists xdg-user-dir; then
-		DOWNLOAD_PATH="$(xdg-user-dir DOWNLOAD)"
-	fi
-
-	# Display help if no URL provided
-	if [[ -z "${URL}" ]]; then
-		echo -e "Automatically downloads based on URL by dynamically choosing the appropriate command"
-		echo -en "Supports ${BRIGHT_CYAN}axel${RESET}, ${BRIGHT_CYAN}aria2c${RESET}, ${BRIGHT_CYAN}wget${RESET}, ${BRIGHT_CYAN}curl${RESET},"
-		echo -e " and common tools for ${BRIGHT_BLUE}Youtube${RESET}, ${BRIGHT_BLUE}Spotify${RESET}, ${BRIGHT_BLUE}Tidal${RESET}, and ${BRIGHT_BLUE}SoundCloud${RESET}"
-		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}d ${BRIGHT_YELLOW}[URL] [OPTIONAL_DOWNLOAD_PATH}${RESET}"
-		echo -e "${BRIGHT_WHITE}Options:${RESET} ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
-		return 1
-
-	# YouTube and other supported URLs
-	#elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be)/ ]]; then
-	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|rumble\.com|dailymotion\.com|amazon\.com/Prime-Video|twitter\.com|t\.co|x\.com)/ ]]; then
-
-		# yt-dlp is a feature-rich command-line audio/video downloader
-		# with support for thousands of sites
-		# Link: https://github.com/yt-dlp/yt-dlp
-		if cmd-exists yt-dlp; then
-			echo -e "${BRIGHT_YELLOW}Using yt-dlp for YouTube URL...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && yt-dlp "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		# youtube-dl downloads videos from youtube.com or other video platforms
-		# Link: https://github.com/ytdl-org/youtube-dl
-		elif cmd-exists youtube-dl; then
-			echo -e "${BRIGHT_YELLOW}Using youtube-dl for YouTube URL...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && youtube-dl --format 'best[vcodec*=avc]' "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		else
-			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable YouTube download tool found${RESET}"
-			return 1
-		fi
-
-	# Spotify URLs
-	elif [[ "${URL}" =~ ^https://open.spotify.com/ ]]; then
-
-		# spotDL finds songs from Spotify playlists on YouTube and downloads
-		# them along with album art, lyrics, and metadata
-		# Link: https://github.com/spotDL/spotify-downloader
-		if cmd-exists spotdl; then
-			echo -e "${BRIGHT_YELLOW}Using spotdl for Spotify URL...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && spotdl --bitrate 320k "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		else
-			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable Spotify download tool found${RESET}"
-			return 1
-		fi
-
-	# Tidal URLs
-	elif [[ "${URL}" =~ ^https://tidal.com/ ]]; then
-
-		# TIDAL Downloader Next Generation downloads songs and videos from TIDAL
-		# https://github.com/exislow/tidal-dl-ng
-		if cmd-exists tidal-dl-ng; then
-			echo -e "${BRIGHT_YELLOW}Using tidal-dl-ng for Tidal URL...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && tidal-dl-ng dl "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		# Tidal-Media-Downloader» lets you download videos and tracks from Tidal
-		# https://github.com/yaronzz/Tidal-Media-Downloader
-		elif cmd-exists tidal-dl; then
-			echo -e "${BRIGHT_YELLOW}Using tidal-dl for Tidal URL (ensure logged in)...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && tidal-dl "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		else
-			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable Tidal download tool found${RESET}"
-			return 1
-		fi
-
-	# SoundCloud URLs
-	elif [[ "${URL}" =~ ^https?://(www\.)?soundcloud.com/ ]]; then
-		# scdl is a script is able to download music from SoundCloud
-		# and can also set the id3tag to the downloaded music file
-		# Link: https://github.com/scdl-org/scdl
-		if cmd-exists scdl; then
-			echo -e "${BRIGHT_YELLOW}Using scdl for SoundCloud URL...${RESET}"
-			(scdl -l "${URL}" --path "${DOWNLOAD_PATH}" --onlymp3) || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		else
-			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable SoundCloud download tool found${RESET}"
-			return 1
-		fi
-
-	# Download using the detected tool
-	else
-		if cmd-exists axel; then
-			# Axel accelerates the download process by using multiple connections
-			# per file, and can also balance the load between different servers
-			# Link: https://github.com/axel-download-accelerator/axel
-			echo -e "${BRIGHT_YELLOW}Downloading using axel...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && command axel -a -n 10 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		elif cmd-exists aria2c; then
-			# aria2c is a lightweight multi-protocol & multi-source command-line
-			# download utility that supports HTTP/HTTPS, FTP, SFTP, BitTorrent, and
-			# Metalink with multiple connections and enhanced control over connections
-			# Link: https://aria2.github.io/
-			echo -e "${BRIGHT_YELLOW}Downloading using aria2c...${RESET}"
-			command aria2c --max-connection-per-server=5 --continue=true --async-dns=false --dir="${DOWNLOAD_PATH}" "${URL}" || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		elif cmd-exists wget; then
-			# wget is a non-interactive command-line file downloader for HTTP, HTTPS,
-			# and FTP that supports resuming downloads on more unstable connections
-			# Link: https://www.gnu.org/software/wget/
-			echo -e "${BRIGHT_YELLOW}Downloading using wget...${RESET}"
-			command wget --continue -P "${DOWNLOAD_PATH}" "${URL}" || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		elif cmd-exists curl; then
-			# curl supports data transfer from or to a server using multiple protocols
-			# like HTTP, HTTPS, and FTP, and features resuming and redirect following
-			# Link: https://curl.se/
-			echo -e "${BRIGHT_YELLOW}Downloading using curl...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && command curl -C - -L -O "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		else
-			echo -e "${BRIGHT_RED}ERROR: No suitable download tool found${RESET}"
-			return 1
-		fi
-	fi
-}
 
 #######################################################
 ### VISUAL
@@ -2821,23 +3124,23 @@ alias dmesg='dmesg --color'
 alias cls='clear'
 
 # Search and play YouTube videos in the terminal
-if cmd-exists --strict ytfzf; then
+if hascommand --strict ytfzf; then
 	alias yt='ytfzf -l -t'
 fi
 
 # Convert images to ASCII in color
-if cmd-exists --strict jp2a; then
+if hascommand --strict jp2a; then
 	alias jp2a='jp2a --color'
 fi
 
 # List fonts for toilet
-if cmd-exists --strict toilet; then
+if hascommand --strict toilet; then
 	alias toiletfont='ls /usr/share/figlet'
 	alias toiletfontlist='for file in /usr/share/figlet/*.?lf; do toilet -f $(basename "$file") $(basename "$file"); done'
 fi
 
 # Launch the cmatrix screen saver (if installed)
-if cmd-exists --strict cmatrix; then
+if hascommand --strict cmatrix; then
 	alias matrix='cmatrix -b'
 fi
 
@@ -2846,7 +3149,7 @@ fi
 #######################################################
 
 # Aliases for BtrFS file systems
-if cmd-exists --strict btrfs; then
+if hascommand --strict btrfs; then
 	alias btrcheck='sudo btrfs fi show'                        # Check status of raid drives
 	alias btrstats='sudo btrfs device stats'                   # Show device statistics
 	alias btrscrub='sudo btrfs scrub start'                    # Start a scrub
@@ -2858,35 +3161,35 @@ if cmd-exists --strict btrfs; then
 fi
 
 # Aliases for Ext3 file systems
-if cmd-exists --strict mkfs.ext3; then
+if hascommand --strict mkfs.ext3; then
 	alias ext3check='sudo fsck.ext3'   # Check and repair Ext3 filesystem
 	alias ext3stats='sudo dumpe2fs -h' # Show statistics for Ext3 filesystem
 	alias ext3trim='sudo fstrim -v'    # Trim unused blocks on Ext3 filesystem
 fi
 
 # Aliases for EXT4 file systems
-if cmd-exists --strict mkfs.ext4; then
+if hascommand --strict mkfs.ext4; then
 	alias ext4check='sudo fsck.ext4'   # Check and repair EXT4 filesystem
 	alias ext4stats='sudo dumpe2fs -h' # Show statistics for EXT4 filesystem
 	alias ext4trim='sudo fstrim -v'    # Trim unused blocks on EXT4 filesystem
 fi
 
 # Aliases for F2FS file systems
-if cmd-exists --strict mkfs.f2fs; then
+if hascommand --strict mkfs.f2fs; then
 	alias f2fscheck='sudo fsck.f2fs'   # Check and repair F2FS filesystem
 	alias f2fsstats='sudo f2fsck'      # Show statistics for F2FS filesystem
 	alias f2fstrim='sudo fstrim -v'    # Trim unused blocks on F2FS filesystem
 fi
 
 # Aliases for XFS file systems
-if cmd-exists --strict mkfs.xfs; then
+if hascommand --strict mkfs.xfs; then
 	alias xfscheck='sudo xfs_repair'   # Check and repair XFS filesystem
 	alias xfsstats='sudo xfs_info'     # Show information about XFS filesystem
 	alias xfstrim='sudo fstrim -v'     # Trim unused blocks on XFS filesystem
 fi
 
 # Aliases for ZFS file systems
-if cmd-exists --strict zpool; then
+if hascommand --strict zpool; then
 	alias zfscheck='sudo zpool scrub'           # Check and repair ZFS pool
 	alias zfsstats='sudo zpool iostat'          # Show ZFS pool statistics
 	alias zfstrim='sudo zpool trim'             # Trim unused blocks on ZFS pool
@@ -2900,14 +3203,14 @@ if cmd-exists --strict zpool; then
 fi
 
 # Aliases for NTFS filesystems
-if cmd-exists --strict ntfsfix; then
+if hascommand --strict ntfsfix; then
 	alias ntfscheck='sudo ntfsfix'  # Check and repair NTFS filesystem
 	alias ntfsstats='sudo ntfsinfo' # Show information about NTFS filesystem
 fi
 
 # Aliases for exFAT, FAT12, FAT16, and FAT32 filesystems
 # I'm on a diet, so no jokes please. This whole section. lol
-if cmd-exists --strict dosfsck; then
+if hascommand --strict dosfsck; then
 	alias fatcheck='sudo dosfsck'     # Check and repair FAT filesystem
 	alias fatstats='sudo fsck.fat -i' # Show information about FAT filesystem
 fi
@@ -2919,7 +3222,7 @@ fi
 # If Distrobox is installed...
 # Link: https://github.com/89luca89/distrobox
 # Link: https://github.com/89luca89/distrobox/blob/main/docs/usage/usage.md
-if cmd-exists --strict distrobox; then
+if hascommand --strict distrobox; then
 	# Create aliases for the most common commands
 	alias db='distrobox'
 	alias {dbe,distrobox-enter}='_distrobox-enter'
@@ -2976,10 +3279,10 @@ fi
 alias whichtty='tty | sed -e "s:/dev/::"'
 
 # Conditionally set alias for checking failed login attempts
-if cmd-exists aureport; then
+if hascommand aureport; then
 	# Use aureport to generate a report of failed authentication attempts
 	alias checkloginfailures='sudo \aureport -au --failed | command less'
-elif cmd-exists lastb; then
+elif hascommand lastb; then
 	# If aureport is not available, check for the lastb command
 	alias checkloginfailures='sudo \lastb | command less'
 else
@@ -2998,7 +3301,7 @@ fi
 
 # Spell check a word with DidYouMean
 # Link: https://github.com/hisbaan/didyoumean
-if cmd-exists --strict dym; then
+if hascommand --strict dym; then
 	alias spell='dym -n 10 -y'
 fi
 
@@ -3007,14 +3310,14 @@ alias rebootsafe='sudo shutdown -r now'
 alias rebootforce='sudo shutdown -r -n now'
 
 # If OpenSSL is installed...
-if cmd-exists --strict openssl; then
+if hascommand --strict openssl; then
 	# If base64 isn't available, use openssl's version to do the same thing
-	if ! cmd-exists --strict base64; then
+	if ! hascommand --strict base64; then
 		alias base64='openssl base64'
 	fi
 
 	# If base64 isn't available, use openssl's version to do the same thing
-	if ! cmd-exists --strict md5sum; then
+	if ! hascommand --strict md5sum; then
 		alias md5sum='openssl md5'
 	fi
 
@@ -3026,18 +3329,18 @@ fi
 # (used by companies like Corsair, Dell, HP, Intel, Logitech, etc.)
 # Install: pkginstall fwupdmgr
 # Link: https://fwupd.org
-if cmd-exists --strict fwupdmgr; then
+if hascommand --strict fwupdmgr; then
 	alias firmwareupdate='fwupdmgr get-devices && fwupdmgr refresh && fwupdmgr get-updates && fwupdmgr update'
 fi
 
 # When updating virus definitions, do it as root
-if cmd-exists --strict freshclam; then
+if hascommand --strict freshclam; then
 	alias freshclam='sudo freshclam'
 fi
 
 # Check passwords with cracklib
 # Link: https://www.cyberciti.biz/security/linux-password-strength-checker/
-if cmd-exists --strict cracklib-check; then
+if hascommand --strict cracklib-check; then
 	alias pwcheck='cracklib-check<<<'
 fi
 
@@ -3048,7 +3351,7 @@ fi
 # Link: http://www.aboutlinux.info/2007/02/links2-cross-platform-console-based-web.html
 # Link: https://www.tecmint.com/command-line-web-browsers/
 for TERMINAL_BROWSER in "w3m" "lynx" "elinks" "links2" "links"; do
-	if cmd-exists "${TERMINAL_BROWSER}"; then
+	if hascommand "${TERMINAL_BROWSER}"; then
 		# Show the Extreme Ultimate .bashrc README file in the available browser
 		if [[ -f "${HOME}/.config/bashrc/README.html" ]]; then
 			alias readme="${TERMINAL_BROWSER} ~/.config/bashrc/README.html"
@@ -3068,7 +3371,7 @@ if [[ $(type -t readme) != 'alias' ]]; then
 	# Link: https://github.com/swsnr/mdcat
 	# Link: https://github.com/ttscoff/mdless
 	for TERMINAL_MARKDOWN_VIEWER in "frogmouth" "glow" "mdcat" "mdless"; do
-		if cmd-exists "${TERMINAL_MARKDOWN_VIEWER}"; then
+		if hascommand "${TERMINAL_MARKDOWN_VIEWER}"; then
 			# If README.md exists in .config/bashrc, set 'readme' alias
 			if [[ -f "${HOME}/.config/bashrc/README.md" ]]; then
 				alias readme="${TERMINAL_MARKDOWN_VIEWER} ~/.config/bashrc/README.md"
@@ -3084,7 +3387,7 @@ fi
 
 # If glow is installed, set up some aliases for it
 # Link: https://github.com/charmbracelet/glow
-if cmd-exists glow; then
+if hascommand glow; then
 	# Use glow's pager option
 	alias glow='glow --all --pager'
 
@@ -3094,43 +3397,45 @@ fi
 
 # If mdcat is installed, use pagination
 # Link: https://github.com/swsnr/mdcat
-if cmd-exists mdcat; then
+if hascommand mdcat; then
 	alias mdcat='mdcat --paginate'
 fi
 
 # fx is a JavaScript Object Notation (JSON) viewer
 # Link: https://github.com/antonmedv/fx
-if cmd-exists --strict fx; then
+if hascommand --strict fx; then
 	alias json='fx'
 
 # jless is a command-line JSON viewer
 # Link: https://jless.io/
-elif cmd-exists --strict jless; then
+elif hascommand --strict jless; then
 	alias json='jless'
 
 # jq - Pretty Print JSON Files in the terminal
 # Link: https://itsfoss.com/pretty-print-json-linux/
-elif cmd-exists --strict jq; then
+elif hascommand --strict jq; then
 	alias json='jq'
 fi
 
 # baca TUI ebook reader
 # Link: https://github.com/wustho/baca
 # Install: pip install baca
-if cmd-exists --strict baca; then
+if hascommand --strict baca; then
 	alias ebook=baca
 fi
 
-if cmd-exists RHVoice-test; then
+if hascommand RHVoice-test; then
 	# RHVoice is a free and open-source multilingual speech synthesizer
 	# Link: https://rhvoice.org
-	alias say='RHVoice-test --rate 120 --volume 100 --profile lyubov <<<'
-	alias {saycb,sayclipboard}='clipboard | RHVoice-test --rate 120 --volume 100 --profile lyubov'
-elif cmd-exists espeak; then
+	alias say='RHVoice-test --rate 130 --volume 100 --profile lyubov <<<'
+	alias {saycb,sayclipboard}='clipboard | RHVoice-test --rate 130 --volume 100 --profile lyubov'
+	alias saygreet='echo "$(HOUR=$(date +%H); echo "$( [ "$HOUR" -lt 12 ] && echo "Good morning" || { [ "$HOUR" -lt 17 ] && echo "Good afternoon" || { [ "$HOUR" -lt 21 ] && echo "Good evening" || echo "Good night"; }; }) $(getent passwd "${USER}" | cut -d ":" -f 5 | cut -d "," -f 1 || echo "${USER}")! It is $(date +"%-I. %M. %p" | sed "s/AM/A. M./; s/PM/P. M./"). $(grep -q "^To " /var/mail/${USER} 2>/dev/null && echo "You have new messages." || echo "")")" | RHVoice-test --rate 130 --volume 100 --profile lyubov'
+elif hascommand espeak; then
 	# Speak with female voice
 	# Link: https://thomashunter.name/posts/2012-05-21-female-voice-using-espeak
 	alias say='espeak -ven-us+f4 -s170'
 	alias {saycb,sayclipboard}='clipboard | espeak -ven-us+f4 -s170'
+	alias saygreet='echo "$(HOUR=$(date +%H); echo "$( [ "$HOUR" -lt 12 ] && echo "Good morning" || { [ "$HOUR" -lt 17 ] && echo "Good afternoon" || { [ "$HOUR" -lt 21 ] && echo "Good evening" || echo "Good night"; }; }) $(getent passwd "${USER}" | cut -d ":" -f 5 | cut -d "," -f 1 || echo "${USER}")! It is $(date +"%-I. %M. %p" | sed "s/AM/A. M./; s/PM/P. M./"). $(grep -q "^To " /var/mail/${USER} 2>/dev/null && echo "You have new messages." || echo "")")" | espeak -ven-us+f4 -s170'
 fi
 
 # Aliases to modify GRUB
@@ -3139,25 +3444,25 @@ alias grubedit='edit /etc/default/grub'
 alias grubsave='sudo update-grub'
 
 # Shows all the script files in a directory and which shell they require
-alias scanscripts='for FILE in *; do [[ -f "$FILE" ]] && echo -n "$FILE - " && head -n 1 $FILE; done | grep "\#\!" 2> /dev/null'
+alias scanscripts='grep -E -r "^#!/" ./* 2> /dev/null'
 
 # Vlock - lock all terminals
 # Install: sudo apt install vlock
 # Install: sudo pacman -S kbd
 # https://odysee.com/@DistroTube:2/lock-your-terminal-sessions-with-vlock:0
-if cmd-exists --strict vlock; then
+if hascommand --strict vlock; then
 	# Alias Vlock to lock all terminals and can be typed with one hand
 	alias lok='vlock --all'
 fi
 
 # Alias thefuck that corrects errors in previous console commands
 # Link: https://github.com/nvbn/thefuck
-if cmd-exists --strict thefuck; then
+if hascommand --strict thefuck; then
 	eval $(thefuck --alias fix)
 fi
 
 # Alias to restart KDE Plasma desktop without rebooting or logging out
-if cmd-exists --strict kstart5 && cmd-exists --strict kquitapp5; then
+if hascommand --strict kstart5 && hascommand --strict kquitapp5; then
 	alias {plasmarestart,kderestart}='kquitapp5 plasmashell && runfree kstart5 plasmashell'
 fi
 
@@ -3167,7 +3472,7 @@ fi
 #######################################################
 
 # Aliases for tmux terminal multiplexer if installed
-if cmd-exists tmux; then
+if hascommand tmux; then
 
 	# Enhance clear to also clear the TMUX scrollback buffer
 	if  [[ -n "${TMUX}" ]]; then
@@ -3347,7 +3652,7 @@ if cmd-exists tmux; then
 	alias tmlistkeys='grep -E "^(bind-key|bind)\s+" ~/.tmux.conf | sort'
 
 # Tmux is not installed, but Zellij is and is very user friendly
-elif cmd-exists zellij; then
+elif hascommand zellij; then
 	# Redirect these Tmux aliases to Zellij instead
 	alias {tm,tmnew,tmjoin}='znew'
 	alias tmlist='zlist'
@@ -3357,7 +3662,7 @@ elif cmd-exists zellij; then
 
 # Tmux is not installed, but Screen is
 # Link: https://linuxize.com/post/how-to-use-linux-screen/
-elif cmd-exists screen; then
+elif hascommand screen; then
 	alias tm="echo 'Tmux is not installed, but screen is installed on this system.'"
 
 fi
@@ -3368,7 +3673,7 @@ fi
 #######################################################
 
 # Aliases for Zellij terminal multiplexer if installed
-if cmd-exists zellij; then
+if hascommand zellij; then
 
 	# Function to load Zellij with a default session named the logged in user
 	# You can also pass in a specific session name as a parameter
@@ -3403,7 +3708,7 @@ fi
 # Link: https://www.brain-dump.org/projects/abduco/
 #######################################################
 
-if cmd-exists abduco; then
+if hascommand abduco; then
 
 	# Start or connect to an abduco session
 	function aa() {
@@ -3435,7 +3740,7 @@ fi
 #######################################################
 
 # Depending on the installed package managers, set up some package aliases
-if cmd-exists --strict paru; then # Arch
+if hascommand --strict paru; then # Arch
 	# Link: https://github.com/Morganamilo/paru
 	# Link: https://itsfoss.com/paru-aur-helper/
 	# NOTE: To get search results to start at the bottom and go upwards, enable BottomUp in paru.conf
@@ -3448,7 +3753,7 @@ if cmd-exists --strict paru; then # Arch
 	alias pkgsearch='paru --bottomup'
 	alias pkglist='paru -Qe'
 	alias pkglistmore='paru -Q' # Also includes dependencies
-elif cmd-exists --strict yay; then # Arch
+elif hascommand --strict yay; then # Arch
 	# Link: https://github.com/Jguer/yay
 	alias has='yay -Si'
 	alias pkgupdateall='yay -Syyu --sudoloop && if type flatpak >/dev/null 2>&1; then sudo flatpak update; fi && if type snap >/dev/null 2>&1; then sudo snap refresh; fi && if type tldr >/dev/null 2>&1; then tldr --update; fi'
@@ -3459,7 +3764,7 @@ elif cmd-exists --strict yay; then # Arch
 	alias pkgsearch='yay'
 	alias pkglist='yay -Qe'
 	alias pkglistmore='yay -Q' # Also includes dependencies
-elif cmd-exists --strict pamac; then    # Manjaro
+elif hascommand --strict pamac; then    # Manjaro
 	# Link: https://wiki.manjaro.org/index.php/Pamac
 	alias has='sudo pamac info'
 	alias pkgupdateall='sudo pamac upgrade -a && if type tldr >/dev/null 2>&1; then tldr --update; fi'
@@ -3470,7 +3775,7 @@ elif cmd-exists --strict pamac; then    # Manjaro
 	alias pkgsearch='sudo pamac search -a'
 	alias pkglist='pacman -Qe'
 	alias pkglistmore='pacman -Q' # Also includes dependencies
-elif cmd-exists --strict pacman && [[ -n $(uname -r | grep arch) ]]; then # Arch (No AUR)
+elif hascommand --strict pacman && [[ -n $(uname -r | grep arch) ]]; then # Arch (No AUR)
 	# Link: https://archlinux.org/pacman/
 	alias has='pacman -Q --info'
 	alias pkgupdateall='sudo pacman -Syyu && if type flatpak >/dev/null 2>&1; then sudo flatpak update; fi && if type snap >/dev/null 2>&1; then sudo snap refresh; fi && if type tldr >/dev/null 2>&1; then tldr --update; fi'
@@ -3481,7 +3786,7 @@ elif cmd-exists --strict pacman && [[ -n $(uname -r | grep arch) ]]; then # Arch
 	alias pkgsearch='pacman -Ss'
 	alias pkglist='pacman -Qe'
 	alias pkglistmore='pacman -Q' # Also includes dependencies
-elif cmd-exists --strict dnf; then # RedHat/Fedora
+elif hascommand --strict dnf; then # RedHat/Fedora
 	# Link: https://fedoraproject.org/wiki/DNF
 	alias has='dnf info'
 	alias pkgupdateall='sudo dnf upgrade --refresh'
@@ -3492,7 +3797,7 @@ elif cmd-exists --strict dnf; then # RedHat/Fedora
 	alias pkgsearch='sudo dnf search'
 	alias pkglist='dnf list installed'
 	alias pkgdependencies='yum whatprovides'
-elif cmd-exists --strict yum; then # RedHat/Fedora
+elif hascommand --strict yum; then # RedHat/Fedora
 	# Link: https://access.redhat.com/articles/yum-cheat-sheet
 	alias has='yum info'
 	alias pkgupdateall='sudo yum clean all && yum -y update'
@@ -3503,7 +3808,7 @@ elif cmd-exists --strict yum; then # RedHat/Fedora
 	alias pkgsearch='sudo yum search'
 	alias pkglist='yum list installed'
 	alias pkgdependencies='yum whatprovides'
-elif cmd-exists --strict nala; then # Debian/Ubuntu/Raspbian
+elif hascommand --strict nala; then # Debian/Ubuntu/Raspbian
 	# Link: https://gitlab.com/volian/nala
 	# Link: https://itsfoss.com/nala/
 	alias has='nala show'
@@ -3515,7 +3820,7 @@ elif cmd-exists --strict nala; then # Debian/Ubuntu/Raspbian
 	alias pkgsearch='sudo nala search'
 	alias pkglist='sudo nala list --installed'
 	alias pkgmirrors='sudo nala fetch'
-elif cmd-exists --strict apt; then # Debian/Ubuntu/Raspbian
+elif hascommand --strict apt; then # Debian/Ubuntu/Raspbian
 	# Link: https://itsfoss.com/apt-command-guide/
 	alias has='apt show'
 	alias pkgupdateall='sudo apt update --assume-yes && sudo apt upgrade --assume-yes && if type pacstall >/dev/null 2>&1; then pacstall --upgrade; fi && if type tldr >/dev/null 2>&1; then tldr --update; fi'
@@ -3526,7 +3831,7 @@ elif cmd-exists --strict apt; then # Debian/Ubuntu/Raspbian
 	alias pkgsearch='sudo apt search'
 	alias pkglist='sudo apt list --installed'
 	alias pkgcheck='sudo apt update --assume-yes && apt list --upgradable'
-elif cmd-exists --strict apt-get; then # Debian/Ubuntu
+elif hascommand --strict apt-get; then # Debian/Ubuntu
 	# Link: https://help.ubuntu.com/community/AptGet/Howto
 	alias has='apt-cache show'
 	alias pkgupdateall='sudo apt-get update && sudo apt-get upgrade && if type pacstall >/dev/null 2>&1; then pacstall --upgrade; fi && if type tldr >/dev/null 2>&1; then tldr --update; fi'
@@ -3536,7 +3841,7 @@ elif cmd-exists --strict apt-get; then # Debian/Ubuntu
 	alias pkgclean='sudo apt-get autoremove'
 	alias pkgsearch='sudo apt-cache search'
 	alias pkglist='sudo dpkg -l'
-elif cmd-exists --strict zypper; then # SUSE
+elif hascommand --strict zypper; then # SUSE
 	# Link: https://en.opensuse.org/SDB:Zypper_usage
 	alias has='zypper info'
 	alias pkgupdateall='sudo zypper patch'
@@ -3546,7 +3851,7 @@ elif cmd-exists --strict zypper; then # SUSE
 	alias pkgclean='sudo zypper packages --orphaned'
 	alias pkgsearch='sudo zypper se'
 	alias pkglist='zypper se --installed-only'
-elif cmd-exists --strict eopkg; then # Solus
+elif hascommand --strict eopkg; then # Solus
 	# Link: https://getsol.us/articles/package-management/basics/en/
 	alias has='sudo eopkg info'
 	alias pkgupdateall='sudo eopkg upgrade'
@@ -3555,7 +3860,7 @@ elif cmd-exists --strict eopkg; then # Solus
 	alias pkgremove='sudo eopkg remove'
 	alias pkgsearch='sudo eopkg search'
 	alias pkglist='eopkg li -l'
-elif cmd-exists --strict emerge; then # Gentoo (Portage)
+elif hascommand --strict emerge; then # Gentoo (Portage)
 	# Link: https://www.linode.com/docs/guides/portage-package-manager/
 	alias has='equery files'
 	alias pkgupdateall='sudo emerge --sync && sudo emerge --update --deep --with-bdeps=y --newuse @world && sudo emerge --depclean && sudo revdep-rebuild'
@@ -3564,7 +3869,7 @@ elif cmd-exists --strict emerge; then # Gentoo (Portage)
 	alias pkgremove='sudo emerge --depclean'
 	alias pkgsearch='sudo emerge --search'
 	alias pkglist='equery list "*"'
-elif cmd-exists --strict slackpkg; then # Slackware
+elif hascommand --strict slackpkg; then # Slackware
 	# Link: https://www.linux.com/training-tutorials/intro-slackware-package-management/
 	alias has='slackpkg info'
 	alias pkgupdateall='slackpkg update && slackpkg install-new && slackpkg upgrade-all'
@@ -3572,7 +3877,7 @@ elif cmd-exists --strict slackpkg; then # Slackware
 	alias pkginstall='installpkg'
 	alias pkgremove='removepkg'
 	alias pkglist='pkgtool'
-elif cmd-exists --strict urpmi; then # Mandrake
+elif hascommand --strict urpmi; then # Mandrake
 	# Link: https://wiki.mageia.org/en/URPMI
 	alias has='urpmq --summary -Y'
 	alias pkgupdateall='urpmi --auto-update'
@@ -3581,7 +3886,7 @@ elif cmd-exists --strict urpmi; then # Mandrake
 	alias pkgremove='urpme'
 	alias pkgsearch='urpmq --summary -Y'
 	alias pkglist='rpm -qa'
-elif cmd-exists --strict apt-cyg; then # Cygwin
+elif hascommand --strict apt-cyg; then # Cygwin
 	# Link: http://stephenjungels.com/jungels.net/projects/apt-cyg/
 	alias has='apt-cyg show'
 	alias pkgupdateall='apt-cyg update'
@@ -3590,7 +3895,7 @@ elif cmd-exists --strict apt-cyg; then # Cygwin
 	alias pkgremove='apt-cyg remove'
 	alias pkgsearch='apt-cyg find'
 	alias pkglist='cygcheck --check-setup'
-elif cmd-exists --strict brew; then # macOS
+elif hascommand --strict brew; then # macOS
 	# Link: https://brew.sh/
 	alias has='brew info'
 	alias pkgupdateall='brew update'
@@ -3603,14 +3908,14 @@ elif cmd-exists --strict brew; then # macOS
 fi
 
 # If this is an Arch based distrobution with pacman...
-if cmd-exists --strict pacman && [[ -d /etc/pacman.d/ ]]; then
+if hascommand --strict pacman && [[ -d /etc/pacman.d/ ]]; then
 
 	# Install a list of packages with regex
 	# https://wiki.archlinux.org/title/pacman#Installing_specific_packages
 	function pkginstallregex() {
 		if [ $# -eq 0 ]; then
 			echo "No regex provided"
-			exit 1
+			return 1
 		else
 			sudo pacman -S $(pacman -Ssq "${@}")
 		fi
@@ -3654,14 +3959,14 @@ if cmd-exists --strict pacman && [[ -d /etc/pacman.d/ ]]; then
 
 	# Pacseek - browse and search through the Arch Linux package databases and AUR
 	# Link: https://github.com/moson-mo/pacseek
-	if cmd-exists --strict pacseek; then
+	if hascommand --strict pacseek; then
 		alias pkg='pacseek'
 	fi
 
 	# If perl is installed (preset on most systems)...
 	# Link: https://wiki.archlinux.org/title/Perl
 	# Install: sudo pacman -S perl
-	if cmd-exists --strict perl; then
+	if hascommand --strict perl; then
 
 		# Use a much more detailed package listing with descriptions (AUR separated)
 		# pkglist [search] will search for all installed packages instead
@@ -3687,7 +3992,7 @@ if cmd-exists --strict pacman && [[ -d /etc/pacman.d/ ]]; then
 
 	# If pacman-contrib (contributed scripts and tools for pacman) is installed...
 	# Install: sudo pacman -S pacman-contrib
-	if cmd-exists --strict paccache; then
+	if hascommand --strict paccache; then
 
 		# Add aliases to find dependencies
 		alias pkgdependencies='pactree --color' # --unique --depth 1
@@ -3706,16 +4011,16 @@ if cmd-exists --strict pacman && [[ -d /etc/pacman.d/ ]]; then
 fi
 
 # If apt package manager is installed, add aliases to find dependencies in Ubuntu/Debian
-if cmd-exists --strict apt-cache; then
+if hascommand --strict apt-cache; then
 	alias pkgdependencies='apt-cache depends'
 	# If apt-rdepends is installed (sudo apt install apt-rdepends)
-	if cmd-exists --strict apt-rdepends; then
+	if hascommand --strict apt-rdepends; then
 		alias pkgwhatuses='apt-rdepends'
 	fi
 fi
 
 # Aliases for flatpak packages if installed
-if cmd-exists --strict flatpak; then
+if hascommand --strict flatpak; then
 	alias flatpakhas='flatpak info'
 	alias flatpakupdateall='sudo flatpak update'
 	alias flatpakupdate='sudo flatpak update'
@@ -3740,7 +4045,7 @@ if cmd-exists --strict flatpak; then
 fi
 
 # Aliases for snap packages if installed
-if cmd-exists --strict snap; then
+if hascommand --strict snap; then
 	alias snaphas='snap info'
 	alias snapupdateall='sudo snap refresh --list'
 	alias snapupdate='sudo snap refresh'
@@ -3764,11 +4069,11 @@ if [[ $_SKIP_SUDO_ALTERNATIVE = false ]]; then
 	# username=yourusername
 	# wrong_pw_sleep=1000
 	# session_ttl=5
-	if cmd-exists --strict rdo; then
+	if hascommand --strict rdo; then
 		alias sudo='rdo'
 
 		# If sudoedit is not avaliable, alias it
-		if ! cmd-exists --strict sudoedit; then
+		if ! hascommand --strict sudoedit; then
 			# The edit alias might not exist in root but the
 			# edit function handles sudo editing when needed
 			alias sudoedit='edit'
@@ -3781,12 +4086,12 @@ if [[ $_SKIP_SUDO_ALTERNATIVE = false ]]; then
 	# Link: https://github.com/Duncaen/OpenDoas or https://github.com/slicer69/doas
 	# Link: https://youtu.be/eamEZCj-CuQ
 	# Config: Add "permit <user> as root" in /etc/doas.conf or /usr/local/etc/doas.conf
-	elif cmd-exists --strict doas; then
+	elif hascommand --strict doas; then
 		alias sudo='doas'
 
 		# Replace sudoedit only if doasedit exists
 		# Link: https://github.com/AN3223/scripts/blob/master/doasedit
-		if cmd-exists --strict doasedit; then
+		if hascommand --strict doasedit; then
 			alias sudoedit='doasedit'
 		fi
 	fi
@@ -3808,7 +4113,7 @@ trap _exit EXIT
 
 # Calculator that uses bc or Bash's built-in arithmetic
 # Example: = 5*5+2
-if cmd-exists bc; then
+if hascommand bc; then
 	# Start calculator with math support
 	# echo 'if (scale == 0) scale=4' > ~/.config/bcrc
 	# Link: https://www.gnu.org/software/bc/manual/html_mono/bc.html
@@ -3847,7 +4152,7 @@ function resolvesymlink() {
 		# Use a subshell to prevent changing the current working directory
 		(
 			# Change to the directory containing the target file
-			cd "$(dirname "$target_file")" || exit 1
+			cd "$(dirname "$target_file")" || return 1
 
 			# Get the base name of the target file (strip directory path)
 			target_file=$(basename "$target_file")
@@ -3857,7 +4162,7 @@ function resolvesymlink() {
 				# Update target_file with the link's actual destination
 				target_file=$(readlink "$target_file")
 				# Change directory to where the symlink points
-				cd "$(dirname "$target_file")" || exit 1
+				cd "$(dirname "$target_file")" || return 1
 				# Update target_file to just the file name again
 				target_file=$(basename "$target_file")
 			done
@@ -3893,10 +4198,10 @@ function ask() {
 	local prompt default reply
 
 	# Determine the prompt and default based on the second parameter
-	if [[ ${2:-} = 'Y' ]]; then
+	if [[ "${2:-}" = "Y" ]]; then
 		prompt='Y/n'
 		default='Y'
-	elif [[ ${2:-} = 'N' ]]; then
+	elif [[ "${2:-}" = "N" ]]; then
 		prompt='y/N'
 		default='N'
 	else
@@ -3907,16 +4212,16 @@ function ask() {
 	# Loop until a valid answer is given
 	while true; do
 		# Ask the question (not using "read -p" as it uses stderr not stdout)
-		echo -ne "$1 [$prompt] "
+		echo -ne "${1} [$prompt] "
 
 		# Read the answer (use /dev/tty in case stdin is redirected from somewhere else)
 		read -r reply </dev/tty
 
 		# Set reply to default if it is empty
-		[[ -z $reply ]] && reply=$default
+		[[ -z "${reply}" ]] && reply="${default}"
 
 		# Check if the reply is valid
-		case "$reply" in
+		case "${reply}" in
 			Y*|y*) return 0 ;;
 			N*|n*) return 1 ;;
 		esac
@@ -3961,7 +4266,7 @@ function createmenu() {
 	for ARG in "$@"; do
 		if [[ "$ARG" == --picker=* ]]; then
 			_PICKER="${ARG#*=}"
-			if cmd-exists "${_PICKER}"; then
+			if hascommand "${_PICKER}"; then
 				_FOUND_PICKER=true
 			else
 				echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}The picker ${BRIGHT_YELLOW}${_PICKER}${BRIGHT_CYAN} is not available or installed${RESET}"
@@ -3977,7 +4282,7 @@ function createmenu() {
 	if [ "$_FOUND_PICKER" == false ]; then
 		# Loop through the list and see if one of them is installed
 		for _PICKER in $_VALID_PICKERS; do
-			if cmd-exists $_PICKER; then
+			if hascommand $_PICKER; then
 				_FOUND_PICKER=true
 				break
 			fi
@@ -4064,10 +4369,10 @@ function createmenu() {
 # Parameters:
 # 	$1: Text description to display while the command is running
 # 	$2: The command to execute
-function run-with-feedback() {
+function runwithfeedback() {
 	# Check if both parameters are provided
 	if [ -z "${1}" ] || [ -z "${2}" ]; then
-		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}run-with-feedback${RESET} ${BRIGHT_GREEN}[description] [command]${RESET}"
+		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}runwithfeedback${RESET} ${BRIGHT_GREEN}[description] [command]${RESET}"
 		return 1
 	fi
 
@@ -4091,7 +4396,7 @@ function run-with-feedback() {
 
 # Finds the current Linux distribution, name, version, and kernel version
 function ver() {
-	if cmd-exists --strict uname; then
+	if hascommand --strict uname; then
 		# Get information about the system kernel, release, and machine hardware
 		uname --kernel-name --kernel-release --machine
 		echo
@@ -4101,12 +4406,12 @@ function ver() {
 		cat /proc/version
 		echo
 	fi
-	if cmd-exists --strict lsb_release; then
+	if hascommand --strict lsb_release; then
 		# Provides LSB (Linux Standard Base) and distribution-specific information
 		lsb_release -a
 		echo
 	fi
-	if cmd-exists --strict hostnamectl; then
+	if hascommand --strict hostnamectl; then
 		# Control the Linux system hostname, also shows various system details
 		hostnamectl
 		echo
@@ -4176,6 +4481,140 @@ function smash() {
 		fi
 	else
 		echo "No processes found for: $1" >&2 && return 1
+	fi
+}
+
+# Automatically downloads based on URL by dynamically choosing the appropriate command
+# Detects the domain from the URL and chooses the appropriate download command
+# ---
+# IMPORTANT: Always ensure that you have the legal right and ethical justification
+# to download media from various services. Respect copyright laws and terms of service
+# agreements. Use of this script should comply with all applicable regulations.
+alias d='download'
+function download() {
+	local URL="${1}"
+	local DOWNLOAD_PATH="${2:-.}"
+
+	# Check if we are in a graphical environment and Desktop exists
+	if [[ "${DOWNLOAD_PATH}" == "." ]] && ([[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]) && [[ -n "$XDG_CURRENT_DESKTOP" ]] && hascommand xdg-user-dir; then
+		DOWNLOAD_PATH="$(xdg-user-dir DOWNLOAD)"
+	fi
+
+	# Display help if no URL provided
+	if [[ -z "${URL}" ]]; then
+		echo -e "Automatically downloads based on URL by dynamically choosing the appropriate command"
+		echo -en "Supports ${BRIGHT_CYAN}axel${RESET}, ${BRIGHT_CYAN}aria2c${RESET}, ${BRIGHT_CYAN}wget${RESET}, ${BRIGHT_CYAN}curl${RESET},"
+		echo -e " and common tools for ${BRIGHT_BLUE}Youtube${RESET}, ${BRIGHT_BLUE}Spotify${RESET}, ${BRIGHT_BLUE}Tidal${RESET}, and ${BRIGHT_BLUE}SoundCloud${RESET}"
+		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}d ${BRIGHT_YELLOW}[URL] [OPTIONAL_DOWNLOAD_PATH}${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET} ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
+		return 1
+
+	# YouTube and other supported URLs
+	#elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be)/ ]]; then
+	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|rumble\.com|dailymotion\.com|amazon\.com/Prime-Video|twitter\.com|t\.co|x\.com)/ ]]; then
+
+		# yt-dlp is a feature-rich command-line audio/video downloader
+		# with support for thousands of sites
+		# Link: https://github.com/yt-dlp/yt-dlp
+		if hascommand yt-dlp; then
+			echo -e "${BRIGHT_YELLOW}Using yt-dlp for YouTube URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && yt-dlp "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		# youtube-dl downloads videos from youtube.com or other video platforms
+		# Link: https://github.com/ytdl-org/youtube-dl
+		elif hascommand youtube-dl; then
+			echo -e "${BRIGHT_YELLOW}Using youtube-dl for YouTube URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && youtube-dl --format 'best[vcodec*=avc]' "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable YouTube download tool found${RESET}"
+			return 1
+		fi
+
+	# Spotify URLs
+	elif [[ "${URL}" =~ ^https://open.spotify.com/ ]]; then
+
+		# spotDL finds songs from Spotify playlists on YouTube and downloads
+		# them along with album art, lyrics, and metadata
+		# Link: https://github.com/spotDL/spotify-downloader
+		if hascommand spotdl; then
+			echo -e "${BRIGHT_YELLOW}Using spotdl for Spotify URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && spotdl --bitrate 320k "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable Spotify download tool found${RESET}"
+			return 1
+		fi
+
+	# Tidal URLs
+	elif [[ "${URL}" =~ ^https://tidal.com/ ]]; then
+
+		# TIDAL Downloader Next Generation downloads songs and videos from TIDAL
+		# https://github.com/exislow/tidal-dl-ng
+		if hascommand tidal-dl-ng; then
+			echo -e "${BRIGHT_YELLOW}Using tidal-dl-ng for Tidal URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && tidal-dl-ng dl "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		# Tidal-Media-Downloader» lets you download videos and tracks from Tidal
+		# https://github.com/yaronzz/Tidal-Media-Downloader
+		elif hascommand tidal-dl; then
+			echo -e "${BRIGHT_YELLOW}Using tidal-dl for Tidal URL (ensure logged in)...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && tidal-dl "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable Tidal download tool found${RESET}"
+			return 1
+		fi
+
+	# SoundCloud URLs
+	elif [[ "${URL}" =~ ^https?://(www\.)?soundcloud.com/ ]]; then
+		# scdl is a script is able to download music from SoundCloud
+		# and can also set the id3tag to the downloaded music file
+		# Link: https://github.com/scdl-org/scdl
+		if hascommand scdl; then
+			echo -e "${BRIGHT_YELLOW}Using scdl for SoundCloud URL...${RESET}"
+			(scdl -l "${URL}" --path "${DOWNLOAD_PATH}" --onlymp3) || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable SoundCloud download tool found${RESET}"
+			return 1
+		fi
+
+	# Download using the detected tool
+	else
+		if hascommand axel; then
+			# Axel accelerates the download process by using multiple connections
+			# per file, and can also balance the load between different servers
+			# Link: https://github.com/axel-download-accelerator/axel
+			echo -e "${BRIGHT_YELLOW}Downloading using axel...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && command axel -a -n 10 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		elif hascommand aria2c; then
+			# aria2c is a lightweight multi-protocol & multi-source command-line
+			# download utility that supports HTTP/HTTPS, FTP, SFTP, BitTorrent, and
+			# Metalink with multiple connections and enhanced control over connections
+			# Link: https://aria2.github.io/
+			echo -e "${BRIGHT_YELLOW}Downloading using aria2c...${RESET}"
+			command aria2c --max-connection-per-server=5 --continue=true --async-dns=false --dir="${DOWNLOAD_PATH}" "${URL}" || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		elif hascommand curl; then
+			# curl supports data transfer from or to a server using multiple protocols
+			# like HTTP, HTTPS, and FTP, and features resuming and redirect following
+			# Link: https://curl.se/
+			echo -e "${BRIGHT_YELLOW}Downloading using curl...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && command curl -C - -L -O "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		elif hascommand wget; then
+			# wget is a non-interactive command-line file downloader for HTTP, HTTPS,
+			# and FTP that supports resuming downloads on more unstable connections
+			# Link: https://www.gnu.org/software/wget/
+			echo -e "${BRIGHT_YELLOW}Downloading using wget...${RESET}"
+			command wget --continue -P "${DOWNLOAD_PATH}" "${URL}" || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		else
+			echo -e "${BRIGHT_RED}ERROR: No suitable download tool found${RESET}"
+			return 1
+		fi
 	fi
 }
 
@@ -4250,19 +4689,19 @@ function genpw() {
 		fi
 	fi
 
-	if cmd-exists --strict apg; then
+	if hascommand --strict apg; then
 		if [[ ${_PASSWORD_SYMBOLS} == true ]]; then
 			apg -a 1 -n 10 -m ${_PASSWORD_LENGTH} -l
 		else
 			apg -a 0 -n 10 -m ${_PASSWORD_LENGTH} -l
 		fi
-	elif cmd-exists --strict pwgen; then
+	elif hascommand --strict pwgen; then
 		if [[ ${_PASSWORD_SYMBOLS} == true ]]; then
 			pwgen --capitalize --numerals --symbols --secure -C ${_PASSWORD_LENGTH} 40
 		else
 			pwgen --capitalize --numerals --secure -C ${_PASSWORD_LENGTH} 40
 		fi
-	elif cmd-exists --strict gpg; then
+	elif hascommand --strict gpg; then
 		for ((n=0;n<10;n++)); do
 			if [[ ${_PASSWORD_SYMBOLS} == true ]]; then
 				gpg --gen-random 1 1024 | tr -dc a-zA-Z0-9'`~!@#$%^&*-_=+()[]{}|;:",.?<>/\\'"'" | head -c${_PASSWORD_LENGTH}; echo
@@ -4270,7 +4709,7 @@ function genpw() {
 				gpg --gen-random 1 1024 | tr -dc a-zA-Z0-9 | head -c${_PASSWORD_LENGTH}; echo
 			fi
 		done
-	elif cmd-exists --strict openssl; then
+	elif hascommand --strict openssl; then
 		for ((n=0;n<10;n++)); do
 			if [[ ${_PASSWORD_SYMBOLS} == true ]]; then
 				openssl rand 1024 | tr -dc a-zA-Z0-9'`~!@#$%^&*-_=+()[]{}|;:",.?<>/\\'"'" | head -c${_PASSWORD_LENGTH}; echo
@@ -4290,19 +4729,17 @@ function genpw() {
 }
 
 # Schedule the computer to auto reboot (defaults to 4:00 AM)
-function reboottonight() {
+function rebootlater() {
 	# If no time is specified or --help or -h is passed, show help text
 	if [ -z "$1" ] || [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
-		echo -e "${BRIGHT_WHITE}reboottonight:${RESET} Schedule the computer to auto reboot (defaults to 4:00 AM)"
-		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}reboottonight${RESET} ${BRIGHT_YELLOW}[OPTIONAL_TIME]${RESET}"
-		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-		echo -e "  ${BRIGHT_CYAN}reboottonight${RESET}          # Reboot at 4:00 AM"
-		echo -e "  ${BRIGHT_CYAN}reboottonight${RESET} ${BRIGHT_YELLOW}'02:30'${RESET}  # Reboot at 2:30 AM"
+		echo -e "${BRIGHT_WHITE}rebootlater:${RESET} Schedule the computer to auto reboot at a specified time"
+		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}rebootlater${RESET} ${BRIGHT_YELLOW}[MILITARY_TIME]${RESET}"
+		echo -e "${BRIGHT_WHITE}Example: ${BRIGHT_CYAN}rebootlater${RESET} ${BRIGHT_YELLOW}'23:30'${RESET} # Reboot at 11:30 PM"
 		return 1
 	fi
 
 	# Check if 'at' command exists directly in the if statement
-	if ! cmd-exists at; then
+	if ! hascommand at; then
 		echo -e "${BRIGHT_RED}Error:${RESET} Required 'at' command is not installed"
 		return 1
 	fi
@@ -4361,7 +4798,7 @@ function trimcb() {
 
 # Long format directory listing with color columns (only requires gawk)
 function llcolor {
-	if cmd-exists --strict gawk; then
+	if hascommand --strict gawk; then
 		# Show long directory listings with color columns
 		command ls -l --all --classify --group-directories-first --human-readable --color=always "$@" | awk '
 			BEGIN {
@@ -4470,22 +4907,22 @@ function trash() {
 
 	# Check if trash-cli exists...
 	# https://github.com/andreafrancia/trash-cli
-	if cmd-exists trash-put; then
+	if hascommand trash-put; then
 		trash-put "${@}" && return 0
 
 	# Check if rem exists...
 	# Link: https://github.com/quackduck/rem
-	elif cmd-exists rem; then
+	elif hascommand rem; then
 		rem "${@}" && return 0
 
 	# Check if gio trash exists (glib2)...
 	# Link: https://wiki.archlinux.org/title/Trash-cli#gio_trash
-	elif cmd-exists gio; then
+	elif hascommand gio; then
 		gio trash "${@}" && return 0
 
 	# Check if kioclient5 exists (kde-cli-tools)...
 	# Link: https://wiki.archlinux.org/title/Trash-cli#kioclient5
-	elif cmd-exists kioclient5; then
+	elif hascommand kioclient5; then
 		kioclient5 move "${@}" trash:/ && return 0
 
 	# Check for various trash directories
@@ -4498,9 +4935,10 @@ function trash() {
 	elif [[ -d "${HOME}/.trash" ]]; then
 		command mv -i "${@}" "${HOME}/.trash/" && return 0
 
-	# Create the trash directory if none exists
+	# Create the trash directory per the XDG specification if none exists
 	else
-		command mkdir -p "${HOME}/.trash" && command mv -i "${@}" "${HOME}/.trash/" && return 0
+		command mkdir -p "${HOME}/.local/share/Trash/files"
+		command mv -i "${@}" "${HOME}/.local/share/Trash/files/" && return 0
 	fi
 
 	# If none of the methods succeeded, return an error
@@ -4512,19 +4950,19 @@ function trash() {
 function trashlist() {
 	# Check if trash-cli exists...
 	# https://github.com/andreafrancia/trash-cli
-	if cmd-exists --strict trash-list; then
+	if hascommand --strict trash-list; then
 		trash-list
 	# Check if rem exists...
 	# Link: https://github.com/quackduck/rem
-	elif cmd-exists --strict rem; then
+	elif hascommand --strict rem; then
 		rem -l
 	# Check if gio trash exists (glib2)...
 	# Link: https://wiki.archlinux.org/title/Trash-cli#gio_trash
-	elif cmd-exists --strict gio; then
+	elif hascommand --strict gio; then
 		gio list trash:///
 	# Check if kioclient5 exists (kde-cli-tools)...
 	# Link: https://wiki.archlinux.org/title/Trash-cli#kioclient5
-	elif cmd-exists --strict kioclient5; then
+	elif hascommand --strict kioclient5; then
 		kioclient5 ls trash:/
 	# Check for alternative trash directories and list files
 	elif [[ -d ${HOME}/.local/share/Trash/files ]]; then
@@ -4546,19 +4984,19 @@ function trashempty() {
 	if ask "${BRIGHT_WHITE}Are you sure you want to ${BRIGHT_MAGENTA}permanently delete${BRIGHT_WHITE} all the files in the trash? ${BRIGHT_RED}This action cannot be undone.${RESET}" "N"; then
 		# Check if trash-cli exists...
 		# https://github.com/andreafrancia/trash-cli
-		if cmd-exists --strict trash-empty; then
+		if hascommand --strict trash-empty; then
 			trash-empty
 		# Check if rem exists...
 		# Link: https://github.com/quackduck/rem
-		elif cmd-exists --strict rem; then
+		elif hascommand --strict rem; then
 			rem --empty
 		# Check if gio trash exists (glib2)...
 		# Link: https://wiki.archlinux.org/title/Trash-cli#gio_trash
-		elif cmd-exists --strict gio; then
+		elif hascommand --strict gio; then
 			gio trash --empty
 		# Check if kioclient5 exists (kde-cli-tools)...
 		# Link: https://wiki.archlinux.org/title/Trash-cli#kioclient5
-		elif cmd-exists --strict kioclient5; then
+		elif hascommand --strict kioclient5; then
 			kioclient5 empty trash:/
 		# Check for alternative trash directories and delete files
 		elif [[ -d ${HOME}/.local/share/Trash/files ]]; then
@@ -4582,9 +5020,9 @@ function trashempty() {
 # Restore the trash only is trash-cli is installed
 # trash-cli - Command Line Interface to FreeDesktop.org Trash
 # Link: https://github.com/andreafrancia/trash-cli
-if cmd-exists --strict restore-trash; then
+if hascommand --strict restore-trash; then
 	alias trashrestore='restore-trash'
-elif cmd-exists --strict trash-restore; then
+elif hascommand --strict trash-restore; then
 	alias trashrestore='trash-restore'
 fi
 
@@ -4594,7 +5032,7 @@ function checksha256() {
 		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}checksha256${RESET} ${BRIGHT_GREEN}[downloaded_filename] [checksum_filename]${RESET}"
 		return 1
 	fi
-	if cmd-exists --strict sha256sum; then
+	if hascommand --strict sha256sum; then
 		if [[ $(sha256sum "${1}" | cut -d' ' -f 1) == $(grep -Po '\b[a-zA-Z0-9]{64}\b' "${2}") ]]; then
 			echo -e "${BRIGHT_GREEN}Good"
 		else
@@ -4647,8 +5085,8 @@ if [[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]; then
 fi
 
 # Searches for filenames (can use wildcards)
-alias findfile="f"
-function f() {
+alias f="findfile"
+function findfile() {
 	# Initialize the sudo prefix for running commands with elevated permissions
 	local SUDO_PREFIX=""
 
@@ -4671,7 +5109,7 @@ function f() {
 	fi
 
 	# Use fdfind if installed, else use fd or find as fallback
-	if cmd-exists --strict fdfind; then
+	if hascommand --strict fdfind; then
 		# fdfind command options
 		# --type 'file' : Only search for files (not directories)
 		# --ignore-case : Perform a case-insensitive search
@@ -4681,7 +5119,7 @@ function f() {
 		echo "${SUDO_PREFIX}fdfind --type 'file' --ignore-case --no-ignore --hidden '$1' ."
 		${SUDO_PREFIX}fdfind --type 'file' --ignore-case --no-ignore --hidden "$1" .
 
-	elif cmd-exists --strict fd; then
+	elif hascommand --strict fd; then
 		echo "${SUDO_PREFIX}fd --type 'file' --ignore-case --no-ignore --hidden '$1' ."
 		${SUDO_PREFIX}fd --type 'file' --ignore-case --no-ignore --hidden "$1" .
 
@@ -4733,7 +5171,7 @@ function findcode() {
 
 	# If ripgrep is installed, use that
 	# Link: https://github.com/BurntSushi/ripgrep
-	if cmd-exists --strict rg; then
+	if hascommand --strict rg; then
 		${SUDO_PREFIX}rg --smart-case --no-ignore --hidden --pretty "${@}" -g '!*.min.*' \
 			-g '*.{ada,asm,awk,bat,c,cbl,cfg,conf,config,cpp,cpy,cs,css,dart,el,erl,ex,f,f90,f95,for,go,gradle,groovy,h,hpp,hrl,htm,html,hx,hxsl,inc,ini,ino,java,js,json,jsx,kt,lib,lua,m,m4,mat,mk,nim,nix,pascal,php,pl,plx,ps1,py,r,rb,rkt,rlib,rs,sc,scala,scss,sh,sml,sql,swift,tcl,template,tex,tpl,ts,tsx,vb,vba,vbs,vhd,vhdl,wren,xml,yaml,yml,zig}' | \
 			awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }'
@@ -4741,7 +5179,7 @@ function findcode() {
 	# If The Silver Searcher is installed, use that
 	# Link: https://github.com/ggreer/the_silver_searcher
 	# Hint: You can use --ignore "dir/or/file"
-	elif cmd-exists --strict ag; then
+	elif hascommand --strict ag; then
 		${SUDO_PREFIX}ag --color             \
 			--smart-case       \
 			--hidden           \
@@ -4874,7 +5312,7 @@ function findtext() {
 
 	# If ripgrep is installed, use that
 	# Link: https://github.com/BurntSushi/ripgrep
-	if cmd-exists --strict rg; then
+	if hascommand --strict rg; then
 		echo -e "${BRIGHT_CYAN}Search using ${BRIGHT_YELLOW}ripgrep${BRIGHT_CYAN}:${RESET}"
 		echo "${SUDO_PREFIX}rg --smart-case --no-ignore --hidden --pretty '$@' ."
 		${SUDO_PREFIX}rg --smart-case --no-ignore --hidden --pretty "$@" .  | \
@@ -4883,7 +5321,7 @@ function findtext() {
 	# If The Silver Searcher is installed, use that
 	# Link: https://github.com/ggreer/the_silver_searcher
 	# Hint: You can use --ignore "dir/or/file"
-	elif cmd-exists --strict ag; then
+	elif hascommand --strict ag; then
 		echo -e "${BRIGHT_CYAN}Search using ${BRIGHT_YELLOW}The Silver Searcher${BRIGHT_CYAN}:${RESET}"
 		echo "${SUDO_PREFIX}ag --color --smart-case --hidden --literal '$@'"
 		${SUDO_PREFIX}ag --color --smart-case --hidden --literal "$@" 2> /dev/null | \
@@ -4916,10 +5354,8 @@ function findtext() {
 
 # Performs case-insensitive text replacement in a file or directory recursively
 function replacetext() {
-	# Prefix for elevated permissions
-	local SUDO_PREFIX=""
-
 	# Check for --sudo flag and remove it from arguments if present
+	local SUDO_PREFIX=""
 	if [[ "$1" == "--sudo" ]]; then
 		SUDO_PREFIX="sudo "
 		shift
@@ -4942,20 +5378,26 @@ function replacetext() {
 		return 1
 	fi
 
-	# Capture the 'find' and 'replace' text
-	local FIND_TEXT=$(regexformat "$1")
-	local REPLACE_TEXT=$(regexformat "$2")
+	# Escape special regex characters and slashes for the find and replace text
+	local FIND_TEXT=$(printf '%s' "${1}" | sed 's/[][\\.() *^$+?{|}/-]/\\&/g')
+	local REPLACE_TEXT=$(printf '%s' "${2}" | sed 's/[][\\.() *^$+?{|}/-]/\\&/g')
 
 	# Show safety check and ask for confirmation only for directory operations
 	if [[ -d "${FILE_PATH}" ]]; then
+		echo -e "${BRIGHT_GREEN}   Find: ${BRIGHT_CYAN}${1}${RESET}"
+		echo -e "${BRIGHT_GREEN}Replace: ${BRIGHT_CYAN}${2}${RESET}"
 		echo -e "${BRIGHT_RED}Warning:${BRIGHT_YELLOW} You are about to recursively operate on the directory ${BRIGHT_CYAN}${FILE_PATH}${RESET}"
 		if ! ask "${BRIGHT_MAGENTA}Are you sure?" "N"; then
 			echo -e "${BRIGHT_RED}Aborted${RESET}"
 			return 1
 		fi
+	else
+		echo -e "${BRIGHT_RED}ERROR: Path not found ${FILE_PATH}${RESET}"
+		return 1
 	fi
 
 	# Execute the find-and-replace operation
+	echo -e "${BRIGHT_GREEN}Replace: ${BRIGHT_CYAN}find \"${FILE_PATH}\" -type f -exec ${SUDO_PREFIX}sed -i \"s/${FIND_TEXT}/${REPLACE_TEXT}/gi\" {} +${RESET}"
 	find "${FILE_PATH}" -type f -exec ${SUDO_PREFIX}sed -i "s/${FIND_TEXT}/${REPLACE_TEXT}/gi" {} +
 }
 
@@ -5009,10 +5451,10 @@ function lines() {
 }
 
 # Analyzes a given code file to provide metrics and statistics
-function analyze-code() {
+function analyzecode() {
 	# Validate input
 	if [[ $# -eq 0 ]]; then
-		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}analyze_code${RESET} ${BRIGHT_GREEN}[filename]${RESET}"
+		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}analyzecode${RESET} ${BRIGHT_GREEN}[filename]${RESET}"
 		return 1
 	fi
 
@@ -5098,10 +5540,10 @@ function analyze-code() {
 }
 
 # List and sort all function names from code files (with line numbers)
-function get-functions() {
+function showfunctions() {
 	# Check if a filename is provided
 	if [[ -z "${1}" ]]; then
-		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}get-functions${RESET} ${BRIGHT_GREEN}[filename]${RESET}"
+		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}showfunctions${RESET} ${BRIGHT_GREEN}[filename]${RESET}"
 		return 1
 	fi
 
@@ -5216,7 +5658,7 @@ function cpp() {
 	fi
 
 	# Check if rsync is available
-	if cmd-exists --strict rsync; then
+	if hascommand --strict rsync; then
 		# Use rsync with archive mode and overall progress bar
 		rsync -ah --info=progress2 "${1}" "${2}"
 	else
@@ -5354,7 +5796,7 @@ function pwdtail() {
 # Encryption has been changed to gpg from SSL due to security
 # Link: https://stackoverflow.com/questions/28247821/openssl-vs-gpg-for-encrypting-off-site-backups
 # Install: pkginstall gnupg # gpg2 on SUSE
-if cmd-exists --strict gpg; then
+if hascommand --strict gpg; then
 	## Uses OpenSSL AES 256bit Cipher Block Chaining Encryption to encrypt a file
 	function encrypt() {
 		if [[ "${#}" -lt 1 ]] || [[ "${1}" = "--help" ]] || [[ "${1}" = "-h" ]]; then
@@ -5488,15 +5930,15 @@ function sparkbars() {
 # View Apache logs
 function apachelog() {
 	if [ -d /var/log/httpd ]; then
-		sudo \ls -Ah /var/log/httpd && sudo logview "/var/log/httpd/*_log"
+		sudo \ls -Ah /var/log/httpd && logview "/var/log/httpd/*_log"
 	else
-		sudo \ls -Ah /var/log/apache2 && sudo logview "/var/log/apache2/*.log"
+		sudo \ls -Ah /var/log/apache2 && logview "/var/log/apache2/*.log"
 	fi
 }
 
 # Auto-find and edit the Apache configuration
 function apacheconfig() {
-	if cmd-exists --strict httpd || cmd-exists --strict apache2 || cmd-exists --strict apachectl; then
+	if hascommand --strict httpd || hascommand --strict apache2 || hascommand --strict apachectl; then
 		# Define an array with common paths
 		declare -a paths=(
 			"/etc/httpd/conf/httpd.conf"
@@ -5526,10 +5968,10 @@ function apacheconfig() {
 # Find the Apache service and restart/start it
 function apacherestart() {
 	# If we are using Systemd...
-	if cmd-exists --strict systemctl; then
-		if cmd-exists --strict httpd; then
+	if hascommand --strict systemctl; then
+		if hascommand --strict httpd; then
 			sudo systemctl restart httpd
-		elif cmd-exists --strict apache2; then
+		elif hascommand --strict apache2; then
 			sudo systemctl restart apache2
 		else
 			echo 'Error: Could not find Apache service name'
@@ -5548,10 +5990,10 @@ function apacherestart() {
 		fi
 
 	# Other systems including OpenRC...
-	elif cmd-exists --strict service; then
-		if cmd-exists --strict httpd; then
+	elif hascommand --strict service; then
+		if hascommand --strict httpd; then
 			sudo service httpd restart
-		elif cmd-exists --strict apache2; then
+		elif hascommand --strict apache2; then
 			sudo service apache2 restart
 		else
 			echo 'Error: Could not find Apache service name'
@@ -5566,7 +6008,7 @@ function apacherestart() {
 
 # Auto-find and edit the Nginx configuration
 function ngconfig() {
-	if cmd-exists --strict nginx; then
+	if hascommand --strict nginx; then
 		# Define an array with common paths
 		declare -a paths=(
 			"/etc/nginx/nginx.conf"
@@ -5594,9 +6036,9 @@ function ngconfig() {
 # Find the Nginx service and restart/start it
 function ngrestart() {
 	# If we are using Systemd...
-	if cmd-exists --strict systemctl; then
+	if hascommand --strict systemctl; then
 		# Check if Nginx executable is available
-		if cmd-exists --strict nginx; then
+		if hascommand --strict nginx; then
 			sudo systemctl restart nginx
 			sudo nginx -t
 		else
@@ -5615,9 +6057,9 @@ function ngrestart() {
 		fi
 
 	# Other systems including OpenRC...
-	elif cmd-exists --strict service; then
+	elif hascommand --strict service; then
 		# Check if Nginx executable is available
-		if cmd-exists --strict nginx; then
+		if hascommand --strict nginx; then
 			sudo service nginx restart
 		else
 			echo 'Error: Could not find Nginx service name'
@@ -5642,7 +6084,7 @@ function phpcheck() {
 
 # Auto-find and edit the PHP configuration file
 function phpconfig() {
-	if cmd-exists --strict php; then
+	if hascommand --strict php; then
 		local _php_ini_file=$(php -r 'echo php_ini_loaded_file();')
 		if [[ -f "${_php_ini_file}" ]]; then
 			echo "Found: ${_php_ini_file}"
@@ -5666,7 +6108,7 @@ function phpconfig() {
 
 # Auto-find and edit the MySQL configuration file
 function mysqlconfig() {
-	if cmd-exists --strict mysqld; then
+	if hascommand --strict mysqld; then
 		if [[ -f /etc/my.cnf ]]; then
 			edit /etc/my.cnf
 		elif [[ -f /etc/mysql/my.cnf ]]; then
@@ -5711,8 +6153,8 @@ function checkreboot() {
 			reboot_required=1
 		fi
 
-	# Use cmd-exists to check if rpm exists (indicative of a RedHat-based system like CentOS)
-	elif cmd-exists --strict rpm; then
+	# Use hascommand to check if rpm exists (indicative of a RedHat-based system like CentOS)
+	elif hascommand --strict rpm; then
 		if ! rpm -q kernel | grep -q $(uname -r); then
 			echo -e "${BRIGHT_RED}->${RESET} ${BRIGHT_CYAN}Red Hat Linux${RESET}: ${BRIGHT_YELLOW}Kernel update detected. A reboot is required.${RESET}"
 			reboot_required=1
@@ -5752,18 +6194,26 @@ function checkreboot() {
 
 # Interactively create, configure, and test a new Linux user
 function createuser() {
-	sudo true
 	local username
+
+	# Check if the user can execute sudo commands
+	if ! sudo -v; then
+		echo -e "${BRIGHT_RED}Error:${RESET} You do not have sufficient permissions to run this script with necessary privileges"
+		return 1
+	fi
 
 	# Check if a username was passed as a parameter
 	if [ "$#" -eq 1 ]; then
 		username="$1"
 	else
-		read -r -p $'${BRIGHT_CYAN}Enter the username for the new user:${RESET} ' username
+		read -r -p $'Enter the username for the new user: ' username
 	fi
 
 	# Check if the user already exists
-	if id "${username}" &>/dev/null; then
+	if [[ -z "${username}" ]]; then
+		echo -e "${BRIGHT_RED}User cannot be blank. Aborting.${RESET}"
+		return 1
+	elif id "${username}" &>/dev/null; then
 		echo -e "${BRIGHT_RED}User ${username} already exists. Aborting.${RESET}"
 		return 1
 	fi
@@ -5772,7 +6222,7 @@ function createuser() {
 	if ask "${BRIGHT_GREEN}Create a new user with a home folder?${RESET}" N; then
 		sudo useradd -m "${username}"
 	else
-		echo -e "${BRIGHT_RED}User creation aborted.${RESET}"
+		echo -e "${BRIGHT_RED}User creation aborted${RESET}"
 		return 1
 	fi
 
@@ -5784,14 +6234,14 @@ function createuser() {
 	if ask "${BRIGHT_GREEN}Force user to change password on next login?${RESET}" N; then
 		sudo passwd -e "${username}"
 	else
-		echo -e "${BRIGHT_YELLOW}No change password enforced.${RESET}"
+		echo -e "${BRIGHT_YELLOW}No change password enforced${RESET}"
 	fi
 
 	# Ask if the user should have root (sudo) access
 	if ask "${BRIGHT_MAGENTA}⚠️ Give user root access? ⚠️${RESET}" N; then
 		sudo usermod -a -G sudo "${username}"
 	else
-		echo -e "${BRIGHT_YELLOW}No root access granted.${RESET}"
+		echo -e "${BRIGHT_YELLOW}No root access granted${RESET}"
 	fi
 
 	# Change the user's login shell to bash
@@ -5808,7 +6258,7 @@ function createuser() {
 		sudo chown "${username}":"${username}" /home/"${username}"/.bashrc
 		sudo chmod 644 /home/"${username}"/.bashrc
 	else
-		echo -e "${BRIGHT_YELLOW}No .bashrc copy.${RESET}"
+		echo -e "${BRIGHT_YELLOW}No .bashrc copy${RESET}"
 	fi
 
 	# Test login with the new user
@@ -5822,6 +6272,12 @@ function createuser() {
 alias deleteuser='sudo userdel'
 function wipeuser() {
 	local username="$1"
+
+	# Check if the user can execute sudo commands
+	if ! sudo -v; then
+		echo -e "${BRIGHT_RED}Error:${RESET} You do not have sufficient permissions to run this script with necessary privileges"
+		return 1
+	fi
 
 	# If username is not provided, get the list of users and use createmenu
 	if [[ -z "${username}" ]]; then
@@ -6119,31 +6575,31 @@ function clipboard() {
 
 	# Handle content that needs to be sent to clipboard
 	if $send_to_clipboard; then
-		if [[ "$OSTYPE" == "darwin"* ]]; then
+		if [[ "$OSTYPE" == "darwin"* ]] && hascommand --strict pbcopy; then
 			# macOS
 			echo -n "${clipboard_content}" | pbcopy
-		elif cmd-exists --strict wl-copy && [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+		elif hascommand --strict wl-copy && [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
 			# Wayland
-			echo -n "${clipboard_content}" | wl-copy
-		elif cmd-exists --strict xclip; then
+			echo -n "${clipboard_content}" | wl-copy &>/dev/null
+		elif hascommand --strict xclip; then
 			# X11 - xclip
-			echo -n "${clipboard_content}" | xclip -selection clipboard
-		elif cmd-exists --strict xsel; then
+			echo -n "${clipboard_content}" | xclip -selection clipboard &>/dev/null
+		elif hascommand --strict xsel; then
 			# X11 - xsel
-			echo -n "${clipboard_content}" | xsel -ib
+			echo -n "${clipboard_content}" | xsel -ib &>/dev/null
 		fi
 	else
 		# Handle content that needs to be pasted from clipboard
-		if [[ "$OSTYPE" == "darwin"* ]]; then
+		if [[ "$OSTYPE" == "darwin"* ]] && hascommand --strict pbpaste; then
 			# macOS
 			pbpaste
-		elif cmd-exists --strict wl-paste && [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+		elif hascommand --strict wl-paste && [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
 			# Wayland
 			wl-paste
-		elif cmd-exists --strict xclip; then
+		elif hascommand --strict xclip; then
 			# X11 - xclip
 			xclip -o -selection clipboard
-		elif cmd-exists --strict xsel; then
+		elif hascommand --strict xsel; then
 			# X11 - xsel
 			xsel -ob
 		fi
@@ -6231,7 +6687,7 @@ function file2asc() {
 	fi
 
 	# Check if gzip is installed
-	if ! cmd-exists --strict gzip; then
+	if ! hascommand --strict gzip; then
 		>&2 echo "Requires gzip/gunzip"
 		return 1
 	fi
@@ -6269,7 +6725,7 @@ function asc2file() {
 	fi
 
 	# Check for gunzip
-	if ! cmd-exists --strict gunzip; then
+	if ! hascommand --strict gunzip; then
 		>&2 echo "Requires gzip/gunzip"
 		return 1
 	fi
@@ -6285,7 +6741,7 @@ function asc2file() {
 	echo "${clipboard_content}" | base64 -di | gunzip > ${1}
 
 	# Display the saved file path
-	if cmd-exists --strict realpath; then
+	if hascommand --strict realpath; then
 		echo "The file was saved: $( command realpath "${1}" )"
 	else
 		echo "The file was saved: ${1}"
@@ -6342,7 +6798,7 @@ function compressimage() {
 	fi
 
 	# Check if ImageMagick's 'convert' and 'identify' commands are available
-	if ! cmd-exists --strict convert || ! cmd-exists --strict identify; then
+	if ! hascommand --strict convert || ! hascommand --strict identify; then
 		echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}ImageMagick is not installed. Please install it first.${RESET}"
 		return 1
 	fi
@@ -6390,311 +6846,513 @@ function convert2mdtag() {
 	echo "[$trimmed_input](#$tag)"
 }
 
+# Remove unneeded execute permissions from strictly non-executable file types
+# It is good practice to remove execute permissions from data files to enhance
+# security, as files masquerading as these types could potentially be malicious
+function fixinvalidexecutepermissions() {
+	# Use current directory as default, or use provided directory
+	local target_directory="${1:-.}"
+
+	# Check if the user can execute sudo commands
+	if ! sudo -v; then
+		echo -e "${BRIGHT_RED}Error:${RESET} You do not have sufficient permissions to run this script with necessary privileges"
+		return 1
+	fi
+
+	# Confirmation prompt using the provided ask function
+	if ask "${BRIGHT_MAGENTA}Do you want to remove invalid execute permissions in directory: ${BRIGHT_CYAN}$target_directory${RESET}" Y; then
+
+		# Document and Text Files
+		local -a doc_extensions=(
+			"ans" "asc" "azw" "azw3" "azw4" "cfg" "chm" "clf" "cnf" "conf" "csv"
+			"doc" "docx" "dot" "dotx" "ebook" "eml" "epub" "fdf" "hlp" "htm"
+			"html" "htmlz" "ics" "inf" "ini" "lng" "log" "lst" "mcw" "mht"
+			"mobi" "mpp" "msg" "nfo" "odp" "ods" "odt" "opf" "org" "ott" "pdf"
+			"plist" "po" "pot" "pps" "ppt" "pptx" "prn" "properties" "rpt" "rst"
+			"rtf" "slk" "sxw" "template" "tex" "toc" "txt" "url" "wb1" "wk1"
+			"wk3" "wk4" "wp5" "wpd" "wps" "wri" "wtf" "xls" "xlsm" "xlsx"
+			"xlsxm" "xlt" "xlw" "xps" "xslt"
+		)
+
+		# Non-Executable Code and Markup Files (should never contain a shebang)
+		local -a code_extensions=(
+			"ascx" "c" "cc" "config" "cpp" "css" "ctl" "cxx" "dtd" "editorconfig"
+			"exp" "frx" "h" "handlebars" "hpp" "htc" "inc" "jshintrc" "json"
+			"jsonl" "kwinrule" "less" "mak" "manifest" "md" "mm" "mo" "proj"
+			"project" "pxd" "qml" "rc" "res" "resx" "sass" "scc" "scss" "sql"
+			"strings" "tpl" "vsixmanifest" "xhtml" "xlf" "xml" "xsd" "yaml" "yml"
+		)
+
+		# Font Files
+		local -a font_extensions=(
+			"afm" "eot" "fnt" "fon" "otf" "ttc" "ttf" "ufm" "woff" "woff2"
+		)
+
+		# Image Files
+		local -a image_extensions=(
+			"afdesign" "afphoto" "ai" "ani" "blp" "bmp" "bpg" "bw" "cbz" "cbr"
+			"cdr" "cgm" "cpt" "cur" "dcx" "dib" "drw" "emf" "eps" "exif" "gif"
+			"hdr" "heic" "heif" "ico" "idml" "iff" "ilbm" "img" "indd" "indl"
+			"indt" "jfif" "jif" "jpeg" "jpg" "kdc" "lbm" "pbm" "pcd" "pcx" "pdn"
+			"pgm" "pic" "pix" "png" "pnm" "ppm" "ps" "psd" "psp" "pspimage"
+			"raw" "rgb" "rgba" "rle" "sgi" "spp" "svg" "svgz" "tga" "tif" "tiff"
+			"vml" "webp" "wmf" "xcf" "xisf" "xmp"
+		)
+
+		# Audio Files
+		local -a audio_extensions=(
+			"8svx" "aa" "aac" "aax" "acm" "act" "aip" "amr" "as" "au" "awb"
+			"cda" "dct" "dsm" "dss" "dvf" "dwd" "flac" "gsm" "iklax" "it" "ivs"
+			"m3u" "m4a" "m4b" "m4p" "mid" "midi" "mmf" "mod" "mogg" "mp1" "mp2"
+			"mp3" "mpa" "mpc" "msv" "mtm" "nmf" "nsf" "oga" "ogg" "opus" "pcm"
+			"pls" "ra" "rmi" "s3m" "sam" "sln" "smp" "snd" "stm" "svx" "vba"
+			"vce" "voc" "vox" "wav" "wma" "wv" "xm"
+		)
+
+		# Video Files
+		local -a video_extensions=(
+			"3g2" "3gp" "asf" "asx" "avi" "divx" "fla" "flv" "m1v" "m4v" "mkv"
+			"mov" "mp4" "mpe" "mpeg" "mpg" "mpv" "qt" "qtif" "ram" "rm" "rmd"
+			"rmm" "rp" "rt" "smi" "smil" "swf" "ts" "viv" "vob" "webm" "wmv"
+		)
+
+		# Subtitle Files
+		local -a subtitle_extensions=(
+			"srt" "sub" "vtt"
+		)
+
+		# Gaming and Emulation Files
+		local -a gaming_emulation_extensions=(
+			"chd" "gba" "gcm" "nds" "nes" "rom" "sav" "sfc" "state" "wad"
+		)
+
+		# Archive Files
+		local -a archive_extensions=(
+			"7z" "ace" "arj" "bz2" "cab" "csv.gz" "cue" "deb" "dmg" "ex_" "gz"
+			"iso" "isz" "lha" "log.gz" "lzh" "mdf" "mds" "nrg" "pak" "pkg" "rar"
+			"rar5" "rpm" "sitx" "tar" "tar.bz2" "tar.gz" "tgz" "xpi" "z" "zip"
+			"zipx"
+		)
+
+		# Backup and Temporary Files
+		local -a backup_temp_extensions=(
+			"~" "bac" "backup" "bak" "bkp" "old" "orig" "original" "snapshot"
+			"swp" "temp" "tmp"
+		)
+
+		# Checksum and Security Files
+		local -a checksum_security_extensions=(
+			"crc" "md5" "md5sum" "par" "par2" "sha1" "sha1sum" "sha256"
+			"sha256sum" "sha512"
+		)
+
+		# Key and Certificate Files
+		local -a key_certs_extensions=(
+			"cer" "cert" "crt" "csr" "der" "jks" "key" "p12" "pfx" "pem" "ppk"
+			"pub" "pubkey" "sig"
+		)
+
+		# Database Files
+		local -a database_extensions=(
+			"accdb" "db" "db3" "dbf" "idx" "mdb" "sqlite" "sqlite3"
+		)
+
+		# Miscellaneous Utilities
+		local -a misc_utilities_extensions=(
+			"cat" "chk" "cpl" "dat" "dll" "dmp" "drv" "dylib" "icl" "lib" "ocb"
+			"ocx" "opml" "ost" "part" "pdb" "prefs" "pst" "reg" "rnd" "rng"
+			"sys" "tlb" "torrent" "vxd" "wasm"
+		)
+
+		# Configuration Files
+		local -a config_files=(
+			".aspell.*.prepl" ".aspell.*.pws" ".bash_history" ".bash_logout"
+			".bash_profile" ".bashrc" ".cshrc" ".csslintrc" ".cvsignore"
+			".dircolors" ".dmrc" ".eslintrc" ".env" ".gitconfig" ".gitignore"
+			".gitmodules" ".gtkrc-2.0" ".htaccess" ".htpasswd" ".ICEauthority"
+			".inputrc" "Jenkinsfile" ".kshrc" ".lesshst" ".nanorc"
+			".node_repl_history" ".npmignore" ".nvmrc" ".rnd" ".screenrc"
+			".steampath" ".steampid" ".tmux.conf" ".vimrc" ".vuescanrc"
+			".wget-hsts" ".Xauthority" ".Xclients" ".xinitrc" ".Xmodmap"
+			".xprofile" ".Xresources" ".xscreensaver" ".yarnrc" ".zshrc"
+		)
+
+		# Combine all extensions into one array
+		local -a all_extensions=(
+			"${doc_extensions[@]}"
+			"${code_extensions[@]}"
+			"${font_extensions[@]}"
+			"${image_extensions[@]}"
+			"${audio_extensions[@]}"
+			"${video_extensions[@]}"
+			"${subtitle_extensions[@]}"
+			"${gaming_emulation_extensions[@]}"
+			"${archive_extensions[@]}"
+			"${backup_temp_extensions[@]}"
+			"${checksum_security_extensions[@]}"
+			"${key_certs_extensions[@]}"
+			"${database_extensions[@]}"
+			"${misc_utilities_extensions[@]}"
+		)
+
+		# Build the find command arguments for file extensions and config files
+		local -a find_args=()
+		for ext in "${all_extensions[@]}"; do
+			find_args+=( -iname "*.$ext" -o )
+		done
+
+		# Add patterns for configuration files (exact filenames)
+		for file in "${config_files[@]}"; do
+			find_args+=( -iname "$file" -o )
+		done
+
+		# Remove the last '-o' (logical OR) to prevent syntax error
+		unset 'find_args[${#find_args[@]}-1]'
+
+		# Execute the find command with sudo to handle permission issues
+		sudo find "$target_directory" -type f \( "${find_args[@]}" \) -exec chmod a-x {} +
+		echo -e "${BRIGHT_GREEN}✓${RESET} Execute permissions have been removed from non-executable files"
+	else
+		return 1
+	fi
+}
+
 # Fixes permissions in a user's home folder
 # If no user is specified, the current user is selected
 function fixuserhome() {
 	# Validate input parameters
-	if [[ -z "${@}" ]]; then
-		local _username="$(whoami)"
+	local _username
+	if [[ -z "${1}" ]]; then
+		_username="$(whoami)"
 	else
-		local _username="${@}"
+		_username="${1}"
+	fi
+
+	# Attempt to retrieve the home directory
+	local _home_dir=$(getent passwd "${_username}" 2>/dev/null | cut -d: -f6)
+
+	# Check if the retrieved directory is valid and exists
+	if [[ -z "${_home_dir}" ]] || [[ ! -d "${_home_dir}" ]]; then
+		# Default to /home/username if no valid directory is found
+		_home_dir="/home/${_username}"
 	fi
 
 	# Verify if the home folder exists
-	if [ ! -d "/home/${_username}" ]; then
-		echo "Error: User ${_username} does not have a home folder."
+	if [ -d "${_home_dir}" ]; then
+		echo -e "Home directory found: ${BRIGHT_YELLOW}${_home_dir}${RESET}"
+	else
+		echo -e "${BRIGHT_RED}Error:${RESET} User ${BRIGHT_CYAN}${_username}${RESET} does not have a home directory"
+		return 1
+	fi
+
+	# Check if the user can execute sudo commands
+	if ! sudo -v; then
+		echo -e "${BRIGHT_RED}Error:${RESET} You do not have sufficient permissions to run this script with necessary privileges"
 		return 1
 	fi
 
 	# Confirm with the user
 	if ask "${BRIGHT_RED}WARNING:${RESET} Change all permissions for user ${BRIGHT_CYAN}${_username}${RESET}'s home folder?" N; then
-		# Elevate privileges to root
-		sudo true
 
 		if ask "Reset group ownership permissions to ${BRIGHT_CYAN}${_username}${RESET}?" Y; then
-			run-with-feedback \
+			runwithfeedback \
 				"Set the owner and group as ${_username}" \
-				"sudo chown -R ${_username}:${_username} /home/${_username}"
+				"sudo chown -R ${_username}:${_username} ${_home_dir}"
 		else
-			run-with-feedback \
+			runwithfeedback \
 				"Set the owner and group as ${_username}" \
-				"sudo chown -R ${_username} /home/${_username}"
+				"sudo chown -R ${_username} ${_home_dir}"
 		fi
 
-		run-with-feedback \
+		# Remove unneeded execute permissions from strictly non-executable file types
+		fixinvalidexecutepermissions "${HOME}"
+
+		runwithfeedback \
 			"Make sure we have read and write access" \
-			"chmod -R u+rw /home/${_username}"
+			"chmod -R u+rw ${_home_dir}"
 
-		run-with-feedback \
+		runwithfeedback \
 			"Remove write access from group" \
-			"chmod -R g-w /home/${_username}"
+			"chmod -R g-w ${_home_dir}"
 
-		run-with-feedback \
+		runwithfeedback \
 			"Remove all access from others" \
-			"chmod -R o-rwx /home/${_username}"
+			"chmod -R o-rwx ${_home_dir}"
 
-		run-with-feedback \
+		runwithfeedback \
 			"Make .sh shell script files executable" \
-			"find /home/${_username} -type f \( -name \"*.sh\" -o -name \".*.sh\" \) -exec chmod ug+x {} \;"
+			"find ${_home_dir} -type f \( -name \"*.sh\" -o -name \".*.sh\" \) -exec chmod ug+x {} \;"
 
-		run-with-feedback \
+		runwithfeedback \
 			"Make sure all directories have execute permissions" \
-			"chmod -R ug+X /home/${_username}"
+			"chmod -R ug+X ${_home_dir}"
 
 		# Remove group permissions for directories without group read
-		run-with-feedback \
+		runwithfeedback \
 			"Remove group permissions for directories without group read" \
-			"find /home/${_username} -type d ! -perm -g+r -execdir chmod g-wx {} \;"
+			"find ${_home_dir} -type d ! -perm -g+r -execdir chmod g-wx {} \;"
 
-		if [[ -d "/home/${_username}/.local/share/kwalletd" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.local/share/kwalletd" ]]; then
+			runwithfeedback \
 				"User only access to KDE Wallet keyring" \
-				"chmod -R go-rwx /home/${_username}/.local/share/kwalletd"
+				"chmod -R go-rwx ${_home_dir}/.local/share/kwalletd"
 		fi
 
 		# If there is a ~/.local/share/keyrings directory...
-		if [[ -d "/home/${_username}/.local/share/keyrings" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.local/share/keyrings" ]]; then
+			runwithfeedback \
 				"User only access to GNOME keyring" \
-				"chmod -R go-rwx /home/${_username}/.local/share/keyrings"
+				"chmod -R go-rwx ${_home_dir}/.local/share/keyrings"
 		fi
 
 		# If there is an .ssh directory...
-		if [[ -d "/home/${_username}/.ssh" ]]; then
+		if [[ -d "${_home_dir}/.ssh" ]]; then
 			# Setting ownership for .ssh directory and files
-			run-with-feedback \
+			runwithfeedback \
 				"Setting ownership for .ssh directory and files" \
-				"chown -R ${_username}:${_username} /home/${_username}/.ssh"
+				"chown -R ${_username}:${_username} ${_home_dir}/.ssh"
 
 			# Setting strict permissions for .ssh and private keys
-			run-with-feedback \
+			runwithfeedback \
 				"User only access to .ssh and private keys" \
-				"chmod -R go-rwx /home/${_username}/.ssh"
+				"chmod -R go-rwx ${_home_dir}/.ssh"
 		fi
 
 		# If there is a .putty directory...
-		if [[ -d "/home/${_username}/.putty" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.putty" ]]; then
+			runwithfeedback \
 				"User only access to .putty and ssh keys" \
-				"chmod -R go-rwx /home/${_username}/.putty"
+				"chmod -R go-rwx ${_home_dir}/.putty"
 		fi
 
 		# If there is a .pki directory...
-		if [[ -d "/home/${_username}/.pki" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.pki" ]]; then
+			runwithfeedback \
 				"User only access to .pki keys and certificates" \
-				"chmod -R go-rwx /home/${_username}/.pki"
+				"chmod -R go-rwx ${_home_dir}/.pki"
 		fi
 
 		# If there is a .gnupg directory...
-		if [[ -d "/home/${_username}/.gnupg" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.gnupg" ]]; then
+			runwithfeedback \
 				"User only access to .gnupg and private keys" \
-				"chmod -R go-rwx /home/${_username}/.gnupg"
+				"chmod -R go-rwx ${_home_dir}/.gnupg"
 		fi
 
 		# If KeePassXC/KeePass/KeeWeb is installed...
-		if cmd-exists --strict keepassxc || cmd-exists --strict keepass || cmd-exists --strict keeweb; then
-			run-with-feedback \
+		if hascommand --strict keepassxc || hascommand --strict keepass || hascommand --strict keeweb; then
+			runwithfeedback \
 				"User only access to KeePassXC/KeePass/KeeWeb .kdbx files" \
-				"find /home/${_username} -type f \( -name '*.kdbx' -o -name '.*.kdbx' \) -exec chmod go-rwx {} \;"
+				"find ${_home_dir} -type f \( -name '*.kdbx' -o -name '.*.kdbx' \) -exec chmod go-rwx {} \;"
 		fi
 
 		# If there is a pass directory...
-		if [[ -d "/home/${_username}/.password-store" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.password-store" ]]; then
+			runwithfeedback \
 				"User only access to pass data" \
-				"chmod -R go-rwx /home/${_username}/.password-store"
+				"chmod -R go-rwx ${_home_dir}/.password-store"
 		fi
 
 		# If there is a Bitwarden directory...
-		if [[ -d "/home/${_username}/.config/Bitwarden" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/Bitwarden" ]]; then
+			runwithfeedback \
 				"User only access to Bitwarden data" \
-				"chmod -R go-rwx /home/${_username}/.config/Bitwarden"
+				"chmod -R go-rwx ${_home_dir}/.config/Bitwarden"
 		fi
-		if [[ -d "/home/${_username}/.var/app/com.bitwarden.desktop" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/com.bitwarden.desktop" ]]; then
+			runwithfeedback \
 				"User only access to Bitwarden data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/com.bitwarden.desktop"
+				"chmod -R go-rwx ${_home_dir}/.var/app/com.bitwarden.desktop"
 		fi
 
 		# Check for Tor settings
-		if [[ -d "/home/${_username}/.local/share/torbrowser" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.local/share/torbrowser" ]]; then
+			runwithfeedback \
 				"User only access to Tor browser data" \
-				"chmod -R go-rwx /home/${_username}/.local/share/torbrowser"
+				"chmod -R go-rwx ${_home_dir}/.local/share/torbrowser"
 		fi
-		if [[ -d "/home/${_username}/.var/app/com.github.micahflee.torbrowser-launcher" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/com.github.micahflee.torbrowser-launcher" ]]; then
+			runwithfeedback \
 				"User only access to Tor browser data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/com.github.micahflee.torbrowser-launcher"
+				"chmod -R go-rwx ${_home_dir}/.var/app/com.github.micahflee.torbrowser-launcher"
 		fi
 
 		# Check for Brave settings
-		if [[ -d "/home/${_username}/.config/BraveSoftware" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/BraveSoftware" ]]; then
+			runwithfeedback \
 				"User only access to Brave browser data" \
-				"chmod -R go-rwx /home/${_username}/.config/BraveSoftware"
+				"chmod -R go-rwx ${_home_dir}/.config/BraveSoftware"
 		fi
-		if [[ -d "/home/${_username}/.var/app/com.brave.Browser" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/com.brave.Browser" ]]; then
+			runwithfeedback \
 				"User only access to Brave browser data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/com.brave.Browser"
+				"chmod -R go-rwx ${_home_dir}/.var/app/com.brave.Browser"
 		fi
 
 		# Check for Chrome settings
-		if [[ -d "/home/${_username}/.config/google-chrome" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/google-chrome" ]]; then
+			runwithfeedback \
 				"User only access to Chrome browser data" \
-				"chmod -R go-rwx /home/${_username}/.config/google-chrome"
+				"chmod -R go-rwx ${_home_dir}/.config/google-chrome"
 		fi
-		if [[ -d "/home/${_username}/.var/app/com.google.Chrome" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/com.google.Chrome" ]]; then
+			runwithfeedback \
 				"User only access to Chrome browser data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/com.google.Chrome"
+				"chmod -R go-rwx ${_home_dir}/.var/app/com.google.Chrome"
 		fi
 
 		# Check for Chromium settings
-		if [[ -d "/home/${_username}/.config/chromium" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/chromium" ]]; then
+			runwithfeedback \
 				"User only access to Chromium browser data" \
-				"chmod -R go-rwx /home/${_username}/.config/chromium"
+				"chmod -R go-rwx ${_home_dir}/.config/chromium"
 		fi
-		if [[ -d "/home/${_username}/.var/app/org.chromium.Chromium" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/org.chromium.Chromium" ]]; then
+			runwithfeedback \
 				"User only access to Chromium browser data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/org.chromium.Chromium"
+				"chmod -R go-rwx ${_home_dir}/.var/app/org.chromium.Chromium"
 		fi
-		if [[ -d "/home/${_username}/.var/app/net.sourceforge.chromium-bsu" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/net.sourceforge.chromium-bsu" ]]; then
+			runwithfeedback \
 				"User only access to Ungoogled Chromium browser data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/net.sourceforge.chromium-bsu"
+				"chmod -R go-rwx ${_home_dir}/.var/app/net.sourceforge.chromium-bsu"
 		fi
 
 		# Check for Firefox settings
-		if [[ -d "/home/${_username}/.mozilla" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.mozilla" ]]; then
+			runwithfeedback \
 				"User only access to Firefox browser data" \
-				"chmod -R go-rwx /home/${_username}/.mozilla"
+				"chmod -R go-rwx ${_home_dir}/.mozilla"
 		fi
-		if [[ -d "/home/${_username}/.var/app/org.mozilla.firefox" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/org.mozilla.firefox" ]]; then
+			runwithfeedback \
 				"User only access to Firefox browser data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/org.mozilla.firefox"
+				"chmod -R go-rwx ${_home_dir}/.var/app/org.mozilla.firefox"
 		fi
 
 		# Check for LibreWolf settings
-		if [[ -d "/home/${_username}/.librewolf" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.librewolf" ]]; then
+			runwithfeedback \
 				"User only access to LibreWolf browser data" \
-				"chmod -R go-rwx /home/${_username}/.librewolf"
+				"chmod -R go-rwx ${_home_dir}/.librewolf"
 		fi
-		if [[ -d "/home/${_username}/.var/app/io.gitlab.librewolf-community" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/io.gitlab.librewolf-community" ]]; then
+			runwithfeedback \
 				"User only access to LibreWolf browser data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/io.gitlab.librewolf-community"
+				"chmod -R go-rwx ${_home_dir}/.var/app/io.gitlab.librewolf-community"
 		fi
 
 		# Check for Opera settings
-		if [[ -d "/home/${_username}/.config/opera" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/opera" ]]; then
+			runwithfeedback \
 				"User only access to Opera browser data" \
-				"chmod -R go-rwx /home/${_username}/.config/opera"
+				"chmod -R go-rwx ${_home_dir}/.config/opera"
 		fi
 
 		# Check for Vivaldi settings
-		if [[ -d "/home/${_username}/.config/vivaldi" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/vivaldi" ]]; then
+			runwithfeedback \
 				"User only access to Vivaldi browser data" \
-				"chmod -R go-rwx /home/${_username}/.config/vivaldi"
+				"chmod -R go-rwx ${_home_dir}/.config/vivaldi"
+		fi
+
+		# Check for Microsoft Edge settings
+		if [[ -d "${_home_dir}/.config/microsoft-edge" ]]; then
+			runwithfeedback \
+				"User only access to Microsoft Edge browser data" \
+				"chmod -R go-rwx ${_home_dir}/.config/microsoft-edge"
+		fi
+		if [[ -d "${_home_dir}/.config/microsoft-edge-beta" ]]; then
+			runwithfeedback \
+				"User only access to Microsoft Edge browser data" \
+				"chmod -R go-rwx ${_home_dir}/.config/microsoft-edge-beta"
 		fi
 
 		# Check for Evolution settings
-		if [[ -d "/home/${_username}/.config/evolution" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/evolution" ]]; then
+			runwithfeedback \
 				"User only access to Evolution email data" \
-				"chmod -R go-rwx /home/${_username}/.config/evolution"
+				"chmod -R go-rwx ${_home_dir}/.config/evolution"
 		fi
-		if [[ -d "/home/${_username}/.var/app/org.gnome.Evolution" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/org.gnome.Evolution" ]]; then
+			runwithfeedback \
 				"User only access to Evolution email data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/org.gnome.Evolution"
+				"chmod -R go-rwx ${_home_dir}/.var/app/org.gnome.Evolution"
 		fi
 
 		# Check for Geary settings
-		if [[ -d "/home/${_username}/.local/share/geary" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.local/share/geary" ]]; then
+			runwithfeedback \
 				"User only access to Geary email data" \
-				"chmod -R go-rwx /home/${_username}/.local/share/geary"
+				"chmod -R go-rwx ${_home_dir}/.local/share/geary"
 		fi
-		if [[ -d "/home/${_username}/.var/app/org.gnome.Geary" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/org.gnome.Geary" ]]; then
+			runwithfeedback \
 				"User only access to Geary email data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/org.gnome.Geary"
+				"chmod -R go-rwx ${_home_dir}/.var/app/org.gnome.Geary"
 		fi
 
 		# Check for Thunderbird settings
-		if [[ -d "/home/${_username}/.thunderbird" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.thunderbird" ]]; then
+			runwithfeedback \
 				"User only access to Thunderbird email data" \
-				"chmod -R go-rwx /home/${_username}/.thunderbird"
+				"chmod -R go-rwx ${_home_dir}/.thunderbird"
 		fi
-		if [[ -d "/home/${_username}/.var/app/org.mozilla.Thunderbird" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/org.mozilla.Thunderbird" ]]; then
+			runwithfeedback \
 				"User only access to Thunderbird email data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/org.mozilla.Thunderbird"
+				"chmod -R go-rwx ${_home_dir}/.var/app/org.mozilla.Thunderbird"
 		fi
 
 		# Check for Element settings
-		if [[ -d "/home/${_username}/.config/Element" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/Element" ]]; then
+			runwithfeedback \
 				"User only access to Element chat data" \
-				"chmod -R go-rwx /home/${_username}/.config/Element"
+				"chmod -R go-rwx ${_home_dir}/.config/Element"
 		fi
-		if [[ -d "/home/${_username}/.var/app/im.riot.Riot" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/im.riot.Riot" ]]; then
+			runwithfeedback \
 				"User only access to Element chat data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/im.riot.Riot"
+				"chmod -R go-rwx ${_home_dir}/.var/app/im.riot.Riot"
 		fi
 
 		# Check for Signal settings
-		if [[ -d "/home/${_username}/.config/Signal" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.config/Signal" ]]; then
+			runwithfeedback \
 				"User only access to Signal chat data" \
-				"chmod -R go-rwx /home/${_username}/.config/Signal"
+				"chmod -R go-rwx ${_home_dir}/.config/Signal"
 		fi
-		if [[ -d "/home/${_username}/.var/app/org.signal.Signal" ]]; then
-			run-with-feedback \
+		if [[ -d "${_home_dir}/.var/app/org.signal.Signal" ]]; then
+			runwithfeedback \
 				"User only access to Signal chat data (Flatpak)" \
-				"chmod -R go-rwx /home/${_username}/.var/app/org.signal.Signal"
+				"chmod -R go-rwx ${_home_dir}/.var/app/org.signal.Signal"
 		fi
 
-		if [[ -f "/home/${_username}/.config/birthdays.csv" ]]; then
-			run-with-feedback \
+		if [[ -f "${_home_dir}/.config/birthdays.csv" ]]; then
+			runwithfeedback \
 				"User only access to birthday/anniversary reminder data" \
-				"chmod 600 /home/${_username}/.config/birthdays.csv"
+				"chmod 600 ${_home_dir}/.config/birthdays.csv"
 		elif [[ -f "${_BDAY_FILE}" ]]; then
-			run-with-feedback \
+			runwithfeedback \
 				"User only access to birthday/anniversary reminder data (from variable)" \
 				"chmod 600 \"${_BDAY_FILE}\""
 		fi
 
 		# [OPTIONAL] Copy group permissions to other
-		#run-with-feedback \
+		#runwithfeedback \
 		#	"Copy group permissions to other" \
-		#	"chmod -R o=g /home/${_username}"
+		#	"chmod -R o=g ${_home_dir}"
 
 		# [OPTIONAL] Copy user permissions to group
-		#run-with-feedback \
+		#runwithfeedback \
 		#	"Copy user permissions to group" \
-		#	"chmod -R g=u /home/${_username}"
+		#	"chmod -R g=u ${_home_dir}"
 
 		# Set the setgid bit, so that files/folder under the directory
 		# will be created with the same group as <directory>
-		run-with-feedback \
+		runwithfeedback \
 			"Set the setgid bit to inherit folder permissions" \
-			"chmod g+s /home/${_username}"
+			"chmod g+s ${_home_dir}"
 
 		# If Access Control Lists (ACL) is installed...
 		# To "activate" ACL, you have to remount the drive with the "acl" option
@@ -6702,17 +7360,17 @@ function fixuserhome() {
 		# Example /etc/fstab Entry:
 		# UUID=abc123def456 / ext4 defaults,acl 0 1
 		# Type "man acl" for more information
-		if cmd-exists --strict setfacl; then
+		if hascommand --strict setfacl; then
 			# Use getfacl [directory] to check ACL for these directories
-			run-with-feedback \
+			runwithfeedback \
 				"Set user default ACL entries" \
-				"setfacl -d -m u::rwx /home/${_username}"
-			run-with-feedback \
+				"setfacl -d -m u::rwx ${_home_dir}"
+			runwithfeedback \
 				"Set group default ACL entries" \
-				"setfacl -d -m g::rx /home/${_username}"
-			run-with-feedback \
+				"setfacl -d -m g::rx ${_home_dir}"
+			runwithfeedback \
 				"Set others default ACL entries" \
-				"setfacl -d -m o::X /home/${_username}"
+				"setfacl -d -m o::--- ${_home_dir}"
 		fi
 
 		echo "Done!"
@@ -6742,27 +7400,37 @@ function configcopy() {
 		".commacd.sh"
 		".config/micro/bindings.json"
 		".config/micro/settings.json"
-		".dir_colors"
+		".dircolors"
 		".inputrc"
 		".nanorc"
 		".p10k.zsh"
 		".screenrc"
 		".tmux.conf"
 		".vimrc"
-		".Xauthority"
+		".Xmodmap"
+		".xprofile"
+		".Xresources"
 		".zshrc"
 		"git-completion.bash"
+		"git-prompt.sh"
 		"gitalias.txt"
 	)
 
 	# Config directories to copy over
 	declare -a dirs=(
 		".config/bashrc"
+		".config/bashrc/.qfc"
+		".config/bashrc/bashmarks"
+		".config/bashrc/enhancd"
+		".config/bashrc/fzf-tab-completion"
+		".config/bashrc/hstr"
 		".config/fish"
 		".config/htop"
 		".config/mc"
 		".config/micro/colorschemes"
 		".config/micro/plug"
+		".config/ranger"
+		".local/share/blesh/src/ble.sh"
 		".qfc"
 		"bashmarks"
 		"ble.sh"
@@ -6909,7 +7577,7 @@ function sync2ssh() {
 	# Check if SSH password is provided
 	if [[ -n "$4" ]]; then
 		# Ensure sshpass is installed
-		if ! cmd-exists --strict sshpass; then
+		if ! hascommand --strict sshpass; then
 			echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}Install sshpass or use SSH keys instead${RESET}"
 			return 1
 		fi
@@ -6936,6 +7604,12 @@ function hoststoggle() {
 	# Confirm we want to do this...
 	if ask "Are you sure you wish to modify the hosts file?" N; then
 
+		# Check if the user can execute sudo commands
+		if ! sudo -v; then
+			echo -e "${BRIGHT_RED}Error:${RESET} You do not have sufficient permissions to run this script with necessary privileges"
+			return 1
+		fi
+
 		# If the hosts backup file exists, restore it
 		if [ -f /etc/hosts.backup_temporary ]; then
 			sudo \rm -f /etc/hosts
@@ -6959,7 +7633,7 @@ function hoststoggle() {
 		# that serve ads, tracking scripts and malware from multiple sources and creates
 		# a hosts file, among other formats, that prevents your system from connecting
 		# to them. See https://github.com/hectorm/hblock
-		elif cmd-exists --strict hblock; then
+		elif hascommand --strict hblock; then
 			if [ -f /etc/hosts.personal ]; then
 				sudo /usr/bin/hblock --header /etc/hosts.personal
 			else
@@ -6975,7 +7649,7 @@ function hoststoggle() {
 	fi
 }
 
-function time-elapsed() {
+function timeelapsed() {
 	# Check if at least one parameter is provided
 	if [ -z "$1" ]; then
 		echo -e "Please provide a date in ${BRIGHT_CYAN}YYYY-MM-DD${RESET} format."
@@ -7055,32 +7729,32 @@ if [[ $EUID -ne 0 ]] && \
 	[[ $_SKIP_SYSTEM_INFO = false ]]; then
 
 	# Link: https://github.com/LinusDierheimer/fastfetch
-	if cmd-exists --strict fastfetch; then
+	if hascommand --strict fastfetch; then
 		fastfetch
 
 	# Link: https://ostechnix.com/neofetch-display-linux-systems-information/
-	elif cmd-exists --strict neofetch; then
+	elif hascommand --strict neofetch; then
 		neofetch
 		printf '\033[A\033[K' # Move the cursor up one line
 
 	# Link: https://github.com/KittyKatt/screenFetch
-	elif cmd-exists --strict screenfetch; then
+	elif hascommand --strict screenfetch; then
 		screenfetch
 
 	# Link: https://github.com/deater/linux_logo
-	elif cmd-exists --strict linuxlogo; then
+	elif hascommand --strict linuxlogo; then
 		linuxlogo
 
 	# Link: https://lclarkmichalek.github.io/archey3/
-	elif cmd-exists --strict archey; then
+	elif hascommand --strict archey; then
 		archey
 
 	# Link: https://github.com/dylanaraps/pfetch
 	elif [[ -f "${HOME}/pfetch.sh" ]]; then
 		"${HOME}/pfetch.sh"
-	elif cmd-exists --strict pfetch.sh; then
+	elif hascommand --strict pfetch.sh; then
 		pfetch.sh
-	elif cmd-exists --strict pfetch; then
+	elif hascommand --strict pfetch; then
 		pfetch
 	fi
 fi
@@ -7107,7 +7781,7 @@ if [[ $_SKIP_UPGRADE_NOTIFY = false ]]; then
 
 	# If this is an Arch based distrobution...
 	# Add to your crontab (this runs every 3 hours): 0 */3 * * * /usr/bin/pacman -Sy
-	if cmd-exists --strict pacman && cmd-exists --strict paccache; then
+	if hascommand --strict pacman && hascommand --strict paccache; then
 
 		# Show if there are updates available
 		_PACKAGE_UPDATE_COUNT=$(pacman -Q --upgrades | wc -l)
@@ -7177,9 +7851,9 @@ function birthday() {
 				_BDAY_MESSAGE="${_BDAY_MESSAGE#\"}"
 
 				# Show the message using toilet and the future font
-				if cmd-exists --strict toilet; then
+				if hascommand --strict toilet; then
 					toilet --font="${_BDAY_FONT}" --termwidth --gay "${_BDAY_MESSAGE}"
-				elif cmd-exists --strict lolcat; then
+				elif hascommand --strict lolcat; then
 					echo "${_BDAY_MESSAGE}" | lolcat --spread=0.4
 				else
 					echo -e "${BRIGHT_CYAN}${_BDAY_MESSAGE}${RESET}"
@@ -7209,7 +7883,7 @@ fi
 #######################################################
 
 if [[ $_SHOW_BASH_CALENDAR = true ]]; then
-	if cmd-exists --strict gcal; then
+	if hascommand --strict gcal; then
 		gcal -H '\033[34m:${RESET}:\033[32m:${RESET}' -q "${_GCAL_COUNTRY_CODE}"
 	else
 		cal -3
@@ -7230,6 +7904,8 @@ fi
 # If bashmarks is installed, load it
 if [[ -f "${HOME}/bashmarks/bashmarks.sh" ]]; then
 	builtin source "${HOME}/bashmarks/bashmarks.sh"
+elif [[ -f "${HOME}/.config/bashrc/bashmarks/bashmarks.sh" ]]; then
+	builtin source "${HOME}/.config/bashrc/bashmarks/bashmarks.sh"
 elif [[ -f "${HOME}/.local/bin/bashmarks.sh" ]]; then
 	builtin source "${HOME}/.local/bin/bashmarks.sh"
 elif [[ -f /usr/share/bashmarks/bashmarks.sh ]]; then
@@ -7243,7 +7919,7 @@ fi
 #######################################################
 
 # If Zoxide is installed, run it's initialization
-if cmd-exists --strict zoxide; then
+if hascommand --strict zoxide; then
 	eval "$(zoxide init bash)"
 fi
 
@@ -7278,7 +7954,7 @@ bind '"\033[B": history-search-forward'
 # (has favorites, syncs across shells, does not require an extra database, but does not show the time since a command)
 # Link: https://github.com/dvorka/hstr
 # Manual: man hstr
-if cmd-exists --strict hstr; then
+if hascommand --strict hstr; then
 
 	# Alias hh for hstr
 	alias hh='hstr'
@@ -7297,7 +7973,7 @@ if cmd-exists --strict hstr; then
 # NOTE: You can type % to match any number of characters when searching
 # Link: https://github.com/cantino/mcfly
 # Install: curl -LSfs https://raw.githubusercontent.com/cantino/mcfly/master/ci/install.sh | sh -s -- --git cantino/mcfly
-elif cmd-exists --strict mcfly; then
+elif hascommand --strict mcfly; then
 
 	# Initialize McFly
 	eval "$(mcfly init bash)"
@@ -7347,6 +8023,10 @@ if [[ -f "${HOME}/.qfc/bin/qfc.sh" ]]; then
 	builtin source "${HOME}/.qfc/bin/qfc.sh"
 	qfc_quick_command 'cd' '\C-_' 'cd "$0"'
 	qfc_quick_command 'edit' '\C-e' 'edit $0'
+elif [[ -f "${HOME}/.config/bashrc/.qfc/bin/qfc.sh" ]]; then
+	builtin source "${HOME}/.config/bashrc/.qfc/bin/qfc.sh"
+	qfc_quick_command 'cd' '\C-_' 'cd "$0"'
+	qfc_quick_command 'edit' '\C-e' 'edit $0'
 elif [[ -f /usr/share/qfc/qfc.sh ]]; then
 	builtin source /usr/share/qfc/qfc.sh
 	qfc_quick_command 'cd' '\C-_' 'cd "$0"'
@@ -7371,7 +8051,7 @@ export use_color=true
 # Tell NCURSES to use UTF-8 encoding
 export NCURSES_NO_UTF8_ACS=1
 
-if cmd-exists --strict moar; then
+if hascommand --strict moar; then
 	# Use moar
 	# Link: https://github.com/walles/moar
 	export PAGER='moar'
@@ -7383,7 +8063,7 @@ elif [[ -n "$LESSOPEN" ]]; then
 	export PAGER='less'
 	export MANPAGER='less'
 	alias les='less -n'
-elif cmd-exists --strict most; then
+elif hascommand --strict most; then
 	# Use most
 	# Link: https://www.jedsoft.org/most/
 	export PAGER='most'
@@ -7398,11 +8078,11 @@ fi
 
 # If bat is installed...
 # https://github.com/sharkdp/bat
-if cmd-exists --strict batcat; then
+if hascommand --strict batcat; then
 	export PAGER='less' # Bat expects and uses less
 	export MANPAGER='batcat --style=plain'
 	alias bat='batcat --force-colorization'
-elif cmd-exists --strict bat; then
+elif hascommand --strict bat; then
 	export PAGER='less' # Bat expects and uses less
 	export MANPAGER='bat --style=plain'
 	alias bat='bat --force-colorization'
@@ -7411,20 +8091,20 @@ fi
 # If bat-extras is installed with the extra commands:
 # batgrep, batman, batpipe, batwatch, batdiff, prettybat
 # Link: https://github.com/eth-p/bat-extras
-if cmd-exists --strict batman; then
+if hascommand --strict batman; then
 	alias man='batman'
 fi
 
 # ccat is the colorizing cat
 # Link: https://github.com/owenthereal/ccat
-if cmd-exists --strict ccat; then
+if hascommand --strict ccat; then
 	alias cat='ccat'
 fi
 
 # Color for manpages in less makes manpages a little easier to read
 if [[ -f /usr/share/source-highlight/src-hilite-lesspipe.sh ]]; then
 	export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
-elif cmd-exists --strict src-hilite-lesspipe.sh; then
+elif hascommand --strict src-hilite-lesspipe.sh; then
 	export LESSOPEN="| src-hilite-lesspipe.sh %s"
 fi
 
@@ -7457,7 +8137,7 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 # Colors for ls
 export CLICOLOR=1
 
-if cmd-exists --strict vivid; then
+if hascommand --strict vivid; then
 	# Vivid is installed
 	export LS_COLORS="$(vivid generate snazzy)"
 	_LS_COLORS_SOURCE="Vivid"
@@ -7469,7 +8149,7 @@ elif [[ -f /usr/share/LS_COLORS/dircolors.sh ]]; then
 	# LS_COLORS is installed system wide
 	builtin source /usr/share/LS_COLORS/dircolors.sh
 	_LS_COLORS_SOURCE="LS_COLORS System Wide"
-elif cmd-exists --strict dircolors; then
+elif hascommand --strict dircolors; then
 	# dircolors is used by ls to set LS_COLORS for colorized directory output
 	# Check if a custom .dircolors file exists in the user's home directory
 	if test -r ~/.dircolors; then
@@ -7491,29 +8171,43 @@ fi
 # Link: https://github.com/garabik/grc
 #######################################################
 
-if [[ $_SKIP_GRC = false ]] && cmd-exists --strict grc; then
+if [[ "${_SKIP_GRC}" = false ]] && hascommand --strict grc; then
 	GRC_ALIASES=true
-	if [[ -f "${HOME}/.local/bin/grc.sh" ]]; then
-		builtin source ~/.local/bin/grc.sh
-	elif [[ -f "/etc/profile.d/grc.sh" ]]; then
-		builtin source /etc/profile.d/grc.sh
-	elif [[ -f "/etc/grc.sh" ]]; then
-		builtin source /etc/grc.sh
-	else
-		GRC="$(command which grc)"
-		if tty -s && [ -n "$TERM" ] && [ "$TERM" != dumb ] && [ -n "$GRC" ]; then
+
+	# If we are not defaulting to manually set values and using includes...
+	if [[ "${_GRC_USE_BASHRC_BUILTIN}" != true ]]; then
+		# Source the first include found
+		if [[ -f "${HOME}/.local/bin/grc.sh" ]]; then
+			builtin source "${HOME}/.local/bin/grc.sh"
+		elif [[ -f "/etc/profile.d/grc.sh" ]]; then
+			builtin source "/etc/profile.d/grc.sh"
+		elif [[ -f "/etc/grc.sh" ]]; then
+			builtin source "/etc/grc.sh"
+		else
+			# No includes found, we will have to use the built-in aliases
+			_GRC_USE_BASHRC_BUILTIN=true
+		fi
+	fi
+
+	# If we need to use the manual built-in aliases...
+	if [[ "${_GRC_USE_BASHRC_BUILTIN}" == true ]]; then
+		# Find the grc command
+		GRC="$(command -v grc)"
+
+		# If the terminal is interactive and GRC command is found...
+		if tty -s && [ -n "${TERM}" ] && [ "${TERM}" != "dumb" ] && [ -n "${GRC}" ]; then
+			alias colourify="${GRC} -es"
 			alias as='colourify as'
 			alias blkid='colourify blkid'
-			alias colourify="$GRC -es"
 			alias configure='colourify ./configure'
-			if [[ "$(type -t df)" != 'alias' ]]; then alias df='colourify df -khT'; fi
-			if [[ "$(type -t diff)" != 'alias' ]]; then alias diff='colourify diff'; fi
+			[[ "$(type -t df)" != 'alias' ]] && alias df='colourify df --human-readable --print-type --exclude-type=squashfs'
+			[[ "$(type -t diff)" != 'alias' ]] && alias diff='colourify diff'
 			alias dig='colourify dig'
+			alias docker='colourify docker'
 			alias docker-compose='colourify docker-compose'
 			alias docker-machine='colourify docker-machine'
-			alias docker='colourify docker'
 			alias du='colourify du'
-			#alias env='colourify env'
+			# alias env='colourify env'
 			alias fdisk='colourify fdisk'
 			alias findmnt='colourify findmnt'
 			alias free='colourify free -m'
@@ -7528,7 +8222,7 @@ if [[ $_SKIP_GRC = false ]] && cmd-exists --strict grc; then
 			alias iptables='colourify iptables'
 			alias journalctl='colourify journalctl'
 			alias kubectl='colourify kubectl'
-			if [[ "$(type -t ld)" != 'alias' ]]; then alias ld='colourify ld'; fi
+			alias ld='colourify ld'
 			alias lsof='colourify lsof'
 			alias lspci='colourify lspci'
 			alias m='colourify mount'
@@ -7537,13 +8231,13 @@ if [[ $_SKIP_GRC = false ]] && cmd-exists --strict grc; then
 			alias mtr='colourify mtr'
 			alias netstat='colourify netstat'
 			alias ping='colourify ping -c 5'
-			#alias ps='colourify ps auxf'
+			# alias ps='colourify ps auxf'
 			alias semanage='colourify semanage'
 			alias sockstat='colourify sockstat'
 			alias ss='colourify ss'
 			alias tail='colourify tail'
-			alias traceroute6='colourify traceroute6'
 			alias traceroute='colourify traceroute'
+			alias traceroute6='colourify traceroute6'
 		fi
 	fi
 
@@ -7557,11 +8251,14 @@ if [[ $_SKIP_GRC = false ]] && cmd-exists --strict grc; then
 	#alias lsblk='colourify lsblk --exclude 1,7 --output NAME,MAJ:MIN,RM,SIZE,RO,TYPE,MOUNTPOINTS'
 	alias lsblk='colourify lsblk --exclude 1,7 --output NAME,MAJ:MIN,TYPE,FSTYPE,RM,MOUNTPOINTS,LABEL,SIZE,FSUSE%,RO,UUID 2> /dev/null || colourify lsblk --exclude 1,7'
 
-else
+else # grc is not installed...
 	# List block devices but show more info including the files systems and permissions
 	# and removes all mem and loopback devices (like snap packages) from the list
 	#alias lsblk='command lsblk --exclude 1,7 --output NAME,MAJ:MIN,RM,SIZE,RO,TYPE,MOUNTPOINTS'
 	alias lsblk='command lsblk --exclude 1,7 --output NAME,MAJ:MIN,TYPE,FSTYPE,RM,MOUNTPOINTS,LABEL,SIZE,FSUSE%,RO,UUID 2> /dev/null || command lsblk --exclude 1,7'
+
+	# Make df look better if not already aliased at this point
+	[[ "$(type -t df)" != 'alias' ]] && alias df='command df --human-readable --print-type --exclude-type=squashfs'
 fi
 
 #######################################################
@@ -7586,10 +8283,10 @@ fi
 # Link: https://www.geeksforgeeks.org/iftop-command-in-linux-with-examples/
 #######################################################
 
-if cmd-exists --strict nethogs; then
+if hascommand --strict nethogs; then
 	# Watch real time network activity by process
 	alias netwatch='sudo nethogs -d 0.5 -C'
-elif cmd-exists --strict iftop; then
+elif hascommand --strict iftop; then
 	# Use iftop
 	alias netwatch='sudo iftop'
 else
@@ -7601,8 +8298,8 @@ fi
 # Diff Enhancement
 #######################################################
 
-if cmd-exists --strict delta; then
-	if cmd-exists --strict batdiff; then
+if hascommand --strict delta; then
+	if hascommand --strict batdiff; then
 		# bat-extras diff uses delta
 		# Link: https://github.com/eth-p/bat-extras
 		alias diff='batdiff --delta'
@@ -7613,17 +8310,23 @@ if cmd-exists --strict delta; then
 		alias diff='delta --side-by-side --line-numbers'
 	fi
 	export DIFFPROG='delta --side-by-side --line-numbers'
-elif cmd-exists --strict icdiff; then
+elif hascommand --strict difft; then
+	# Difftastic is a structural diff tool that compares files based on their syntax
+	# Supports over 30 programming languages
+	# Link: https://github.com/Wilfred/difftastic
+	alias diff='difft'
+	export DIFFPROG='difft'
+elif hascommand --strict icdiff; then
 	# Icdiff - Improved (side by side) colored diff
 	# Link: https://github.com/jeffkaufman/icdiff
 	alias diff='icdiff --line-numbers --strip-trailing-cr'
 	export DIFFPROG="icdiff --line-numbers --strip-trailing-cr"
-elif cmd-exists --strict diff-so-fancy; then
+elif hascommand --strict diff-so-fancy; then
 	# diff-so-fancy strives to make your diffs human readable instead of machine readable
 	# Link: https://github.com/so-fancy/diff-so-fancy
 	alias diff='_diff_f() { command diff -u "$@" | diff-so-fancy; }; _diff_f'
 	export DIFFPROG='diff-so-fancy'
-elif cmd-exists --strict colordiff; then
+elif hascommand --strict colordiff; then
 	# Colorize diff output if colordiff is installed
 	alias diff='colordiff'
 	export DIFFPROG="colordiff"
@@ -7650,7 +8353,7 @@ if ([[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]) && [[ -n "$XDG_CURRENT_D
 	# Check if the user's session type is X11
 	if [[ "${XDG_SESSION_TYPE}" == "x11" ]]; then
 		# Ensure the ffmpeg command is available
-		if cmd-exists --strict ffmpeg; then
+		if hascommand --strict ffmpeg; then
 			# Create an alias to capture video on X11 using ffmpeg
 			# Documentation for ffmpeg: https://ffmpeg.org/documentation.html
 			alias grabvideo='ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -qscale 0'
@@ -7664,7 +8367,7 @@ if ([[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]) && [[ -n "$XDG_CURRENT_D
 	# Check if the user's session type is Wayland
 	elif [[ "${XDG_SESSION_TYPE}" == "wayland" ]]; then
 		# Ensure the wf-recorder command is available (requires wl-roots compositor)
-		if cmd-exists wf-recorder; then
+		if hascommand wf-recorder; then
 			# Create an alias to capture video on Wayland using wf-recorder
 			# Documentation for wf-recorder: https://github.com/ammen99/wf-recorder
 			alias grabvideo='wf-recorder -f output.mp4'
@@ -7683,7 +8386,7 @@ if ([[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]) && [[ -n "$XDG_CURRENT_D
 		kdiff3 \
 		xxdiff
 	do
-		if cmd-exists --strict ${_DIFF_APP_GUI}; then
+		if hascommand --strict ${_DIFF_APP_GUI}; then
 			# Create a function to use the diff tool with parameters
 			gdiff() {
 				# Pass all parameters and run in background
@@ -7715,7 +8418,7 @@ if ([[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]) && [[ -n "$XDG_CURRENT_D
 		nnn \
 		mc
 	do
-		if cmd-exists --strict ${_FILE_MANAGER}; then
+		if hascommand --strict ${_FILE_MANAGER}; then
 			if [[ "${_FILE_MANAGER}" == "exo-open" ]]; then
 				# Special command options for exo-open
 				alias ui="exo-open --launch FileManager \"\${PWD}\" > /dev/null 2>&1 & disown"
@@ -7748,7 +8451,7 @@ fi
 # This is necessary for programmable completion
 shopt -s extglob
 
-if [[ $_SCRIPT_BASH_COMPLETION = false ]]; then
+if [[ ! ${_SKIP_BASH_COMPLETION} = true ]]; then
 	# Use bash-completion, if available
 	if [[ -f "/usr/share/bash-completion/bash_completion" ]]; then
 		builtin source "/usr/share/bash-completion/bash_completion"
@@ -7768,7 +8471,7 @@ fi
 # Link: https://github.com/dim-an/cod
 #######################################################
 
-if cmd-exists --strict cod; then
+if hascommand --strict cod; then
 	builtin source <(cod init $$ bash)
 fi
 
@@ -7790,7 +8493,7 @@ if [[ -f "/usr/share/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 	bind '"\033[Z": complete'
 
 	# If nodejs is installed, enable fzf-tab-completion for nodejs repl
-	if cmd-exists node; then
+	if hascommand node; then
 		alias node='node -r /usr/share/fzf-tab-completion/node/fzf-node-completion.js'
 	fi
 elif [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
@@ -7804,8 +8507,22 @@ elif [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 	bind '"\033[Z": complete'
 
 	# If nodejs is installed, enable fzf-tab-completion for nodejs repl
-	if cmd-exists node; then
+	if hascommand node; then
 		alias node='node -r ${HOME}/fzf-tab-completion/node/fzf-node-completion.js'
+	fi
+elif [[ -f "${HOME}/.config/bashrc/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
+	# Source the fzf bash completion script if git cloned
+	builtin source "${HOME}/.config/bashrc/fzf-tab-completion/bash/fzf-bash-completion.sh"
+
+	# Bind the tab key to the fzf_bash_completion function
+	bind -x '"\t": fzf_bash_completion'
+
+	# Bind Shift+Tab to the default completion function as a backup
+	bind '"\033[Z": complete'
+
+	# If nodejs is installed, enable fzf-tab-completion for nodejs repl
+	if hascommand node; then
+		alias node='node -r ${HOME}/.config/bashrc/fzf-tab-completion/node/fzf-node-completion.js'
 	fi
 fi
 
@@ -7844,10 +8561,6 @@ bind '"\C-d":"\C-k\C-u\C-d"'
 # Disable the bell sound but make it visible
 bind 'set bell-style visible'
 
-# Prevent overwriting an existing file with the >, >&, and <> redirection operators
-# Use `>|` to force redirection to an existing file
-#set -o noclobber
-
 # Update window size after each command and, if necessary, update the values of LINES and COLUMNS
 # shopt -s checkwinsize
 [[ $DISPLAY ]] && shopt -s checkwinsize
@@ -7871,15 +8584,29 @@ shopt -s checkhash
 # Bash includes filenames beginning with a "." in the results of filename expansion
 shopt -s dotglob
 
-# Turns off CTRL+D to log out
-#set -o ignoreeof
-
-# Disable coredumps
+# Disable core dumps because of the following reasons:
+# 1. Security:    Core dumps can contain sensitive data, such as passwords or
+#                 encryption keys which are a potential security risk!
+# 2. Disk Space:  Core dumps can be large and consume significant disk space
+# 3. Performance: Writing core dumps to disk can impact system performance
+#                 particularly if crashes are frequent or if the disk is slow
+# You can also edit the /etc/security/limits.conf file and add the following:
+# * soft core 0  <- without the # in the beginning
+# * hard core 0  <- without the # in the beginning
+# For more information on disabling core dumps in systemd, visit the following:
+# https://www.cyberciti.biz/faq/disable-core-dumps-in-linux-with-systemd-sysctl/
 ulimit -S -c 0
 
 # Don't let my shell warn me of incoming mail
 shopt -u mailwarn
 unset MAILCHECK
+
+# Prevent overwriting an existing file with the >, >&, and <> redirection operators
+# Use `>|` to force redirection to an existing file
+#set -o noclobber
+
+# Turns off CTRL+D to log out
+#set -o ignoreeof
 
 # Fix the HOME and END keys in PuTTY
 if [[ "$COLORTERM" ]]; then # rxvt
@@ -7958,7 +8685,7 @@ shopt -s histappend histverify
 # WARNING: Some of these mess up the history counter and is slower as history grows larger
 # WARNING: It can also break some more advanced installed prompts
 # This has issues with McFly so only set if it's not installed
-if ! cmd-exists --strict mcfly; then
+if ! hascommand --strict mcfly; then
 	## Append new history to history file, clear internal history list, and re-read the history file
 	export PROMPT_COMMAND="history -a; history -c; history -r; ${PROMPT_COMMAND}"
 	## -Or- just record each line as it gets issued but new history is not in other sessions (faster)
@@ -8026,10 +8753,18 @@ fi
 #######################################################
 
 # If enhancd is installed, initialize it
-if [[ -f "${HOME}/enhancd/init.sh" ]]; then
+if [[ -f "/usr/share/enhancd/init.sh" ]]; then
 	ENHANCD_FILTER=fzy:sk:fzf:peco:percol:pick:icepick:selecta:sentaku:zf
 	export ENHANCD_FILTER
-	builtin source ~/enhancd/init.sh
+	builtin source "/usr/share/enhancd/init.sh"
+elif [[ -f "${HOME}/enhancd/init.sh" ]]; then
+	ENHANCD_FILTER=fzy:sk:fzf:peco:percol:pick:icepick:selecta:sentaku:zf
+	export ENHANCD_FILTER
+	builtin source "${HOME}/enhancd/init.sh"
+elif [[ -f "${HOME}/.config/bashrc/enhancd/init.sh" ]]; then
+	ENHANCD_FILTER=fzy:sk:fzf:peco:percol:pick:icepick:selecta:sentaku:zf
+	export ENHANCD_FILTER
+	builtin source "${HOME}/.config/bashrc/enhancd/init.sh"
 fi
 
 #######################################################
@@ -8047,7 +8782,7 @@ fi
 #######################################################
 
 # If fasd is installed, initialize it
-if cmd-exists --strict fasd; then
+if hascommand --strict fasd; then
 	eval "$(fasd --init auto)"
 fi
 
@@ -8056,7 +8791,7 @@ fi
 #######################################################
 
 # Load the npm configuration and bash completion
-if cmd-exists --strict npm; then
+if hascommand --strict npm; then
 	export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 	[ -s "$NVM_DIR/nvm.sh" ] && builtin source "$NVM_DIR/nvm.sh" # This loads nvm
 
@@ -8065,8 +8800,8 @@ if cmd-exists --strict npm; then
 fi
 
 # Source Node Version Manager to manage multiple active node.js versions
-if [[ -f /usr/share/nvm/init-nvm.sh ]]; then
-	builtin source /usr/share/nvm/init-nvm.sh
+if [[ -f "/usr/share/nvm/init-nvm.sh" ]]; then
+	builtin source "/usr/share/nvm/init-nvm.sh"
 fi
 
 #######################################################
@@ -8226,7 +8961,7 @@ elif [[ -f "${HOME}/.config/bashrc/prompt" ]] && [[ $_SKIP_PROMPT_ORIGINAL = fal
 # Link: https://github.com/petobens/trueline
 # Install: wget https://raw.githubusercontent.com/petobens/trueline/master/trueline.sh -P ~/
 # Fonts: https://github.com/powerline/fonts
-elif cmd-exists --strict trueline && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
+elif hascommand --strict trueline && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
 	builtin source "$(command which trueline)"
 elif [[ -f /usr/bin/trueline ]] && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
 	builtin source /usr/bin/trueline
@@ -8263,7 +8998,7 @@ elif [[ -f "$GOPATH/bin/powerline-go" ]] && [[ $_SKIP_PROMPT_POWERLINE_GO = fals
 
 # Powerline-Shell (details about git/svn/hg/fossil branch and Python virtualenv environment)
 # Link: https://github.com/b-ryan/powerline-shell
-elif cmd-exists --strict powerline-shell && [[ $_SKIP_PROMPT_POWERLINE_SHELL = false ]]; then
+elif hascommand --strict powerline-shell && [[ $_SKIP_PROMPT_POWERLINE_SHELL = false ]]; then
 
 	# Prompt Configuration for Powerline-Shell
 	function _powerline_shell_update_ps1() {
@@ -8282,7 +9017,7 @@ elif [[ -f "${HOME}/pureline/pureline" ]] && [[ $_SKIP_PROMPT_PURELINE = false ]
 # Starship Cross Shell Prompt (focus on compatibility and written in Rust)
 # Link: https://starship.rs
 # Install: sh -c "$(curl -fsSL https://starship.rs/install.sh)"
-elif cmd-exists --strict starship && [[ $_SKIP_PROMPT_STARSHIP = false ]]; then
+elif hascommand --strict starship && [[ $_SKIP_PROMPT_STARSHIP = false ]]; then
 	eval "$(starship init bash)"
 
 # Oh-My-Git (only used for Git but has huge support for it, requires font)
@@ -8362,15 +9097,20 @@ fi
 # WARNING: Can be buggy with certain prompts (like Trueline)
 # To Update (in a ble.sh session): ble-update
 # To Install:
-# git clone --recursive https://github.com/akinomyoga/ble.sh.git
+# mkdir -P ~/.local/share/blesh/src && cd ~/.local/share/blesh/src
+# git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git
+# make -C ble.sh install PREFIX=~/.local
+# To Run Without Installation:
+# git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git
 # make -C ble.sh
 #######################################################
 
 # Define an array of possible locations for ble.sh (checked in order)
 _BLESH_PATHS=(
-	"${HOME}/ble.sh/out/ble.sh"          # Local installation
-	"${HOME}/.local/share/blesh/ble.sh"  # User-level installation
-	"/usr/share/blesh/ble.sh"            # System-wide installation
+	"${HOME}/.local/share/blesh/ble.sh"     # User-level installation
+	"${HOME}/.local/share/doc/blesh/ble.sh" # User-level installation
+	"${HOME}/ble.sh/out/ble.sh"             # Local Git installation
+	"/usr/share/blesh/ble.sh"               # System-wide installation
 )
 
 # Loop through each potential path to find where ble.sh might be located
@@ -8420,12 +9160,12 @@ unset _BLESH_PATHS
 # Link: https://linoxide.com/terminology-terminal/
 #######################################################
 
-if [[ $_SKIP_TERMINOLOGY_TTY = false ]] && cmd-exists --strict terminology; then
+if [[ $_SKIP_TERMINOLOGY_TTY = false ]] && hascommand --strict terminology; then
 	# If we are in a TTY window , not in TMUX, and not logged in via SSH...
 	if [[ "$(tty)" =~ /dev/tty ]] && [[ ! "$TERM" =~ screen ]] && [[ -z "$SSH_CLIENT" ]] && [[ -z "$SSH_TTY" ]]; then
 
 		# If TMUX is installed and set to load at TTY
-		if [[ $_TMUX_LOAD_TTY = true ]] && cmd-exists --strict tmux; then
+		if [[ $_TMUX_LOAD_TTY = true ]] && hascommand --strict tmux; then
 
 			# Get the default session name
 			if [[ -z "${_TMUX_LOAD_SESSION_NAME}" ]]; then
@@ -8462,7 +9202,7 @@ if [[ $_SKIP_TERMINOLOGY_TTY = false ]] && cmd-exists --strict terminology; then
 #######################################################
 
 # If TMUX is installed...
-elif cmd-exists --strict tmux; then
+elif hascommand --strict tmux; then
 
 	# We're in a TTY terminal...
 	if [[ "$(tty)" =~ /dev/tty ]] && [[ ! "$TERM" =~ screen ]]; then
