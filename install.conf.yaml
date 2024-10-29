@@ -46,11 +46,10 @@
     ~/.inputrc: config/ExtremeUltimateBashrc/support/_inputrc
 
     #Bash
-    # ~/.bashrc: config/general/.bashrc
     ~/.bashrc: config/ExtremeUltimateBashrc/_bashrc
     ~/.envrc: config/general/.envrc
     ~/.bashrc_help: config/general/.bashrc_help
-    ~/.bashrc_prompt: config/general/.bashrc_prompt #OG Prompt from ExtremeUltimateBashrc
+    ~/.bashrc_prompt: config/general/.bashrc_prompt 
     ~/.bash_aliases: config/general/.bash_aliases
     
     #profile
