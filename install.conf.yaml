@@ -46,7 +46,9 @@
     ~/.inputrc: config/ExtremeUltimateBashrc/support/_inputrc
 
     #Bash
-    ~/.bashrc: config/general/.bashrc
+    # ~/.bashrc: config/general/.bashrc
+    ~/.bashrc: config/ExtremeUltimateBashrc/_bashrc
+    ~/.envrc: config/general/.envrc
     ~/.bashrc_help: config/general/.bashrc_help
     ~/.bashrc_prompt: config/general/.bashrc_prompt #OG Prompt from ExtremeUltimateBashrc
     ~/.bash_aliases: config/general/.bash_aliases
@@ -93,7 +95,10 @@
     ~/.config/sublime-text: config/sublime-text
 
     #conky
-    ~/.conkyrc: config/conky/.conkyrc    
+    ~/.conkyrc: config/conky/.conkyrc   
+
+    #conky
+    ~/.blerc: config/blesh/.blerc   
 
     #tools
     ~/bin:

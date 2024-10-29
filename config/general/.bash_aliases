@@ -222,7 +222,7 @@ alias fk='fuck'
 
 #-------------------------------------------------------------
 # cd with immediate ll afterwards
-if cmd-exists --strict zoxide; then
+if hascommand --strict zoxide; then
 	eval "$(zoxide init bash)"
 	# Issues with zoxide and tmux
 	if [ -z "${TMUX}" ]; then
@@ -259,7 +259,7 @@ if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
 	alias epxenv="source ${HOME}/dev/epx/devtools/env.sh"
 	if [[ "${SHLVL}" -lt 2 ]]; then
 		if [ -z "${TMUX}" ]; then
-			epxenv
+			epxenv 1> /dev/null
 		fi
 	fi
 fi
@@ -269,25 +269,25 @@ fi
 alias weather="proxy && curl wttr.in/?F"
 alias c='clear'         # c:            Clear terminal display
 alias which='type -all' # which:        Find executables
-if cmd-exists eza; then
+if hascommand eza; then
 	unalias ldir
 	alias ldir="eza -lD"
 	unalias lfile
 	alias lfile="eza -lf --color=always | grep -v /"
 fi
-if cmd-exists --strict nvim; then
+if hascommand --strict nvim; then
 	alias {v,vi,vim}='nvim'
 	alias svi='sudo nvim'
 	alias vis='nvim "+set si"'
-elif cmd-exists --strict vim; then
+elif hascommand --strict vim; then
 	alias {v,vi}='vim'
 	alias svi='sudo vim'
 	alias vis='vim "+set si"'
-elif cmd-exists --strict vi; then
+elif hascommand --strict vi; then
 	alias v='vi'
 	alias svi='sudo vi'
 fi
-if cmd-exists --strict batcat; then
+if hascommand --strict batcat; then
 	alias bat='batcat --decorations=always --color=always'
 fi
 #-------------------------------------------------------------
@@ -326,7 +326,7 @@ if [[ "${SHLVL}" -lt 2 ]]; then
 	fi
 	welcome
 	# Fortune message
-	if cmd-exists --strict lolcat; then
+	if hascommand --strict lolcat; then
 		if [ -x /usr/games/fortune ]; then
 			echo -e '\e[m'
 			/usr/games/fortune -s | lolcat # Makes our day a bit more fun.... :-)
@@ -363,8 +363,8 @@ export SELECTED_EDITOR=$EDITOR
 
 #-------------------------------------------------------------
 # Fzf config
-if cmd-exists --strict fzf; then
-	if cmd-exists --strict fdfind; then
+if hascommand --strict fzf; then
+	if hascommand --strict fdfind; then
 		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
 	# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 	# export FZF_ALT_C_COMMAND="fdfind --type=d --hidden --exclude .git"
@@ -383,8 +383,8 @@ fi
 #-------------------------------------------------------------
 # Fzf+fdfind
 # Use fd (https://github.com/sharkdp/fd) for listing path candidates.
-if cmd-exists --strict fzf; then
-	if cmd-exists --strict fdfind; then
+if hascommand --strict fzf; then
+	if hascommand --strict fdfind; then
 		_fzf_compgen_path() {
 			fdfind --hidden --exclude .git . "$1"
 		}
@@ -397,7 +397,7 @@ fi
 
 #-------------------------------------------------------------
 # Fzf-git
-if cmd-exists --strict fzf; then
+if hascommand --strict fzf; then
 	if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
 		source "$HOME/dotfiles/config/fzf-git/fzf-git.sh"
 		_fzf_git_fzf() {
@@ -424,7 +424,7 @@ fi
 # source ${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/clear_color_spark
 # fi
 # TTY Terminal colors
-if [[ -f "${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/clear_color_spark/tty_terminal_color_scheme" ]]; then
-	source ${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/clear_color_spark/tty_terminal_color_scheme
-fi
+# if [[ -f "${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/tty_terminal_color_scheme" ]]; then
+# 	source ${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/tty_terminal_color_scheme
+# fi
 #-------------------------------------------------------------

@@ -192,5 +192,51 @@ function __setprompt
 	fi
 }
 
+function __my_setprompt
+{
+	# Extra line for clarity
+	# PS1="____________________________________________________________________________________________________________________\n"
+	PS1="\n"
+
+	
+	if [[ $_GIT_IS_SLOW = true ]]; then
+		# Prompt using faster and less intensive functions on Git Bash
+		PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %d} \[\033[0;36m\]\A \[\033[0;33m\]\w\[\033[0;31m\]\`_fast_git_ps1\`\[\033[0m\]\n\[\033[0;32m\]>\[\033[0m\] "
+
+	else
+		# Prompt color changes if logged on as root
+		if [[ $EUID > 0 ]]; then
+			_COLOR_USER="\033[0;32m"
+		else
+			_COLOR_USER="\033[1;31m"
+		fi
+	
+		# Date formats can be found here (man strftime):
+		# https://manpages.ubuntu.com/manpages/xenial/man3/strftime.3.html
+		# https://www.cyberciti.biz/faq/linux-unix-formatting-dates-for-display/
+	
+		# Only if connected SSH, show the host
+		if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
+			if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
+				# Remote SSH with short path (1 line)
+				PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+			else
+				# Remote SSH with full path (2 lines)
+				PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+			fi
+		else # Otherwise, only show the name
+			if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
+				# Local with short path (1 line)
+				PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+			else
+				# Local with full path (2 lines)
+				PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+			fi
+	fi
+	fi		
+}
+
 # export PROMPT_COMMAND="history -a; history -c; history -r; __setprompt" # Breaks error trapping
-export PROMPT_COMMAND="__setprompt"
+# export PROMPT_COMMAND="__setprompt"
+export PS1=""
+export PROMPT_COMMAND="__my_setprompt"
