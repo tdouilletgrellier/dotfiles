@@ -194,43 +194,77 @@ function __setprompt
 
 function __my_setprompt
 {
+	local LAST_COMMAND=$? # Must come first!
+
+	# Define colors
+	local LIGHTGRAY="\033[0;37m"
+	local WHITE="\033[1;37m"
+	local BLACK="\033[0;30m"
+	local DARKGRAY="\033[1;30m"
+	local RED="\033[0;31m"
+	local LIGHTRED="\033[1;31m"
+	local GREEN="\033[0;32m"
+	local LIGHTGREEN="\033[1;32m"
+	local BROWN="\033[0;33m"
+	local YELLOW="\033[1;33m"
+	local BLUE="\033[0;34m"
+	local LIGHTBLUE="\033[1;34m"
+	local MAGENTA="\033[0;35m"
+	local LIGHTMAGENTA="\033[1;35m"
+	local CYAN="\033[0;36m"
+	local LIGHTCYAN="\033[1;36m"
+	local NOCOLOR="\033[0m"
+	local GITCOLOR="${GREEN}"	
+
+	if [[ $LAST_COMMAND != 0 ]]; then
+		_COLOR_LAST_COMMAND="${LIGHTRED}"
+		_PROMPT_SSH="x"
+		_PROMPT="✗"
+	else
+		_COLOR_LAST_COMMAND="${GREEN}"
+		_PROMPT_SSH=">"
+		_PROMPT="❯"
+	fi
+
 	# Extra line for clarity
-	# PS1="____________________________________________________________________________________________________________________\n"
-	PS1="\n"
+	# PS1="\n"
+
+	# No extra line for clarity
+	PS1=""
 
 	
 	if [[ $_GIT_IS_SLOW = true ]]; then
 		# Prompt using faster and less intensive functions on Git Bash
-		PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %d} \[\033[0;36m\]\A \[\033[0;33m\]\w\[\033[0;31m\]\`_fast_git_ps1\`\[\033[0m\]\n\[\033[0;32m\]>\[\033[0m\] "
+		if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
+			PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${LIGHTGREEN}\]@\[${LIGHTRED}\]\h\[${LIGHTRED}\]) \[${BROWN}\][\w]\[${RED}\]\`_fast_git_ps1\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
+		else
+			PS1=${PS1}"\[${GREEN}\]┌── \[${MAGENTA}\](\u) \[${BROWN}\]{\w}\[${RED}\]\`_fast_git_ps1\`\[${NOCOLOR}\]\n\[${GREEN}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "	
+		fi
 
 	else
 		# Prompt color changes if logged on as root
 		if [[ $EUID > 0 ]]; then
-			_COLOR_USER="\033[0;32m"
+			_COLOR_USER="${GREEN}"
 		else
-			_COLOR_USER="\033[1;31m"
+			_COLOR_USER="${LIGHTRED}"
 		fi
-	
-		# Date formats can be found here (man strftime):
-		# https://manpages.ubuntu.com/manpages/xenial/man3/strftime.3.html
-		# https://www.cyberciti.biz/faq/linux-unix-formatting-dates-for-display/
 	
 		# Only if connected SSH, show the host
 		if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 			if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 				# Remote SSH with short path (1 line)
-				PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+				PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${LIGHTGREEN}\]@\[${LIGHTRED}\]\h\[${LIGHTRED}\]) \[${BROWN}\][\w]\[${RED}\]\`_parse_git_branch\` \[${_COLOR_USER}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
 			else
 				# Remote SSH with full path (2 lines)
-				PS1=${PS1}"\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+				PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${LIGHTGREEN}\]@\[${LIGHTRED}\]\h\[${LIGHTRED}\]) \[${BROWN}\][\$(_pwd)]\[${RED}\]\`_parse_git_branch\`\[${NOCOLOR}\]\n\[${_COLOR_USER}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
 			fi
 		else # Otherwise, only show the name
 			if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 				# Local with short path (1 line)
-				PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+				PS1=${PS1}"\[${_COLOR_USER}\]┌── \[${MAGENTA}\](\u) \[${BROWN}\][\w]\[${RED}\]\`_parse_git_branch\` \[${_COLOR_USER}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
 			else
 				# Local with full path (2 lines)
-				PS1=${PS1}"\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+				PS1=${PS1}"\[${_COLOR_USER}\]┌── \[${MAGENTA}\](\u) \[${BROWN}\][\$(_pwd)]\[${RED}\]\`_parse_git_branch\`\[${NOCOLOR}\]\n\[${_COLOR_USER}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
 			fi
 	fi
 	fi		
