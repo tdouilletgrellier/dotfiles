@@ -16,3 +16,4 @@
 [submodule "config/vim"]
 	path = config/vim
 	url = https://github.com/amix/vimrc
+	ignore = untracked
