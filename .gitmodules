@@ -4,9 +4,6 @@
 [submodule "lib/tpm"]
 	path = lib/tpm
 	url = https://github.com/tmux-plugins/tpm.git
-[submodule "config/vim"]
-	path = config/vim
-	url = https://github.com/amix/vimrc
 [submodule "config/fzf-git"]
 	path = config/fzf-git
 	url = https://github.com/junegunn/fzf-git.sh
