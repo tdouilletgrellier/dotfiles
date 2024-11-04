@@ -218,11 +218,11 @@ function __my_setprompt
 
 	if [[ $LAST_COMMAND != 0 ]]; then
 		_COLOR_LAST_COMMAND="${LIGHTRED}"
-		_PROMPT_SSH="x"
+		_PROMPT_SSH="✘"
 		_PROMPT="✗"
 	else
 		_COLOR_LAST_COMMAND="${GREEN}"
-		_PROMPT_SSH=">"
+		_PROMPT_SSH="➤"
 		_PROMPT="❯"
 	fi
 
