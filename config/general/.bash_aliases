@@ -67,9 +67,9 @@ debian_apps=(
 #-------------------------------------------------------------
 # Welcome message
 # Formatting variables
-COLOR_P='\033[1;36m'
-COLOR_S='\033[0;36m'
-RESET='\033[0m'
+COLOR_P="\033[1;32m"
+COLOR_S="\033[0;32m"
+RESET="\033[0m"
 
 # Print time-based personalized message, using figlet & lolcat if availible
 function welcome_greeting() {
@@ -108,32 +108,37 @@ function welcome_sysinfo() {
 
 # Print todays info: Date, IP, weather, etc
 function welcome_today() {
-	timeout=0.5
+
 	#echo -e "\033[1;34mToday\n------"
 
 	# Print last login in the format: "Last Login: Day Month Date HH:MM on tty"
-	last_login=$(last | grep "^$USER " | head -1 | awk '{print "⏲️  Last Login: "$4" "$5" "$6" "$7" on "$2}')
+	last_login=$(last | grep "^$USER " | head -1 | awk '{print "⧗  "$4" "$6" "$5" at "$7}')
 	echo -e "${COLOR_S}${last_login}"
 
 	# Print date time
-	echo -e "$COLOR_S$(date '+🗓️  Date: %A, %B %d, %Y at %H:%M')"
+	echo -e "$COLOR_S$(date '+⏲  %a %d %b at %H:%M')"
 
 	# Print local weather
 	if ! [ -n "$SSH_CLIENT" ]; then
-		curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
+		echo -e "${COLOR_S}⌂  $(hostname)"
+		# curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
 	else
-		echo -e "${COLOR_S}🌐 Host: $(hostname)"
+		echo -e "${COLOR_S}⌂  $(hostname)"
 	fi
-	# proxy && curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
 	echo -e "${RESET}"
 
 	# Print IP address (quite slow so commented)
 	# if hash ip 2>/dev/null; then
 	#   ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
 	#   ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
-	#   echo -e "${COLOR_S}🌐 IP: $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
+	#   echo -e "${COLOR_S}🜨  $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
 	#   echo -e "${RESET}\n"
 	# fi
+}
+
+function weather() {
+	timeout=0.5
+	curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
 }
 
 # Putting it all together
@@ -141,6 +146,7 @@ function welcome() {
 	welcome_greeting
 	# welcome_sysinfo
 	welcome_today
+	# weather
 }
 #-------------------------------------------------------------
 
@@ -266,7 +272,6 @@ fi
 if [[ -f "${HOME}/arm/forge/22.1.2/bin/ddt" ]]; then
 	alias ddt="${HOME}/arm/forge/22.1.2/bin/ddt &"
 fi
-alias weather="proxy && curl wttr.in/?F"
 alias c='clear'         # c:            Clear terminal display
 alias which='type -all' # which:        Find executables
 if hascommand eza; then
