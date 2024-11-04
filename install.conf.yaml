@@ -6,102 +6,102 @@
 - clean: ['~']
 
 - link:
-    #git
-    ~/.gitconfig: config/general/.gitconfig
-    ~/.gitignore_global: config/general/.gitignore_global
+    # #git
+    # ~/.gitconfig: config/general/.gitconfig
+    # ~/.gitignore_global: config/general/.gitignore_global
 
-    #curl
-    ~/.curlrc: config/general/.curlrc
+    # #curl
+    # ~/.curlrc: config/general/.curlrc
 
-    #wget
-    ~/.wgetrc: config/general/.wgetrc
+    # #wget
+    # ~/.wgetrc: config/general/.wgetrc
 
-    #htop
-    ~/.config/htop/htoprc: config/general/.htoprc
+    # #htop
+    # ~/.config/htop/htoprc: config/general/.htoprc
 
-    #nano    
-    ~/.nanorc: config/general/.nanorc
-    ~/.config/nano/nano-syntax-highlighting: config/nano-syntax-highlighting
-    ~/epx.nanorc: config/general/epx.nanorc
+    # #nano    
+    # ~/.nanorc: config/general/.nanorc
+    # ~/.config/nano/nano-syntax-highlighting: config/nano-syntax-highlighting
+    # ~/epx.nanorc: config/general/epx.nanorc
 
-    #screen
-    ~/.screenrc: config/ExtremeUltimateBashrc/support/_screenrc
+    # #screen
+    # ~/.screenrc: config/ExtremeUltimateBashrc/support/_screenrc
 
-    #latexmk
-    ~/.config/latexmk/latexmkrc: config/latexmk/latexmkrc
+    # #latexmk
+    # ~/.config/latexmk/latexmkrc: config/latexmk/latexmkrc
 
-    #zathura
-    ~/.config/zathura/zathurarc: config/zathura/zathurarc    
+    # #zathura
+    # ~/.config/zathura/zathurarc: config/zathura/zathurarc    
 
-    #lazygit
-    ~/.config/lazygit: config/lazygit
+    # #lazygit
+    # ~/.config/lazygit: config/lazygit
 
-    #ranger
-    ~/.config/ranger: config/ranger    
+    # #ranger
+    # ~/.config/ranger: config/ranger    
 
-    #bpytop
-    ~/.config/bpytop: config/bpytop    
+    # #bpytop
+    # ~/.config/bpytop: config/bpytop    
 
-    #readline
-    ~/.inputrc: config/ExtremeUltimateBashrc/support/_inputrc
+    # #readline
+    # ~/.inputrc: config/ExtremeUltimateBashrc/support/_inputrc
 
-    #Bash
-    ~/.bashrc: config/ExtremeUltimateBashrc/_bashrc
-    ~/.envrc: config/general/.envrc
-    ~/.bashrc_help: config/general/.bashrc_help
-    ~/.bashrc_prompt: config/general/.bashrc_prompt 
-    ~/.bash_aliases: config/general/.bash_aliases
+    # #Bash
+    # ~/.bashrc: config/ExtremeUltimateBashrc/_bashrc
+    # ~/.envrc: config/general/.envrc
+    # ~/.bashrc_help: config/general/.bashrc_help
+    # ~/.bashrc_prompt: config/general/.bashrc_prompt 
+    # ~/.bash_aliases: config/general/.bash_aliases
     
-    #profile
-    ~/.profile: config/general/.profile
+    # #profile
+    # ~/.profile: config/general/.profile
 
-    #zsh
-    ~/.zshrc: config/ExtremeUltimateBashrc/support/_zshrc 
+    # #zsh
+    # ~/.zshrc: config/ExtremeUltimateBashrc/support/_zshrc 
 
-    #vimrc
-    ~/.vimrc: config/general/.vimrc
-    ~/.vim_runtime: config/vim
-    ~/.vim_runtime/syntax: config/vimrc/syntax
-    ~/.vim_runtime/ftdetect: config/vimrc/ftdetect
-    ~/.vim_runtime/colors: config/vimrc/colors
-    ~/.vim_runtime/my_configs.vim: config/vimrc/my_configs.vim
+    # #vimrc
+    # ~/.vimrc: config/general/.vimrc
+    # ~/.vim_runtime: config/vim
+    # ~/.vim_runtime/syntax: config/vimrc/syntax
+    # ~/.vim_runtime/ftdetect: config/vimrc/ftdetect
+    # ~/.vim_runtime/colors: config/vimrc/colors
+    # ~/.vim_runtime/my_configs.vim: config/vimrc/my_configs.vim
 
-    #micro
-    ~/.config/micro/settings.json: config/micro/settings.json
-    ~/.config/micro/bindings.json: config/micro/bindings.json
-    ~/.config/micro/syntax/europlexus.yaml: config/micro/syntax/europlexus.yaml
+    # #micro
+    # ~/.config/micro/settings.json: config/micro/settings.json
+    # ~/.config/micro/bindings.json: config/micro/bindings.json
+    # ~/.config/micro/syntax/europlexus.yaml: config/micro/syntax/europlexus.yaml
 
-    #tmux
-    ~/.tmux.conf: config/tmux/.tmux.conf
-    ~/.tmux/plugins/tpm: lib/tpm    
+    # #tmux
+    # ~/.tmux.conf: config/tmux/.tmux.conf
+    # ~/.tmux/plugins/tpm: lib/tpm    
 
-    #nvim
-    ~/.config/nvim: config/nvim
+    # #nvim
+    # ~/.config/nvim: config/nvim
 
     #bash-completion
-    ~/.config/bash-completion: config/bash-completion
+    ~/.config/bash-completion: config/bash-completion/bash_completion
 
-    #fzf-tab-completion
-    ~/fzf-tab-completion: config/fzf-tab-completion
+    # #fzf-tab-completion
+    # ~/fzf-tab-completion: config/fzf-tab-completion
 
-    #git-completion
-    ~/git-completion.bash: config/git-completion/git-completion.bash
+    # #git-completion
+    # ~/git-completion.bash: config/git-completion/git-completion.bash
 
-    #terminator
-    ~/.config/terminator/config: config/terminator/config
+    # #terminator
+    # ~/.config/terminator/config: config/terminator/config
 
-    #sublime
-    ~/.config/sublime-text: config/sublime-text
+    # #sublime
+    # ~/.config/sublime-text: config/sublime-text
 
-    #conky
-    ~/.conkyrc: config/conky/.conkyrc   
+    # #conky
+    # ~/.conkyrc: config/conky/.conkyrc   
 
-    #conky
-    ~/.blerc: config/blesh/.blerc   
+    # #conky
+    # ~/.blerc: config/blesh/.blerc   
 
-    #tools
-    ~/bin:
-        path: utils/
-        create: true
+    # #tools
+    # ~/bin:
+    #     path: utils/
+    #     create: true
 
 
