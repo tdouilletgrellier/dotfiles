@@ -227,18 +227,18 @@ function __my_setprompt
 	fi
 
 	# Extra line for clarity
-	# PS1="\n"
+	PS1="\n"
 
 	# No extra line for clarity
-	PS1=""
+	# PS1=""
 
 	
 	if [[ $_GIT_IS_SLOW = true ]]; then
 		# Prompt using faster and less intensive functions on Git Bash
 		if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
-			PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${LIGHTGREEN}\]@\[${LIGHTRED}\]\h\[${LIGHTRED}\]) \[${BROWN}\]{\w}\[${RED}\]\`_fast_git_ps1\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
+			PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${MAGENTA}\]@\[${MAGENTA}\]\h\[${MAGENTA}\]) \[${BROWN}\]{\w}\[${RED}\]\`_fast_git_ps1\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
 		else
-			PS1=${PS1}"\[${GREEN}\]┌── \[${MAGENTA}\](\u) \[${BROWN}\]{\w}\[${RED}\]\`_fast_git_ps1\`\[${NOCOLOR}\]\n\[${GREEN}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "	
+			PS1=${PS1}"\[${GREEN}\]\[${BROWN}\]{\w}\[${RED}\]\`_fast_git_ps1\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "	
 		fi
 
 	else
@@ -253,18 +253,18 @@ function __my_setprompt
 		if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 			if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 				# Remote SSH with short path (1 line)
-				PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${LIGHTGREEN}\]@\[${LIGHTRED}\]\h\[${LIGHTRED}\]) \[${BROWN}\]{\w}\[${RED}\]\`_parse_git_branch\` \[${_COLOR_USER}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
+				PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${MAGENTA}\]@\[${MAGENTA}\]\h\[${MAGENTA}\]) \[${BROWN}\]{\w}\[${RED}\]\`_parse_git_branch\` \[${_COLOR_USER}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
 			else
 				# Remote SSH with full path (2 lines)
-				PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${LIGHTGREEN}\]@\[${LIGHTRED}\]\h\[${LIGHTRED}\]) \[${BROWN}\]{\$(_pwd)}\[${RED}\]\`_parse_git_branch\`\[${NOCOLOR}\]\n\[${_COLOR_USER}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
+				PS1=${PS1}"\[${_COLOR_USER}\]┌── \[${MAGENTA}\](\u\[${MAGENTA}\]@\[${MAGENTA}\]\h\[${MAGENTA}\]) \[${BROWN}\]{\$(_pwd)}\[${RED}\]\`_parse_git_branch\`\[${NOCOLOR}\]\n\[${_COLOR_USER}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
 			fi
 		else # Otherwise, only show the name
 			if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 				# Local with short path (1 line)
-				PS1=${PS1}"\[${_COLOR_USER}\]┌── \[${MAGENTA}\](\u) \[${BROWN}\]{\w}\[${RED}\]\`_parse_git_branch\` \[${_COLOR_USER}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
+				PS1=${PS1}"\[${MAGENTA}\](\u) \[${BROWN}\]{\w}\[${RED}\]\`_parse_git_branch\` \[${_COLOR_USER}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
 			else
 				# Local with full path (2 lines)
-				PS1=${PS1}"\[${_COLOR_USER}\]┌── \[${MAGENTA}\](\u) \[${BROWN}\]{\$(_pwd)}\[${RED}\]\`_parse_git_branch\`\[${NOCOLOR}\]\n\[${_COLOR_USER}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
+				PS1=${PS1}"\[${_COLOR_USER}\]┌── \[${BROWN}\]{\$(_pwd)}\[${RED}\]\`_parse_git_branch\`\[${NOCOLOR}\]\n\[${_COLOR_USER}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
 			fi
 	fi
 	fi		

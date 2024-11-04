@@ -48,7 +48,7 @@
     #Bash
     ~/.bashrc: config/ExtremeUltimateBashrc/_bashrc
     ~/.envrc: config/general/.envrc
-    ~/.bashrc_help: config/general/.bashrc_help
+    ~/.bashrc_help: config/ExtremeUltimateBashrc/_bashrc_help
     ~/.bashrc_prompt: config/general/.bashrc_prompt 
     ~/.bash_aliases: config/general/.bash_aliases
     
