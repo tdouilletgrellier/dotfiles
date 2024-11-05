@@ -96,8 +96,11 @@
     #conky
     ~/.conkyrc: config/conky/.conkyrc   
 
-    #conky
+    #ble.sh
     ~/.blerc: config/blesh/.blerc   
+
+    #kitty
+    ~/.config/kitty: config/kitty  
 
     #tools
     ~/bin:
