@@ -445,3 +445,10 @@ if [[ -f "${HOME}/carapace/carapace" ]]; then
 	source <(carapace _carapace)	
 fi
 #-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Change ssh alias if kitty otherwise $TERM is unknown
+if [[ $TERM = xterm-kitty ]]; then
+	alias ssh='kitten ssh'
+fi
+#-------------------------------------------------------------
