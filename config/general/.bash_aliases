@@ -70,6 +70,7 @@ debian_apps=(
 COLOR_P="\033[1;32m"
 COLOR_S="\033[0;32m"
 RESET="\033[0m"
+BORING=true
 
 # Print time-based personalized message, using figlet & lolcat if availible
 function welcome_greeting() {
@@ -87,10 +88,14 @@ function welcome_greeting() {
 		greeting="Hello"
 	fi
 	WELCOME_MSG="$greeting $USER!"
-	if hash lolcat 2>/dev/null && hash figlet 2>/dev/null; then
-		echo "${WELCOME_MSG}" | figlet | lolcat
-	else
+	if [[ $BORING = true ]]; then
 		echo -e "$COLOR_P${WELCOME_MSG}${RESET}\n"
+	else	
+		if hash lolcat 2>/dev/null && hash figlet 2>/dev/null; then
+			echo "${WELCOME_MSG}" | figlet | lolcat
+		else
+			echo -e "$COLOR_P${WELCOME_MSG}${RESET}\n"
+		fi
 	fi
 }
 
@@ -332,11 +337,16 @@ if [[ "${SHLVL}" -lt 2 ]]; then
 	welcome
 	# Fortune message
 	if hascommand --strict lolcat; then
-		if [ -x /usr/games/fortune ]; then
+		if [[ $BORING = true ]]; then
 			echo -e '\e[m'
-			/usr/games/fortune -s | lolcat # Makes our day a bit more fun.... :-)
-			echo -e '\e[m'
-			sparkbars | lolcat
+			echo -e "$COLOR_S$(sparkbars)${NC}"
+		else
+			if [ -x /usr/games/fortune ]; then
+				echo -e '\e[m'
+				/usr/games/fortune -s | lolcat # Makes our day a bit more fun.... :-)
+				echo -e '\e[m'
+				sparkbars | lolcat
+			fi
 		fi
 	else
 		if [ -z "${TMUX}" ]; then
