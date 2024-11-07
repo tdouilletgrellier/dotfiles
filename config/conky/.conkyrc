@@ -61,7 +61,7 @@ ${color6}${font Hack Nerd:size=15}${alignc}${time %A} ${time %B} ${time %e}, ${t
 ${font sans-serif:bold:size=10}CPU ${hr 2}${font}${color2}
 ${font sans-serif:bold:size=8}MODEL : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $1}'}${color2}
 ${font sans-serif:bold:size=8}CLOCK RATE : ${color3}${execi 1000 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//' | awk -F '@' 'NR==1 {print $2}'}${color2}
-${font sans-serif:bold:size=8}TEMP. : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C / ${color3}${if_match ${hwmon 2 temp 1}>=70}${color8}${endif}${if_match ${hwmon 2 temp 1}>=90}${color9}${endif}${hwmon 2 temp 1}°C ${color2}
+${font sans-serif:bold:size=8}TEMP. : ${color3}${if_match ${hwmon 0 temp 1}>=70}${color8}${endif}${if_match ${hwmon 0 temp 1}>=90}${color9}${endif}${hwmon 0 temp 1}°C${color2}
 ${font sans-serif:bold:size=8}TOTAL USAGE : ${color3}${cpu}%${color2}
 ${font sans-serif:bold:size=8}FAN TEMP : ${color3}${acpitemp}°C${color2}
 
