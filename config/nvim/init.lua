@@ -4,8 +4,8 @@ local cyberdream = require("lualine.themes.cyberdream") --.get_theme()
 require("lualine").setup({
   options = { theme = cyberdream },
 })
-
 vim.cmd("colorscheme cyberdream")
+-- vim.cmd("colorscheme vim")
 
 vim.cmd("highlight TelescopeBorder guibg=none")
 vim.cmd("highlight TelescopeTitle guibg=none")

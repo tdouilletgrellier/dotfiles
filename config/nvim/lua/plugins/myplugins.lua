@@ -58,7 +58,7 @@ return {
     end,
   },
 
-{
+  {
     "hrsh7th/nvim-cmp",
     init = function()
       vim.g.cmp_disabled = true
@@ -366,7 +366,7 @@ return {
             bgHighlight = "#666666",
             red = "#cd0000",
             -- green2 = "#66ff66",
-            orange = "#f3d64e",
+            orange = "#ff8700",
             -- blue3 = "#709aed",
             purple = "#db67e6",
             cyan = "#79dff2",
