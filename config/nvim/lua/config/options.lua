@@ -20,3 +20,6 @@ vim.cmd("au BufRead,BufNewFile *.epx set filetype=epx")
 
 -- Fixed form Fortran by default
 vim.cmd("let b:fortran_fixed_source = 1")
+
+-- No diagnostics by default (<leader>+ud to toggle)
+vim.diagnostic.enable(false)
