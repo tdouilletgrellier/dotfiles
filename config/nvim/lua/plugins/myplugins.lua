@@ -39,7 +39,7 @@ return {
       require("colorful-winsep").setup({
         -- highlight for Window separator
         hi = {
-          -- bg = "#16161E",
+          -- bg = "#79ff0f",
           fg = "#e7bf00",
         },
         -- This plugin will not be activated for filetype in the following table.
@@ -145,26 +145,13 @@ return {
     "mcauley-penney/visual-whitespace.nvim",
     event = "ModeChanged",
     opts = {
-      highlight = { link = "Visual" },
-      space_char = "·",
-      tab_char = "→",
-      nl_char = "↲",
+      highlight = { link = 'Visual' },
+      space_char = '·',
+      tab_char = '→',
+      nl_char = '↲',
+      cr_char = '←',
+      enabled = true,
     },
-  },
-
-  {
-    "RRethy/vim-illuminate",
-    event = "CursorHold",
-    config = function()
-      require("illuminate").configure({
-        providers = {
-          "lsp",
-          "treesitter",
-          "regex",
-        },
-        under_cursor = false,
-      })
-    end,
   },
 
   {
@@ -203,34 +190,14 @@ return {
   },
 
   {
-    "kdheepak/lazygit.nvim",
-    cmd = {
-      "LazyGit",
-      "LazyGitConfig",
-      "LazyGitCurrentFile",
-      "LazyGitFilter",
-      "LazyGitFilterCurrentFile",
-    },
-    -- optional for floating window border decoration
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    -- setting the keybinding for LazyGit with 'keys' is recommended in
-    -- order to load the plugin when the command is run for the first time
-    keys = {
-      { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
-    },
-  },
-
-  {
-     "m4xshen/hardtime.nvim",
+    "m4xshen/hardtime.nvim",
     dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
     lazy = false,
     keys = {
       { "j", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"' },
-      { "k", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"' }
-    },    
-    opts = {}
+      { "k", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"' },
+    },
+    opts = {},
   },
 
   {
@@ -268,11 +235,6 @@ return {
   },
 
   {
-    "Fildo7525/pretty_hover",
-    opts = {},
-  },
-
-  {
     "NvChad/nvim-colorizer.lua",
     opts = {
       filetypes = {
@@ -301,36 +263,59 @@ return {
   },
   {
     "NStefan002/visual-surround.nvim",
-    event = "BufEnter",
-    opts = true,
+    config = function()
+        require("visual-surround").setup({
+            -- your config
+        })
+    end,
+    -- or if you don't want to change defaults
+    -- config = true
   },
-
   {
     "m-demare/hlargs.nvim",
-    event = "BufWinEnter",
     config = function()
-      require("hlargs").setup({
-        hl_priority = 200,
-      })
+require('hlargs').setup({
+  color = '#ef9062',
+  highlight = {},
+  -- excluded_filetypes = {},
+  -- disable = function(lang, bufnr) -- If changed, `excluded_filetypes` will be ignored
+  --   return vim.tbl_contains(opts.excluded_filetypes, lang)
+  -- end,
+  paint_arg_declarations = true,
+  paint_arg_usages = true,
+  paint_catch_blocks = {
+    declarations = false,
+    usages = false
+  },
+  extras = {
+    named_parameters = false,
+  },
+  hl_priority = 120,
+  excluded_argnames = {
+    declarations = {},
+    usages = {
+      python = { 'self', 'cls' },
+      lua = { 'self' }
+    }
+  },
+  performance = {
+    parse_delay = 1,
+    slow_parse_delay = 50,
+    max_iterations = 400,
+    max_concurrent_partial_parses = 30,
+    debounce = {
+      partial_parse = 3,
+      partial_insert_mode = 100,
+      total_parse = 700,
+      slow_parse = 5000
+    }
+  }
+})
     end,
   },
 
   {
-    "cbochs/portal.nvim",
-    keys = { "<leader>pj", "<leader>ph" },
-  },
-
-  {
-    "jubnzv/virtual-types.nvim",
-    event = "LspAttach",
-  },
-
-  {
     "sheerun/vim-polyglot",
-  },
-
-  {
-    "ThePrimeagen/harpoon",
   },
 
   {
