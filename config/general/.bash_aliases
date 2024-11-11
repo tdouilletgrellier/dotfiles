@@ -383,6 +383,9 @@ if hascommand --strict fzf; then
 		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
 	# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 	# export FZF_ALT_C_COMMAND="fdfind --type=d --hidden --exclude .git"
+		export FZF_DEFAULT_COMMAND="fd --hidden --exclude .git"
+	elif hascommand --strict rg; then
+		export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'	
 	fi
 	# --- setup fzf theme ---
 	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
