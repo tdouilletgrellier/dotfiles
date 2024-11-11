@@ -298,12 +298,14 @@ elif hascommand --strict vi; then
 	alias svi='sudo vi'
 fi
 if hascommand --strict batcat; then
+	unalias bat
+	unalias cat
 	alias bat='batcat --color=always'
-	alias cat='bat'
 fi
 if hascommand --strict bat; then
+	unalias bat
+	unalias cat
 	alias bat='bat --color=always'
-	alias cat='bat'
 fi
 #-------------------------------------------------------------
 
@@ -445,7 +447,6 @@ if hascommand --strict fzf; then
 		--bind 'ctrl-/:change-preview-window(down|hidden|)'
 		--bind 'ctrl-u:preview-half-page-up'
 		--bind 'ctrl-d:preview-half-page-down'
-		--preview-window hidden
 		--header 'Press ctrl-/ to change preview'"
 	fi
 fi
