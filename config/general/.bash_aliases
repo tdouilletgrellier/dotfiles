@@ -90,7 +90,7 @@ function welcome_greeting() {
 	WELCOME_MSG="$greeting $USER!"
 	if [[ $BORING = true ]]; then
 		echo -e "$COLOR_P${WELCOME_MSG}${RESET}\n"
-	else	
+	else
 		if hash lolcat 2>/dev/null && hash figlet 2>/dev/null; then
 			echo "${WELCOME_MSG}" | figlet | lolcat
 		else
@@ -270,7 +270,7 @@ if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
 	alias epxenv="source ${HOME}/dev/epx/devtools/env.sh"
 	if [[ "${SHLVL}" -lt 2 ]]; then
 		if [ -z "${TMUX}" ]; then
-			epxenv 1> /dev/null
+			epxenv 1>/dev/null
 		fi
 	fi
 fi
@@ -381,25 +381,29 @@ export SELECTED_EDITOR=$EDITOR
 if hascommand --strict fzf; then
 	if hascommand --strict fdfind; then
 		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
-		export FZF_CTRL_T_COMMAND='fdfind --hidden'
-		export FZF_ALT_C_COMMAND='fdfind --hidden'
 	elif hascommand --strict fd; then
 		export FZF_DEFAULT_COMMAND="fd --hidden --exclude .git"
-		export FZF_CTRL_T_COMMAND='fd --hidden'
-		export FZF_ALT_C_COMMAND='fd --hidden'
 	elif hascommand --strict rg; then
 		export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
 		export FZF_CTRL_T_COMMAND='rg --files --hidden'
-		export FZF_ALT_C_COMMAND='rg --files --hidden'			
+		export FZF_ALT_C_COMMAND='rg --files --hidden'
 	fi
+	export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+	export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+	export FZF_DEFAULT_OPTS=""
 	# --- setup fzf theme ---
 	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-  --color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#000000
-  --color=hl:#386bd7,hl+:#66ccff,info:#f3d64e,marker:#e7bf00
-  --color=prompt:#cd0000,spinner:#db67e6,pointer:#b349be,header:#87afaf
-  --color=border:#2a2a2a,label:#666666,query:#bbbbbb
-  --border="rounded" --border-label="" --preview-window="border-rounded" --prompt="> "
-  --marker=">" --pointer="◆" --separator="─" --scrollbar="│"'
+ 	 --color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#2a2a2a
+ 	--color=hl:#386bd7,hl+:#66ccff,info:#f3d64e,marker:#e7bf00
+  	--color=prompt:#cd0000,spinner:#db67e6,pointer:#b349be,header:#87afaf
+  	--color=border:#2a2a2a,label:#666666,query:#bbbbbb'
+	# --- setup fzf options ---
+	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+	--border="rounded" --border-label="" --prompt="❯ "
+	--marker="x" --pointer="◆"'
+	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
+		export FZF_TAB_COMPLETION_PROMPT='❯ '
+	fi
 fi
 #-------------------------------------------------------------
 
@@ -460,7 +464,7 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 if [[ -f "${HOME}/carapace/carapace" ]]; then
 	pathprepend "${HOME}/carapace/"
 	export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
-	source <(carapace _carapace)	
+	source <(carapace _carapace)
 fi
 #-------------------------------------------------------------
 
