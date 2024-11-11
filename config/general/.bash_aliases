@@ -381,11 +381,16 @@ export SELECTED_EDITOR=$EDITOR
 if hascommand --strict fzf; then
 	if hascommand --strict fdfind; then
 		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
-	# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-	# export FZF_ALT_C_COMMAND="fdfind --type=d --hidden --exclude .git"
+		export FZF_CTRL_T_COMMAND='fdfind --hidden'
+		export FZF_ALT_C_COMMAND='fdfind --hidden'
+	elif hascommand --strict fd; then
 		export FZF_DEFAULT_COMMAND="fd --hidden --exclude .git"
+		export FZF_CTRL_T_COMMAND='fd --hidden'
+		export FZF_ALT_C_COMMAND='fd --hidden'
 	elif hascommand --strict rg; then
-		export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'	
+		export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
+		export FZF_CTRL_T_COMMAND='rg --files --hidden'
+		export FZF_ALT_C_COMMAND='rg --files --hidden'			
 	fi
 	# --- setup fzf theme ---
 	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
