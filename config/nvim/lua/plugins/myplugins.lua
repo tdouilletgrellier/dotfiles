@@ -261,6 +261,7 @@ return {
       },
     },
   },
+
   {
     "NStefan002/visual-surround.nvim",
     config = function()
@@ -271,6 +272,7 @@ return {
     -- or if you don't want to change defaults
     -- config = true
   },
+
   {
     "cappyzawa/trim.nvim",
     config = function()
@@ -295,6 +297,7 @@ return {
       })
     end,
   },
+  
   {
     "m-demare/hlargs.nvim",
     config = function()
