@@ -297,7 +297,7 @@ return {
       })
     end,
   },
-  
+
   {
     "m-demare/hlargs.nvim",
     config = function()
