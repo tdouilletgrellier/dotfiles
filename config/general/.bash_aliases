@@ -393,13 +393,13 @@ if hascommand --strict fzf; then
 	export FZF_DEFAULT_OPTS=""
 	# --- setup fzf theme ---
 	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
- 	 --color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#2a2a2a
+ 	--color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#2a2a2a
  	--color=hl:#386bd7,hl+:#66ccff,info:#f3d64e,marker:#e7bf00
   	--color=prompt:#cd0000,spinner:#db67e6,pointer:#b349be,header:#87afaf
   	--color=border:#2a2a2a,label:#666666,query:#bbbbbb'
 	# --- setup fzf options ---
 	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-	--border="rounded" --border-label="" --prompt="❯ " --pointer="◆"'
+	--border="rounded" --border-label="" --prompt="❯ " --pointer="◆" '
 	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 		export FZF_TAB_COMPLETION_PROMPT='❯ '
 	fi
@@ -412,12 +412,12 @@ if hascommand --strict fzf; then
 	if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
 		source "$HOME/dotfiles/config/fzf-git/fzf-git.sh"
 		_fzf_git_fzf() {
-  			fzf --height=50% --tmux 90%,70% \
-    			--layout=reverse --multi --min-height=20 --border \
-    			--border-label-pos=2 \
-    			--color='header:italic:underline,label:blue' \
-    			--preview-window='right,50%,border-left' \
-    			--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
+			fzf --height=50% --tmux 90%,70% \
+				--layout=reverse --multi --min-height=20 --border \
+				--border-label-pos=2 \
+				--color='header:italic:underline,label:blue' \
+				--preview-window='right,50%,border-left' \
+				--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
 		}
 	fi
 fi
