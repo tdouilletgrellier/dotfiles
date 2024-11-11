@@ -102,9 +102,6 @@
     #kitty
     ~/.config/kitty: config/kitty
 
-    #bat
-    ~/.config/bat/syntaxes/europlexus.sublime-syntax: config/config/sublime-text/Packages/User/europlexus.sublime-syntax
-
     #tools
     ~/bin:
       path: utils/

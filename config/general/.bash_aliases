@@ -394,12 +394,14 @@ if hascommand --strict fzf; then
 		export FZF_CTRL_T_COMMAND='rg --files --hidden'
 		export FZF_ALT_C_COMMAND='rg --files --hidden'
 	fi
-	if hascommand bat; then
+	if hascommand --strict bat; then
 		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
+	elif hascommand --strict batcat; then	
+		export FZF_PREVIEW_COMMAND_FILE='batcat -n --color=always -r :500 {}'
 	else
 		export FZF_PREVIEW_COMMAND_FILE='cat -n {}'
 	fi
-	if hascommand eza; then
+	if hascommand --strict eza; then
 		export FZF_PREVIEW_COMMAND_DIR='eza --tree --level 1 --color=always --icons {}'
 	else
 		export FZF_PREVIEW_COMMAND_DIR='tree -C {}'
@@ -420,9 +422,7 @@ if hascommand --strict fzf; then
   	--walker-skip .git,node_modules,target
   	--preview '${FZF_PREVIEW_COMMAND_DIR}'"
 	export FZF_CTRL_R_OPTS="
-  	--bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
-  	--header 'Press CTRL-Y to copy command into clipboard. Press ctrl-/ to see full command'"
-	export FZF_CTRL_R_OPTS=${FZF_CTRL_R_OPTS}"
+  	--header 'Press ctrl-/ to see full command'
 	--preview 'echo {}' --preview-window down:3:hidden:wrap
 	--bind 'ctrl-/:toggle-preview'"
 	export FZF_DEFAULT_OPTS=""
@@ -439,15 +439,14 @@ if hascommand --strict fzf; then
 	--prompt="❯ " --pointer="◆" --marker="✓"'
 	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 		export FZF_TAB_COMPLETION_PROMPT='❯ '
-		# export FZF_COMPLETION_OPTS=""
-		# export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
-		# --preview '${FZF_PREVIEW_COMMAND}'
-		# --bind 'ctrl-/:change-preview-window(down|hidden|)'
-		# --bind 'ctrl-u:preview-half-page-up'
-		# --bind 'ctrl-d:preview-half-page-down'
-		# --preview-window hidden
-		# --bind 'ctrl+?:toggle-preview'
-		# c
+		export FZF_COMPLETION_OPTS=""
+		export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
+		--preview '${FZF_PREVIEW_COMMAND}'
+		--bind 'ctrl-/:change-preview-window(down|hidden|)'
+		--bind 'ctrl-u:preview-half-page-up'
+		--bind 'ctrl-d:preview-half-page-down'
+		--preview-window hidden
+		--header 'Press ctrl-/ to change preview'"
 	fi
 fi
 #-------------------------------------------------------------
@@ -491,11 +490,11 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 
 #-------------------------------------------------------------
 # Carapace (not working with ble.sh but looks good)
-if [[ -f "${HOME}/carapace/carapace" ]]; then
-	pathprepend "${HOME}/carapace/"
-	export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
-	source <(carapace _carapace)
-fi
+# if [[ -f "${HOME}/carapace/carapace" ]]; then
+# 	pathprepend "${HOME}/carapace/"
+# 	export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
+# 	source <(carapace _carapace)
+# fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
