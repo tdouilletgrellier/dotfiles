@@ -279,7 +279,7 @@ if [[ -f "${HOME}/arm/forge/22.1.2/bin/ddt" ]]; then
 fi
 alias c='clear'         # c:            Clear terminal display
 alias which='type -all' # which:        Find executables
-if hascommand eza; then
+if hascommand --strict eza; then
 	unalias ldir
 	alias ldir="eza -lD"
 	unalias lfile
@@ -298,7 +298,12 @@ elif hascommand --strict vi; then
 	alias svi='sudo vi'
 fi
 if hascommand --strict batcat; then
-	alias bat='batcat --decorations=always --color=always'
+	alias bat='batcat --color=always'
+	alias cat='bat'
+fi
+if hascommand --strict bat; then
+	alias bat='bat --color=always'
+	alias cat='bat'
 fi
 #-------------------------------------------------------------
 
@@ -369,6 +374,7 @@ export HOSTFILE=$HOME/.hosts # Put a list of remote hosts in ~/.hosts
 #-------------------------------------------------------------
 # Bat theme
 export BAT_THEME=base16
+export BAT_STYLE=plain
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -388,20 +394,60 @@ if hascommand --strict fzf; then
 		export FZF_CTRL_T_COMMAND='rg --files --hidden'
 		export FZF_ALT_C_COMMAND='rg --files --hidden'
 	fi
+	if hascommand bat; then
+		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
+	else
+		export FZF_PREVIEW_COMMAND_FILE='cat -n {}'
+	fi
+	if hascommand eza; then
+		export FZF_PREVIEW_COMMAND_DIR='eza --tree --level 1 --color=always --icons {}'
+	else
+		export FZF_PREVIEW_COMMAND_DIR='tree -C {}'
+	fi
+	export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && echo {} is binary file || '${FZF_PREVIEW_COMMAND_FILE}')'
+	# export FZF_PREVIEW_COMMAND='(cat -n {} || tree -C {} || echo {}) 2> /dev/null'
+	# export FZF_PREVIEW_COMMAND='cat -n --color=always {}'
 	export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-	export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+	export FZF_CTRL_T_OPTS="
+  	--walker-skip .git,node_modules,target
+  	--preview '${FZF_PREVIEW_COMMAND}'
+  	--bind 'ctrl-/:change-preview-window(down|hidden|)'
+  	--bind 'ctrl-u:preview-half-page-up'
+  	--bind 'ctrl-d:preview-half-page-down'
+  	--header 'Press ctrl-/ to change preview'"
+	export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND}"
+	export FZF_ALT_C_OPTS="
+  	--walker-skip .git,node_modules,target
+  	--preview '${FZF_PREVIEW_COMMAND_DIR}'"
+	export FZF_CTRL_R_OPTS="
+  	--bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
+  	--header 'Press CTRL-Y to copy command into clipboard. Press ctrl-/ to see full command'"
+	export FZF_CTRL_R_OPTS=${FZF_CTRL_R_OPTS}"
+	--preview 'echo {}' --preview-window down:3:hidden:wrap
+	--bind 'ctrl-/:toggle-preview'"
 	export FZF_DEFAULT_OPTS=""
 	# --- setup fzf theme ---
-	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
  	--color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#2a2a2a
  	--color=hl:#386bd7,hl+:#66ccff,info:#f3d64e,marker:#e7bf00
   	--color=prompt:#cd0000,spinner:#db67e6,pointer:#b349be,header:#87afaf
-  	--color=border:#2a2a2a,label:#666666,query:#bbbbbb'
+  	--color=border:#2a2a2a,label:#666666,query:#bbbbbb
+  	--color header:italic'
 	# --- setup fzf options ---
-	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-	--border="rounded" --border-label="" --prompt="❯ " --pointer="◆" '
+	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
+	--border="rounded" --border-label=""
+	--prompt="❯ " --pointer="◆" --marker="✓"'
 	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 		export FZF_TAB_COMPLETION_PROMPT='❯ '
+		# export FZF_COMPLETION_OPTS=""
+		# export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
+		# --preview '${FZF_PREVIEW_COMMAND}'
+		# --bind 'ctrl-/:change-preview-window(down|hidden|)'
+		# --bind 'ctrl-u:preview-half-page-up'
+		# --bind 'ctrl-d:preview-half-page-down'
+		# --preview-window hidden
+		# --bind 'ctrl+?:toggle-preview'
+		# c
 	fi
 fi
 #-------------------------------------------------------------

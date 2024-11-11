@@ -3,7 +3,7 @@
       create: true
       relink: true
 
-- clean: ['~']
+- clean: ["~"]
 
 - link:
     #git
@@ -19,7 +19,7 @@
     #htop
     ~/.config/htop/htoprc: config/general/.htoprc
 
-    #nano    
+    #nano
     ~/.nanorc: config/general/.nanorc
     ~/.config/nano/nano-syntax-highlighting: config/nano-syntax-highlighting
     ~/epx.nanorc: config/general/epx.nanorc
@@ -31,16 +31,16 @@
     ~/.config/latexmk/latexmkrc: config/latexmk/latexmkrc
 
     #zathura
-    ~/.config/zathura/zathurarc: config/zathura/zathurarc    
+    ~/.config/zathura/zathurarc: config/zathura/zathurarc
 
     #lazygit
     ~/.config/lazygit: config/lazygit
 
     #ranger
-    ~/.config/ranger: config/ranger    
+    ~/.config/ranger: config/ranger
 
     #bpytop
-    ~/.config/bpytop: config/bpytop    
+    ~/.config/bpytop: config/bpytop
 
     #readline
     ~/.inputrc: config/ExtremeUltimateBashrc/support/_inputrc
@@ -49,14 +49,14 @@
     ~/.bashrc: config/ExtremeUltimateBashrc/_bashrc
     ~/.envrc: config/general/.envrc
     ~/.bashrc_help: config/ExtremeUltimateBashrc/_bashrc_help
-    ~/.bashrc_prompt: config/general/.bashrc_prompt 
+    ~/.bashrc_prompt: config/general/.bashrc_prompt
     ~/.bash_aliases: config/general/.bash_aliases
-    
+
     #profile
     ~/.profile: config/general/.profile
 
     #zsh
-    ~/.zshrc: config/ExtremeUltimateBashrc/support/_zshrc 
+    ~/.zshrc: config/ExtremeUltimateBashrc/support/_zshrc
 
     #vimrc
     ~/.vimrc: config/general/.vimrc
@@ -73,7 +73,7 @@
 
     #tmux
     ~/.tmux.conf: config/tmux/.tmux.conf
-    ~/.tmux/plugins/tpm: lib/tpm    
+    ~/.tmux/plugins/tpm: lib/tpm
 
     #nvim
     ~/.config/nvim: config/nvim
@@ -94,17 +94,18 @@
     ~/.config/sublime-text: config/sublime-text
 
     #conky
-    ~/.conkyrc: config/conky/.conkyrc   
+    ~/.conkyrc: config/conky/.conkyrc
 
     #ble.sh
-    ~/.blerc: config/blesh/.blerc   
+    ~/.blerc: config/blesh/.blerc
 
     #kitty
-    ~/.config/kitty: config/kitty  
+    ~/.config/kitty: config/kitty
+
+    #bat
+    ~/.config/bat/syntaxes/europlexus.sublime-syntax: config/config/sublime-text/Packages/User/europlexus.sublime-syntax
 
     #tools
     ~/bin:
-        path: utils/
-        create: true
-
-
+      path: utils/
+      create: true
