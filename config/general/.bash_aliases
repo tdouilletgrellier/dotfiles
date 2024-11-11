@@ -399,25 +399,9 @@ if hascommand --strict fzf; then
   	--color=border:#2a2a2a,label:#666666,query:#bbbbbb'
 	# --- setup fzf options ---
 	export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-	--border="rounded" --border-label="" --prompt="❯ "
-	--marker="x" --pointer="◆"'
+	--border="rounded" --border-label="" --prompt="❯ " --pointer="◆"'
 	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 		export FZF_TAB_COMPLETION_PROMPT='❯ '
-	fi
-fi
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# Fzf+fdfind
-# Use fd (https://github.com/sharkdp/fd) for listing path candidates.
-if hascommand --strict fzf; then
-	if hascommand --strict fdfind; then
-		_fzf_compgen_path() {
-			fdfind --hidden --exclude .git . "$1"
-		}
-		_fzf_compgen_dir() {
-			fdfind --type=d --hidden --exclude .git . "$1"
-		}
 	fi
 fi
 #-------------------------------------------------------------
@@ -428,12 +412,12 @@ if hascommand --strict fzf; then
 	if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
 		source "$HOME/dotfiles/config/fzf-git/fzf-git.sh"
 		_fzf_git_fzf() {
-			fzf-tmux --ansi -p80%,60% -- \
-				--layout=reverse --multi --height=50% --min-height=20 --border \
-				--border-label-pos=2 \
-				--color='header:italic:underline,label:blue' \
-				--preview-window='right,50%,border-left' \
-				--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
+  			fzf --height=50% --tmux 90%,70% \
+    			--layout=reverse --multi --min-height=20 --border \
+    			--border-label-pos=2 \
+    			--color='header:italic:underline,label:blue' \
+    			--preview-window='right,50%,border-left' \
+    			--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
 		}
 	fi
 fi
