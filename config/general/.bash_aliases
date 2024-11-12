@@ -408,14 +408,16 @@ if hascommand --strict fzf; then
 	else
 		export FZF_PREVIEW_COMMAND_DIR='tree -C {}'
 	fi
-	export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && echo {} is binary file || '${FZF_PREVIEW_COMMAND_FILE}')'
-	# export FZF_PREVIEW_COMMAND='(cat -n {} || tree -C {} || echo {}) 2> /dev/null'
-	# export FZF_PREVIEW_COMMAND='cat -n --color=always {}'
+	export FZF_PREVIEW_COMMAND_DEFAULT='echo {}'
+	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file || '${FZF_PREVIEW_COMMAND_FILE}')'
+	export FZF_PREVIEW_COMMAND='('${FZF_PREVIEW_COMMAND_FILE}' || '${FZF_PREVIEW_COMMAND_DIR}' || '${FZF_PREVIEW_COMMAND_DEFAULT}') 2> /dev/null'
+	# export FZF_PREVIEW_COMMAND='([[ -d {} ]] && '${FZF_PREVIEW_COMMAND_DIR}') || ([[ -f {} ]] && '${FZF_PREVIEW_COMMAND_FILE}') || '${FZF_PREVIEW_COMMAND_DEFAULT}''
 	export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 	export FZF_CTRL_T_OPTS="
   	--walker-skip .git,node_modules,target
   	--preview '${FZF_PREVIEW_COMMAND}'
-  	--bind 'ctrl-/:change-preview-window(down|hidden|)'
+  	--preview-window 'right:60%:hidden:wrap'
+  	--bind 'ctrl-/:change-preview-window(right|hidden|)'
   	--bind 'ctrl-u:preview-half-page-up'
   	--bind 'ctrl-d:preview-half-page-down'
   	--header 'Press ctrl-/ to change preview'"
@@ -444,7 +446,8 @@ if hascommand --strict fzf; then
 		export FZF_COMPLETION_OPTS=""
 		export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
 		--preview '${FZF_PREVIEW_COMMAND}'
-		--bind 'ctrl-/:change-preview-window(down|hidden|)'
+  		--preview-window 'right:60%:hidden:wrap'
+  		--bind 'ctrl-/:change-preview-window(right|hidden|)'
 		--bind 'ctrl-u:preview-half-page-up'
 		--bind 'ctrl-d:preview-half-page-down'
 		--header 'Press ctrl-/ to change preview'"
