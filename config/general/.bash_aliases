@@ -388,13 +388,9 @@ export SELECTED_EDITOR=$EDITOR
 # Fzf config
 if hascommand --strict fzf; then
 	if hascommand --strict fdfind; then
-		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude .git"
+		export FZF_DEFAULT_COMMAND="fdfind --max-depth 1 --hidden --exclude .git"
 	elif hascommand --strict fd; then
-		export FZF_DEFAULT_COMMAND="fd --hidden --exclude .git"
-	elif hascommand --strict rg; then
-		export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
-		export FZF_CTRL_T_COMMAND='rg --files --hidden'
-		export FZF_ALT_C_COMMAND='rg --files --hidden'
+		export FZF_DEFAULT_COMMAND="fd --max-depth 1 --hidden --exclude .git"		
 	fi
 	if hascommand --strict bat; then
 		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
@@ -407,7 +403,7 @@ if hascommand --strict fzf; then
 		export FZF_PREVIEW_COMMAND_DIR='eza --tree --level 1 --color=always --icons {}'
 	else
 		export FZF_PREVIEW_COMMAND_DIR='tree -C {}'
-	fi
+	fi	
 	export FZF_PREVIEW_COMMAND_DEFAULT='echo {}'
 	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file || '${FZF_PREVIEW_COMMAND_FILE}')'
 	export FZF_PREVIEW_COMMAND='('${FZF_PREVIEW_COMMAND_FILE}' || '${FZF_PREVIEW_COMMAND_DIR}' || '${FZF_PREVIEW_COMMAND_DEFAULT}') 2> /dev/null'
@@ -419,8 +415,7 @@ if hascommand --strict fzf; then
   	--preview-window 'right:60%:hidden:wrap'
   	--bind 'ctrl-/:change-preview-window(right|hidden|)'
   	--bind 'ctrl-u:preview-half-page-up'
-  	--bind 'ctrl-d:preview-half-page-down'
-  	--header 'Press ctrl-/ to change preview'"
+  	--bind 'ctrl-d:preview-half-page-down'"
 	export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND}"
 	export FZF_ALT_C_OPTS="
   	--walker-skip .git,node_modules,target
@@ -444,12 +439,14 @@ if hascommand --strict fzf; then
 		export FZF_TAB_COMPLETION_PROMPT='❯ '
 		export FZF_COMPLETION_OPTS=""
 		export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
+		--walker-skip .git,node_modules,target
 		--preview '${FZF_PREVIEW_COMMAND}'
   		--preview-window 'right:60%:hidden:wrap'
   		--bind 'ctrl-/:change-preview-window(right|hidden|)'
 		--bind 'ctrl-u:preview-half-page-up'
 		--bind 'ctrl-d:preview-half-page-down'
-		--header 'Press ctrl-/ to change preview'"
+		--bind 'ctrl-d:reload("$FZF_DEFAULT_COMMAND" --type d),ctrl-f:reload(eval "$FZF_DEFAULT_COMMAND" --type f)'
+		"
 	fi
 fi
 #-------------------------------------------------------------
