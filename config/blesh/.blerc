@@ -1578,7 +1578,7 @@ bleopt complete_menu_complete=0
 #bleopt complete_menu_style=align-nowrap
 bleopt complete_menu_style=linewise
 bleopt complete_source_sabbrev_opts=no-empty-completion
-#ble-bind -f 'TAB' fzf-complete
+ble-bind -f 'TAB' fzf-complete
 
 # Set up fzf-git
 _ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
