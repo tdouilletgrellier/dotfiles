@@ -491,11 +491,11 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 
 #-------------------------------------------------------------
 # Carapace (not working with ble.sh but looks good)
-# if [[ -f "${HOME}/carapace/carapace" ]]; then
-# 	pathprepend "${HOME}/carapace/"
-# 	export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
-# 	source <(carapace _carapace)
-# fi
+if [[ -f "${HOME}/carapace/carapace" ]]; then
+	pathprepend "${HOME}/carapace/"
+	export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
+	source <(carapace _carapace)
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
