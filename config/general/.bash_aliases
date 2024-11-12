@@ -388,9 +388,9 @@ export SELECTED_EDITOR=$EDITOR
 # Fzf config
 if hascommand --strict fzf; then
 	if hascommand --strict fdfind; then
-		export FZF_DEFAULT_COMMAND="fdfind --max-depth 1 --hidden --exclude .git"
+		export FZF_DEFAULT_COMMAND="fdfind --max-depth 1 --hidden --exclude '.git'"
 	elif hascommand --strict fd; then
-		export FZF_DEFAULT_COMMAND="fd --max-depth 1 --hidden --exclude .git"		
+		export FZF_DEFAULT_COMMAND="fd --max-depth 1 --hidden --exclude '.git'"		
 	fi
 	if hascommand --strict bat; then
 		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
@@ -431,22 +431,22 @@ if hascommand --strict fzf; then
   	--color=prompt:#cd0000,spinner:#db67e6,pointer:#b349be,header:#87afaf
   	--color=border:#2a2a2a,label:#666666,query:#bbbbbb
   	--color header:italic'
-	# --- setup fzf options ---
+	# --- setup fzf default options ---
 	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
 	--border="rounded" --border-label=""
 	--prompt="❯ " --pointer="◆" --marker="✓"'
+	# --- setup fzf completions options ---
+	export FZF_COMPLETION_OPTS=""
+	export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
+	--walker-skip .git,node_modules,target
+	--preview '${FZF_PREVIEW_COMMAND}'
+  	--preview-window 'right:60%:hidden:wrap'
+  	--bind 'ctrl-/:change-preview-window(right|hidden|)'
+	--bind 'ctrl-u:preview-half-page-up'
+	--bind 'ctrl-d:preview-half-page-down'
+	--bind 'ctrl-d:reload("$FZF_DEFAULT_COMMAND" --type d),ctrl-f:reload(eval "$FZF_DEFAULT_COMMAND" --type f)'"	
 	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 		export FZF_TAB_COMPLETION_PROMPT='❯ '
-		export FZF_COMPLETION_OPTS=""
-		export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
-		--walker-skip .git,node_modules,target
-		--preview '${FZF_PREVIEW_COMMAND}'
-  		--preview-window 'right:60%:hidden:wrap'
-  		--bind 'ctrl-/:change-preview-window(right|hidden|)'
-		--bind 'ctrl-u:preview-half-page-up'
-		--bind 'ctrl-d:preview-half-page-down'
-		--bind 'ctrl-d:reload("$FZF_DEFAULT_COMMAND" --type d),ctrl-f:reload(eval "$FZF_DEFAULT_COMMAND" --type f)'
-		"
 	fi
 fi
 #-------------------------------------------------------------
