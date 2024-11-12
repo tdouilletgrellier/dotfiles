@@ -426,7 +426,6 @@ if hascommand --strict fzf; then
   	--walker-skip .git,node_modules,target
   	--preview '${FZF_PREVIEW_COMMAND_DIR}'"
 	export FZF_CTRL_R_OPTS="
-  	--header 'Press ctrl-/ to see full command'
 	--preview 'echo {}' --preview-window down:3:hidden:wrap
 	--bind 'ctrl-/:toggle-preview'"
 	export FZF_DEFAULT_OPTS=""
@@ -496,5 +495,6 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 # Change ssh alias if kitty otherwise $TERM is unknown
 if [[ $TERM = xterm-kitty ]]; then
 	alias ssh='kitten ssh'
+	alias icat="kitten icat"
 fi
 #-------------------------------------------------------------
