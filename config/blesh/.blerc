@@ -1574,6 +1574,7 @@ ble-face vbell_flash=fg=#79ff0f,reverse
 # Set up fzf
 ble-import -d integration/fzf-completion
 ble-import -d integration/fzf-key-bindings
+ble-bind -f 'TAB' fzf-complete
 
 # Set up fzf-git
 _ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
