@@ -408,14 +408,15 @@ if hascommand --strict fzf; then
 	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file || '${FZF_PREVIEW_COMMAND_FILE}')'
 	export FZF_PREVIEW_COMMAND='('${FZF_PREVIEW_COMMAND_FILE}' || '${FZF_PREVIEW_COMMAND_DIR}' || '${FZF_PREVIEW_COMMAND_DEFAULT}') 2> /dev/null'
 	# export FZF_PREVIEW_COMMAND='([[ -d {} ]] && '${FZF_PREVIEW_COMMAND_DIR}') || ([[ -f {} ]] && '${FZF_PREVIEW_COMMAND_FILE}') || '${FZF_PREVIEW_COMMAND_DEFAULT}''
-	export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+	export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
 	export FZF_CTRL_T_OPTS="
   	--walker-skip .git,node_modules,target
   	--preview '${FZF_PREVIEW_COMMAND}'
   	--preview-window 'right:60%:hidden:wrap'
   	--bind 'ctrl-/:change-preview-window(right|hidden|)'
   	--bind 'ctrl-u:preview-half-page-up'
-  	--bind 'ctrl-d:preview-half-page-down'"
+  	--bind 'ctrl-d:preview-half-page-down'
+  	--bind 'ctrl-d:reload("$FZF_DEFAULT_COMMAND" --type d),ctrl-f:reload(eval "$FZF_DEFAULT_COMMAND" --type f)'"
 	export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND}"
 	export FZF_ALT_C_OPTS="
   	--walker-skip .git,node_modules,target

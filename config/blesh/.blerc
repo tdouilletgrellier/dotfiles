@@ -1505,7 +1505,7 @@ ble-face filename_executable=fg=#66ff66
 ble-face filename_link=fg=#66ccff
 ble-face filename_ls_colors=none
 ble-face filename_orphan=fg=#66ccff
-ble-face filename_other=underline
+ble-face filename_other=none
 ble-face filename_pipe=fg=#66ff66
 ble-face filename_setgid=fg=#bbbbbb
 ble-face filename_setuid=fg=#bbbbbb
@@ -1575,8 +1575,8 @@ ble-face vbell_flash=fg=#79ff0f,reverse
 ble-import -d integration/fzf-completion
 ble-import -d integration/fzf-key-bindings
 bleopt complete_menu_complete=0
-bleopt complete_menu_style=align-nowrap
-#bleopt complete_menu_style=desc-text
+#bleopt complete_menu_style=align-nowrap
+bleopt complete_menu_style=linewise
 bleopt complete_source_sabbrev_opts=no-empty-completion
 #ble-bind -f 'TAB' fzf-complete
 
