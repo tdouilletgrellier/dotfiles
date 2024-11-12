@@ -298,13 +298,9 @@ elif hascommand --strict vi; then
 	alias svi='sudo vi'
 fi
 if hascommand --strict batcat; then
-	unalias bat
-	unalias cat
 	alias bat='batcat --color=always'
 fi
 if hascommand --strict bat; then
-	unalias bat
-	unalias cat
 	alias bat='bat --color=always'
 fi
 #-------------------------------------------------------------
