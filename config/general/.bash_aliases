@@ -431,7 +431,7 @@ if hascommand --strict fzf; then
 	# --- setup fzf default options ---
 	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
 	--border="rounded" --border-label=""
-	--prompt="❯ " --pointer="◆" --marker="✓"'
+	--prompt="❯ " --pointer="◆" --marker="✓ "'
 	# --- setup fzf completions options ---
 	export FZF_COMPLETION_OPTS=""
 	export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
