@@ -384,9 +384,9 @@ export SELECTED_EDITOR=$EDITOR
 # Fzf config
 if hascommand --strict fzf; then
 	if hascommand --strict fdfind; then
-		export FZF_DEFAULT_COMMAND="fdfind --max-depth 1 --hidden --exclude '.git'"
+		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude '.git'"
 	elif hascommand --strict fd; then
-		export FZF_DEFAULT_COMMAND="fd --max-depth 1 --hidden --exclude '.git'"		
+		export FZF_DEFAULT_COMMAND="fd --hidden --exclude '.git'"		
 	fi
 	if hascommand --strict bat; then
 		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
@@ -433,17 +433,18 @@ if hascommand --strict fzf; then
 	--border="rounded" --border-label=""
 	--prompt="❯ " --pointer="◆" --marker="✓ "'
 	# --- setup fzf completions options ---
+	# export FZF_COMPLETION_COMMAND="${FZF_DEFAULT_COMMAND}"
+	# --bind='start:reload:${FZF_COMPLETION_COMMAND}'	
+	# --bind='change:reload:${FZF_COMPLETION_COMMAND}'
 	export FZF_COMPLETION_OPTS=""
 	export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
-	--bind='change:reload:${FZF_DEFAULT_COMMAND}'
-	--bind='start:reload:${FZF_DEFAULT_COMMAND}'
 	--walker-skip .git,node_modules,target
 	--preview '${FZF_PREVIEW_COMMAND}'
   	--preview-window 'right:60%:hidden:wrap'
   	--bind 'ctrl-/:change-preview-window(right|hidden|)'
 	--bind 'ctrl-u:preview-half-page-up'
 	--bind 'ctrl-d:preview-half-page-down'
-	--bind 'ctrl-d:reload("$FZF_DEFAULT_COMMAND" --type d),ctrl-f:reload(eval "$FZF_DEFAULT_COMMAND" --type f)'"	
+	--bind 'ctrl-d:reload("$FZF_COMPLETION_COMMAND" --type d),ctrl-f:reload(eval "$FZF_COMPLETION_COMMAND" --type f)'"	
 	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 		export FZF_TAB_COMPLETION_PROMPT='❯ '
 	fi
