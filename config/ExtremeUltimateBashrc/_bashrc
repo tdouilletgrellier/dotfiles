@@ -1353,7 +1353,8 @@ if hascommand git; then
 	alias ggsquash='git reset $(git merge-base master $(git branch --show-current)) && git add --all && git commit --message "Squashed commits"'
 	alias ggb='gitbranch' # Change branch
 	alias gg-='git checkout -'
-	alias ggcb='git checkout --branch' # Create new branch
+	alias ggcb='git checkout -b' # Create new branch
+	alias ggcbforce='git checkout -B' # Create new branch - if the branch already exists it will reset it
 	#alias gglb='git branch --verbose'
 	alias {gglb,ggbl}='git for-each-ref --sort=-committerdate refs/heads/ --format="%(committerdate:short) %(refname:short)" | head -n 25'
 	alias gga='git add'
@@ -2698,6 +2699,17 @@ alias mkdir='mkdir -p'
 # When copying files, prompt before overwriting a file
 alias cp='cp -i'
 
+# Copy file(s) recursively with permissions, ownership, timestamps, symbolic
+# links, devices, special files, security context, and extended attributes
+if hascommand --strict rsync; then
+	alias clone='rsync --archive --human-readable --progress'
+
+	# Clone and synchronize directories deleting files not present at source
+	alias clonesync='rsync --archive --delete --human-readable --progress'
+else
+	alias clone='cp --recursive --preserve=all --verbose'
+fi
+
 # When moving files, prompt for confirmation if the destination path exists
 # Use -f if you want to skip all prompts (-i option is ignored)
 alias mv='mv -i'
@@ -2806,19 +2818,6 @@ fi
 # Alias to show MySQL's data directory location
 if hascommand --strict mysqld; then
 	alias mysqldatadir='mysqld --verbose --help 2>/dev/null | grep ^datadir | column --table'
-fi
-
-# Aliases to compressed or uncompressed archives
-alias mkbz2='tar -cvjf' # [filename.tar.bz2] [files_or_directories_to_compress]
-alias unbz2='tar -xvjf'
-alias mkgz='tar -cvzf' # [filename.tar.gz] [files_or_directories_to_compress]
-alias ungz='tar -xvzf'
-alias mktar='tar -cvf' # [filename.tar] [files_or_directories_to_compress]
-alias untar='tar -xvf'
-
-# Alias to use zip recursively with maximum compression
-if hascommand --strict zip; then
-	alias mkzip='zip -r9' # [filename.zip] [files_or_directories_to_compress]
 fi
 
 # Alias to launch a document, file, or URL in it's default X application
@@ -3465,6 +3464,116 @@ fi
 if hascommand --strict kstart5 && hascommand --strict kquitapp5; then
 	alias {plasmarestart,kderestart}='kquitapp5 plasmashell && runfree kstart5 plasmashell'
 fi
+
+#######################################################
+# Set compression aliases with automatic parallel processing if installed
+# Note: Use [-P] to preserve full paths
+# To encrypt the output, pipe it to the built-in encrypt function:
+#   mk... - [files_or_directories_to_compress] | encrypt [encrypted_file.ext.gpg]
+#   Example: mkgz - file1 file2 dir1 | encrypt archive.tar.gz.gpg
+# Usage:
+#   mkbz2 [-P] [archive.tar.bz2] [files_or_directories_to_compress]
+#     Create a bz2 compressed tar archive (using pbzip2 if available)
+#   unbz2 [-P] [archive.tar.bz2]
+#     Extract a bz2 compressed tar archive (using pbzip2 if available)
+#   mkgz [-P] [archive.tar.gz] [files_or_directories_to_compress]
+#     Create a gz compressed tar archive (using pigz if available)
+#   ungz [-P] [archive.tar.gz]
+#     Extract a gz compressed tar archive (using pigz if available)
+#   mkxz [-P] [archive.tar.xz] [files_or_directories_to_compress]
+#     Create an xz compressed tar archive (using pixz if available)
+#   unxz [-P] [archive.tar.xz]
+#     Extract an xz compressed tar archive (using pixz if available)
+#   mkzst [-P] [archive.tar.zst] [files_or_directories_to_compress]
+#     Create a zstd compressed tar archive (using all CPU cores)
+#   unzst [-P] [archive.tar.zst]
+#     Extract a zstd compressed tar archive (using all CPU cores)
+#   mkzip [archive.zip] [files_or_directories_to_compress]
+#     Create a zip archive with maximum compression
+#   unzip [archive.zip]
+#     Extract a zip archive
+#   mk7z [archive.7z] [files_or_directories_to_compress]
+#     Create a 7z archive with ultra compression and multi-threading
+#   un7z [archive.7z]
+#     Extract a 7z archive (supports many formats)
+#   mktar [-P] [archive.tar] [files_or_directories_to_compress]
+#     Create an uncompressed tar archive
+#   untar [-P] [archive.tar]
+#     Extract an uncompressed tar archive
+#   mkiso [archive.iso] [files_or_directories_to_compress]
+#     Create an ISO image
+#   uniso [archive.iso]
+#     Extract an ISO image
+#######################################################
+
+# Check for pbzip2 parallel block-sorting file compressor
+# Link: https://github.com/ruanhuabin/pbzip2
+# Note: bzip2 can reduce files by 10-15% more than gzip on average but is slower
+#       and has better integrity checking even if slightly less common
+if hascommand --strict pbzip2; then
+	alias mkbz2='tar --use-compress-program="pbzip2 -9" -cvf'
+	alias unbz2='tar --use-compress-program=pbzip2 -xvf'
+else
+	alias mkbz2='tar -9cvjf'
+	alias unbz2='tar -xvjf'
+fi
+
+# Check for pigz parallel implementation of the gzip file compressor
+# Link: https://zlib.net/pigz/
+# Note: gzip is significantly faster for both compression and decompression
+#       and is more widely supported (virtually universal)
+if hascommand --strict pigz; then
+	alias mkgz='tar --use-compress-program="pigz -9" -cvf'
+	alias ungz='tar --use-compress-program=pigz -xvf'
+else
+	alias mkgz='tar -9cvzf'
+	alias ungz='tar -xvzf'
+fi
+
+# Check for pixz (parallel xz) which automatically indexes during compression
+# Link: https://github.com/vasi/pixz
+if hascommand --strict pixz; then
+	alias mkxz='tar --use-compress-program="pixz -9" -cvf'
+	alias unxz='tar --use-compress-program=pixz -xvf'
+elif hascommand --strict xz; then
+	alias mkxz='tar --use-compress-program="xz -T0 -9" -cvf'
+	alias unxz='tar -xvJf'
+fi
+
+# Check for zstd with better compression ratios and built-in multi-threading
+# Link: https://github.com/facebook/zstd
+# Note: Generally considered one of the best modern compression tools
+if hascommand --strict zstd; then
+	alias mkzst='tar --use-compress-program="zstd -T0 -19" -cvf'
+	alias unzst='tar --use-compress-program="zstd -T0" -xvf'
+fi
+
+# Check for zip compression utility (unzip is included and not needed to alias)
+# Link: http://infozip.sourceforge.net/Zip.html
+# Note: Best for greatest multi-platform compatibility
+if hascommand --strict zip; then
+	alias mkzip='zip -9r'
+fi
+
+# Check for 7-zip (p7zip) compression utility
+# Link: https://sourceforge.net/projects/p7zip/
+# Note: Excellent compression ratio and supports many formats
+if hascommand --strict 7z; then
+	alias mk7z='7z a -mx=9 -mmt=on'
+	alias un7z='7z x'
+	alias uniso='7z x'
+fi
+
+# ISO image creation and extraction
+if hascommand --strict mkisofs; then
+	alias mkiso='mkisofs -o'
+elif hascommand --strict genisoimage; then
+	alias mkiso='genisoimage -o'
+fi
+
+# Standard tar without compression
+alias mktar='tar -cvf'  # Create tar file
+alias untar='tar -xvf'  # Extract tar file
 
 #######################################################
 # Tmux Terminal Multiplexor Support
@@ -4518,13 +4627,23 @@ function download() {
 		# Link: https://github.com/yt-dlp/yt-dlp
 		if hascommand yt-dlp; then
 			echo -e "${BRIGHT_YELLOW}Using yt-dlp for YouTube URL...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && yt-dlp "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+			# Download highest quality video with best matching audio
+			(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestvideo[ext=mp4]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+			# Also download audio only in best quality
+			#(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestaudio/best' --extract-audio --audio-quality 0 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
 
 		# youtube-dl downloads videos from youtube.com or other video platforms
 		# Link: https://github.com/ytdl-org/youtube-dl
 		elif hascommand youtube-dl; then
 			echo -e "${BRIGHT_YELLOW}Using youtube-dl for YouTube URL...${RESET}"
-			(cd "${DOWNLOAD_PATH}" && youtube-dl --format 'best[vcodec*=avc]' "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+			# Download highest quality video with best matching audio
+			(cd "${DOWNLOAD_PATH}" && youtube-dl --format 'best[vcodec*=avc]+bestaudio' "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+			# Also download audio only in best quality
+			#(cd "${DOWNLOAD_PATH}" && youtube-dl -f 'bestaudio' --extract-audio --audio-format best --audio-quality 0 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
 
 		else
 			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable YouTube download tool found${RESET}"
@@ -5797,23 +5916,49 @@ function pwdtail() {
 # Link: https://stackoverflow.com/questions/28247821/openssl-vs-gpg-for-encrypting-off-site-backups
 # Install: pkginstall gnupg # gpg2 on SUSE
 if hascommand --strict gpg; then
+	# Set an alias to clear the GPG cache
+	alias gpgclear='echo RELOADAGENT | gpg-connect-agent'
+
 	## Uses OpenSSL AES 256bit Cipher Block Chaining Encryption to encrypt a file
 	function encrypt() {
-		if [[ "${#}" -lt 1 ]] || [[ "${1}" = "--help" ]] || [[ "${1}" = "-h" ]]; then
-			echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}encrypt${RESET} ${BRIGHT_GREEN}[input_file]${RESET} ${BRIGHT_MAGENTA}(output file will end in .gpg)${RESET}"
-			return
-		elif [[ ! -r "${1}" ]]; then
-			echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}File ${BRIGHT_YELLOW}${1}${BRIGHT_CYAN} not found${RESET}"
-			return 1
+		if [[ -p /dev/stdin ]]; then
+			# If there is data being piped from stdin
+			if [[ "${#}" -lt 1 ]]; then
+				echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}Output file not specified${RESET}"
+				return 1
+			fi
+
+			echo "Encrypting data..."
+			# equivalents in the gpg.conf file
+			# s2k-mode 3
+			# s2k-count 65011712
+			# s2k-digest-algo SHA512
+			# s2k-cipher-algo AES256
+			gpg --s2k-mode 3 --s2k-count 65011712 --s2k-digest-algo SHA512 --s2k-cipher-algo AES256 --symmetric --output "${1}"
+
+			if [[ $? -eq 0 ]]; then
+				echo -e "${BRIGHT_GREEN}Data successfully encrypted to ${1}${RESET}"
+			else
+				echo -e "${BRIGHT_RED}Encryption failed${RESET}"
+				return 1
+			fi
+		else
+			# If no data from stdin, expect a file as argument
+			if [[ "${#}" -lt 1 ]] || [[ "${1}" = "--help" ]] || [[ "${1}" = "-h" ]]; then
+				echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_CYAN}encrypt${RESET} ${BRIGHT_GREEN}[input_file]${RESET} ${BRIGHT_MAGENTA}(the output file will be named [input_file].gpg)${RESET}"
+				echo -e "${BRIGHT_WHITE}   or: ${BRIGHT_YELLOW}command${RESET} | ${BRIGHT_CYAN}encrypt${RESET} ${BRIGHT_GREEN}[output_file]${RESET} ${BRIGHT_MAGENTA}(encrypt data piped from another command)${RESET}"
+				return
+			elif [[ ! -r "${1}" ]]; then
+				echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}File ${BRIGHT_YELLOW}${1}${BRIGHT_CYAN} not found${RESET}"
+				return 1
+			fi
+
+			echo "Encrypting ${1}..."
+			gpg --s2k-mode 3 --s2k-count 65011712 --s2k-digest-algo SHA512 --s2k-cipher-algo AES256 --symmetric "${1}"
+
+			local _encrypted_file="${1}.gpg"
+			echo -e "${BRIGHT_GREEN}File ${_encrypted_file} successfully encrypted${RESET}"
 		fi
-		echo "Encrypting ${1}..."
-		# equivalents in the gpg.conf file
-		# s2k-mode 3
-		# s2k-count 65011712
-		# s2k-digest-algo SHA512
-		# s2k-cipher-algo AES256
-		gpg --s2k-mode 3 --s2k-count 65011712 --s2k-digest-algo SHA512 --s2k-cipher-algo AES256 --symmetric "${1}"
-		echo -e "${BRIGHT_GREEN}File ${_encrypted_file} successfully encrypted${RESET}"
 	}
 
 	## Uses OpenSSL AES 256bit Cipher Block Chaining Encryption to decrypt a file
@@ -5825,11 +5970,16 @@ if hascommand --strict gpg; then
 			echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}File ${BRIGHT_YELLOW}${1}${BRIGHT_CYAN} not found${RESET}"
 			return 1
 		fi
+
 		echo "Decrypting ${1}..."
-		if gpg "${1}" ; then
-			echo -e "${BRIGHT_GREEN}File successfully decrypted${RESET}"
+
+		local _DECRYPTED_FILE="${1%.gpg}"  # Remove '.gpg' extension from the input file name
+
+		if gpg --output "${_DECRYPTED_FILE}" --decrypt "${1}"; then
+			echo -e "${BRIGHT_GREEN}File successfully decrypted to ${_DECRYPTED_FILE}${RESET}"
 		else
 			echo -e "${BRIGHT_RED}Error decrypting ${BRIGHT_YELLOW}${1}${RESET}"
+			return 1
 		fi
 	}
 fi

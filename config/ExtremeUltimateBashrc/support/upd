@@ -122,6 +122,9 @@
 #     URL: https://curl.se/
 #############################################################################
 
+# Change the terminal window title
+echo -ne "\033]0;System Update\007"
+
 # -----------------------------------------------------------------------------
 # Check if a command exists
 # -----------------------------------------------------------------------------
@@ -241,12 +244,12 @@ function confirm_update_installation() {
 function prompt_for_fast_mode() {
 	# Check if --confirm is enabled
 	if [ $_PARAMETER_CONFIRM -eq 1 ]; then
-		echo -ne "\033[1;33mWould you like to include additional updates? (Y/n): \033[0m"
+		echo -ne "\033[1;33mWould you like to include additional updates? (y/N): \033[0m"
 		read -r response
 
 		# Check the response
 		case "$response" in
-			[yY][eE][sS]|[yY]|"")
+			[yY][eE][sS]|[yY])
 				# User opted for additional updates
 				_PARAMETER_FAST=0
 				;;
@@ -629,11 +632,11 @@ function perform_update_with_yay() {
 		echo -e "\033[1;32m✓\033[0m Found \033[1;32mpowerpill\033[0m for parallel and segmented downloading."
 
 		# Use powerpill for downloading and yay for AUR updates
-		sudo pacman -Sy && sudo powerpill -Su && yay -Syu --sudoloop --noredownload --norebuild --nodiffmenu --noeditmenu --removemake
+		sudo pacman -Sy && sudo powerpill -Su && yay -Syu --noconfirm --removemake --sudoloop --noredownload --norebuild --removemake
 	else
 		# Update using yay directly if powerpill is not available
 		print_line green
-		yay -Syu --sudoloop --noredownload --norebuild --nodiffmenu --noeditmenu --removemake
+		yay -Syu --noconfirm --removemake --sudoloop --noredownload --norebuild --removemake
 	fi
 
 	# Clean up local package cache with yay
@@ -821,8 +824,6 @@ function update_micro() {
 			# Exclude certain plugins from updating
 			# bounce, comment, etc., are known to cause issues
 			if [[ ! "${line,,}" =~ ^(bounce|comment|diff|ftoptions|linter|literate|status|the)$ ]]; then
-				# Print a blue line for each plugin update
-				print_line blue
 
 				# Notify about updating the specific plugin
 				echo -e "\033[1;33m=>\033[0m Updating ${line}..."
@@ -963,7 +964,7 @@ function perform_additional_updates() {
 		update_git_repositories
 
 		# Update Git Aliases
-		update_git_aliases
+		#update_git_aliases
 
 		# Update Micro text editor plugins
 		update_micro
@@ -978,7 +979,7 @@ function perform_additional_updates() {
 		update_clamav_database
 
 		# Update the locate file database
-		update_locate_database
+		#update_locate_database
 
 		# Update system firmware
 		update_firmware
