@@ -435,6 +435,8 @@ if hascommand --strict fzf; then
 	# --- setup fzf completions options ---
 	export FZF_COMPLETION_OPTS=""
 	export FZF_COMPLETION_OPTS=${FZF_COMPLETION_OPTS}"
+	--bind='change:reload:${FZF_DEFAULT_COMMAND}'
+	--bind='start:reload:${FZF_DEFAULT_COMMAND}'
 	--walker-skip .git,node_modules,target
 	--preview '${FZF_PREVIEW_COMMAND}'
   	--preview-window 'right:60%:hidden:wrap'
