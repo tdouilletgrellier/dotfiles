@@ -1583,7 +1583,8 @@ bleopt complete_source_sabbrev_opts=no-empty-completion
 bleopt complete_auto_complete_opts=suppress-after-complete
  
 # Fzf or ble.sh on TAB ?
-#ble-bind -f 'TAB' fzf-complete
+#ble-bind -x C-i fzf_bash_completion
+#ble-bind -x TAB fzf_bash_completion
 
 # Set up fzf-git
 _ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
