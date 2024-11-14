@@ -400,15 +400,15 @@ if hascommand --strict fzf; then
 	else
 		export FZF_PREVIEW_COMMAND_DIR='tree -C {}'
 	fi	
-	export FZF_PREVIEW_COMMAND_DEFAULT='echo {}'
 	if [[ $TERM = xterm-kitty ]]; then
 		export FZF_PREVIEW_COMMAND_IMG='kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {}'
 	else
-		export FZF_PREVIEW_COMMAND_IMG=''
+		export FZF_PREVIEW_COMMAND_IMG='echo {}'
 	fi
-	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file || '${FZF_PREVIEW_COMMAND_FILE}')'
-	export FZF_PREVIEW_COMMAND='('${FZF_PREVIEW_COMMAND_FILE}' || '${FZF_PREVIEW_COMMAND_DIR}' || '${FZF_PREVIEW_COMMAND_DEFAULT}') 2> /dev/null'
-	# export FZF_PREVIEW_COMMAND='([[ -d {} ]] && '${FZF_PREVIEW_COMMAND_DIR}') || ([[ -f {} ]] && '${FZF_PREVIEW_COMMAND_FILE}') || '${FZF_PREVIEW_COMMAND_DEFAULT}''
+	export FZF_PREVIEW_COMMAND_DEFAULT='echo {}'
+	export FZF_PREVIEW_COMMAND_FILE='[[ $(file --mime {}) =~ image ]] && '${FZF_PREVIEW_COMMAND_IMG}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
+	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
+	export FZF_PREVIEW_COMMAND='('${FZF_PREVIEW_COMMAND_IMG}' || '${FZF_PREVIEW_COMMAND_FILE}' || '${FZF_PREVIEW_COMMAND_DIR}' || '${FZF_PREVIEW_COMMAND_DEFAULT}') 2> /dev/null'
 	export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND} --type f"
 	export FZF_CTRL_T_OPTS="
   	--walker-skip .git,node_modules,target
