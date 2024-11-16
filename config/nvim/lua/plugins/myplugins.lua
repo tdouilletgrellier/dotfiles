@@ -202,30 +202,7 @@ return {
 
   {
     "hiphish/rainbow-delimiters.nvim",
-    event = "BufReadPost",
-    config = function()
-      local rainbow_delimiters = require("rainbow-delimiters")
-
-      vim.g.rainbow_delimiters = {
-        strategy = {
-          [""] = rainbow_delimiters.strategy["global"],
-          vim = rainbow_delimiters.strategy["local"],
-        },
-        query = {
-          [""] = "rainbow-delimiters",
-          lua = "rainbow-blocks",
-        },
-        highlight = {
-          "RainbowDelimiterRed",
-          "RainbowDelimiterYellow",
-          "RainbowDelimiterBlue",
-          "RainbowDelimiterOrange",
-          "RainbowDelimiterGreen",
-          "RainbowDelimiterViolet",
-          "RainbowDelimiterCyan",
-        },
-      }
-    end,
+    convig = true,
   },
 
   {
@@ -264,13 +241,7 @@ return {
 
   {
     "NStefan002/visual-surround.nvim",
-    config = function()
-      require("visual-surround").setup({
-        -- your config
-      })
-    end,
-    -- or if you don't want to change defaults
-    -- config = true
+    config = true,
   },
 
   {
@@ -307,20 +278,6 @@ return {
     },
   },
 
-{
-  "shellRaining/hlchunk.nvim",
-  event = { "BufReadPre", "BufNewFile" },
-  config = function()
-    require("hlchunk").setup({
-    chunk = {
-        enable = true
-        -- ...
-    },
-
-    })
-  end
-},
-
   {
     "0xAdk/full_visual_line.nvim",
     keys = { "V" },
@@ -331,13 +288,8 @@ return {
 
   {
     "karb94/neoscroll.nvim",
-    -- keys = { "<C-d>", "<C-u>" },
     config = function()
       require("neoscroll").setup { 
-        -- mappings = {
-        -- "<C-u>",
-        -- "<C-d>",
-      -- } 
     }
     end,
   },
