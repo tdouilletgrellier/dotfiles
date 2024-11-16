@@ -20,6 +20,7 @@ return {
 
       -- then load the extension
       telescope.load_extension("live_grep_args")
+      telescope.load_extension("fzf")
     end,
   },
 
@@ -297,6 +298,20 @@ return {
   {
     "sheerun/vim-polyglot",
   },
+
+    {
+    "roobert/search-replace.nvim",
+    config = function()
+        require("search-replace").setup({
+          default_replace_single_buffer_options = "g",
+        })
+
+        vim.keymap.set('n', 'zh', "<cmd>SearchReplaceSingleBufferCWord<cr>")
+
+        vim.o.inccommand = "split" -- or nosplit
+        vim.keymap.set('v', 'zh', "<cmd>SearchReplaceSingleBufferVisualSelection<cr>")
+    end,
+    },
 
   {
     "lervag/vimtex",
