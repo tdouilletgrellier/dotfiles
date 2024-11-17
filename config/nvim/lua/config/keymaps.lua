@@ -23,18 +23,18 @@
 --   --vim.api.nvim_set_keymap("n", "<BS>", msg, { noremap = true, silent = false })
 -- end
 
-vim.cmd("nmap oo o<Esc>")
-vim.cmd("nmap OO O<Esc>")
+vim.keymap.set("n", "oo", "O<Esc>", { desc = "Insert New Line (Below)" })
+vim.keymap.set("n", "OO", "O<Esc>", { desc = "Insert New Line (Above)" })
 
 -- Make Y behave like C or D
-vim.keymap.set("n", "Y", "y$")
+vim.keymap.set("n", "Y", "y$", { desc = "Copy Until End of Line" })
 
 -- Keep window centered when going up/down
-vim.keymap.set("n", "J", "mzJ`z")
-vim.keymap.set("n", "<C-d>", "<C-d>zz")
-vim.keymap.set("n", "<C-u>", "<C-u>zz")
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
+vim.keymap.set("n", "J", "mzJ`z", { desc = "Join Lines" })
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll Down" })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll Up" })
+vim.keymap.set("n", "n", "nzzzv", { desc = "Next Result" })
+vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous Result" })
 
 -- Replace word under cursor across entire buffer
 vim.keymap.set(
@@ -51,6 +51,12 @@ vim.keymap.set(
   require("telescope").extensions.live_grep_args.live_grep_args,
   { desc = "Live Grep (args)" }
 )
+
+-- Resize window using <ctrl> arrow keys
+map("n", "<C-S-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
+map("n", "<C-S-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
+map("n", "<C-S-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
+map("n", "<C-S-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
 
 -- Visual --
 -- Stay in indent mode
