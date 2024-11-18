@@ -60,8 +60,8 @@ vim.keymap.set("n", "<A-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increa
 
 -- Visual --
 -- Stay in indent mode
-vim.keymap.set("v", "<", "<gv")
-vim.keymap.set("v", ">", ">gv")
+vim.keymap.set("v", "<", "<gv", { desc = "Indent Right" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent Left" })
 
 -- Move block
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move Block Down" })
