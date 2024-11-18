@@ -234,7 +234,6 @@ alias fk='fuck'
 #-------------------------------------------------------------
 # cd with immediate ll afterwards
 if hascommand --strict zoxide; then
-	eval "$(zoxide init bash)"
 	# Issues with zoxide and tmux
 	if [ -z "${TMUX}" ]; then
 		# echo "not in tmux"
