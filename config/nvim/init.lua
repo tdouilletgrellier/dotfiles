@@ -17,10 +17,14 @@ vim.cmd("highlight TelescopeTitle guibg=none")
 vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "none" })
 
 -- No cursor line, fomrating current line number
-vim.o.cursorline = true -- does not enable cursor line
+-- vim.o.cursorline = true -- does not enable cursor line
+vim.o.cursorline = true
+vim.o.cursorcolumn = true
 vim.o.cursorlineopt = number -- does not enable cursor line
-vim.cmd("highlight CursorLine cterm=NONE ctermbg=NONE ctermfg=NONE guibg=NONE guifg=NON")
-vim.cmd("highlight CursorLineNr cterm=bold term=bold gui=bold")
+vim.cmd("highlight CursorLine cterm=NONE ctermbg=NONE ctermfg=NONE guibg=NONE guifg=NONE")
+vim.cmd("highlight CursorLineNr cterm=bold term=bold gui=bold guifg=#e7bf00")
+vim.cmd("highlight CursorLine guibg=#2a2a2a")
+vim.cmd("highlight CursorColumn guibg=#2a2a2a")
 
 -- Mouse on
 vim.o.mouse = "a" 

@@ -271,6 +271,18 @@ return {
   },
 
   {
+    "lukas-reineke/indent-blankline.nvim",
+    config = function()
+      require("ibl").setup({
+        exclude = { filetypes = { "dashboard" } },
+        indent = { char = "▏" },
+        whitespace = { highlight = { "Whitespace" } },
+        scope = { enabled = false },
+      })
+    end,
+  },
+
+  {
     "m-demare/hlargs.nvim",
     event = "BufWinEnter",
     opts = {
@@ -283,35 +295,34 @@ return {
     "0xAdk/full_visual_line.nvim",
     keys = { "V" },
     config = function()
-      require("full_visual_line").setup {}
+      require("full_visual_line").setup({})
     end,
   },
 
   {
     "karb94/neoscroll.nvim",
     config = function()
-      require("neoscroll").setup { 
-    }
+      require("neoscroll").setup({})
     end,
   },
-  
+
   {
     "sheerun/vim-polyglot",
   },
 
-    {
+  {
     "roobert/search-replace.nvim",
     config = function()
-        require("search-replace").setup({
-          default_replace_single_buffer_options = "g",
-        })
+      require("search-replace").setup({
+        default_replace_single_buffer_options = "g",
+      })
 
-        vim.keymap.set('n', 'zh', "<cmd>SearchReplaceSingleBufferCWord<cr>")
+      vim.keymap.set("n", "zh", "<cmd>SearchReplaceSingleBufferCWord<cr>")
 
-        vim.o.inccommand = "split" -- or nosplit
-        vim.keymap.set('v', 'zh', "<cmd>SearchReplaceSingleBufferVisualSelection<cr>")
+      vim.o.inccommand = "split" -- or nosplit
+      vim.keymap.set("v", "zh", "<cmd>SearchReplaceSingleBufferVisualSelection<cr>")
     end,
-    },
+  },
 
   {
     "lervag/vimtex",
