@@ -20,6 +20,7 @@ return {
 
       -- then load the extension
       telescope.load_extension("live_grep_args")
+      telescope.load_extension("fzf")
     end,
   },
 
@@ -202,30 +203,7 @@ return {
 
   {
     "hiphish/rainbow-delimiters.nvim",
-    event = "BufReadPost",
-    config = function()
-      local rainbow_delimiters = require("rainbow-delimiters")
-
-      vim.g.rainbow_delimiters = {
-        strategy = {
-          [""] = rainbow_delimiters.strategy["global"],
-          vim = rainbow_delimiters.strategy["local"],
-        },
-        query = {
-          [""] = "rainbow-delimiters",
-          lua = "rainbow-blocks",
-        },
-        highlight = {
-          "RainbowDelimiterRed",
-          "RainbowDelimiterYellow",
-          "RainbowDelimiterBlue",
-          "RainbowDelimiterOrange",
-          "RainbowDelimiterGreen",
-          "RainbowDelimiterViolet",
-          "RainbowDelimiterCyan",
-        },
-      }
-    end,
+    convig = true,
   },
 
   {
@@ -264,13 +242,7 @@ return {
 
   {
     "NStefan002/visual-surround.nvim",
-    config = function()
-      require("visual-surround").setup({
-        -- your config
-      })
-    end,
-    -- or if you don't want to change defaults
-    -- config = true
+    config = true,
   },
 
   {
@@ -300,50 +272,46 @@ return {
 
   {
     "m-demare/hlargs.nvim",
+    event = "BufWinEnter",
+    opts = {
+      hl_priority = 200,
+      extras = { named_parameters = true },
+    },
+  },
+
+  {
+    "0xAdk/full_visual_line.nvim",
+    keys = { "V" },
     config = function()
-      require("hlargs").setup({
-        color = "#ef9062",
-        highlight = {},
-        -- excluded_filetypes = {},
-        -- disable = function(lang, bufnr) -- If changed, `excluded_filetypes` will be ignored
-        --   return vim.tbl_contains(opts.excluded_filetypes, lang)
-        -- end,
-        paint_arg_declarations = true,
-        paint_arg_usages = true,
-        paint_catch_blocks = {
-          declarations = false,
-          usages = false,
-        },
-        extras = {
-          named_parameters = false,
-        },
-        hl_priority = 120,
-        excluded_argnames = {
-          declarations = {},
-          usages = {
-            python = { "self", "cls" },
-            lua = { "self" },
-          },
-        },
-        performance = {
-          parse_delay = 1,
-          slow_parse_delay = 50,
-          max_iterations = 400,
-          max_concurrent_partial_parses = 30,
-          debounce = {
-            partial_parse = 3,
-            partial_insert_mode = 100,
-            total_parse = 700,
-            slow_parse = 5000,
-          },
-        },
-      })
+      require("full_visual_line").setup {}
     end,
   },
 
   {
+    "karb94/neoscroll.nvim",
+    config = function()
+      require("neoscroll").setup { 
+    }
+    end,
+  },
+  
+  {
     "sheerun/vim-polyglot",
   },
+
+    {
+    "roobert/search-replace.nvim",
+    config = function()
+        require("search-replace").setup({
+          default_replace_single_buffer_options = "g",
+        })
+
+        vim.keymap.set('n', 'zh', "<cmd>SearchReplaceSingleBufferCWord<cr>")
+
+        vim.o.inccommand = "split" -- or nosplit
+        vim.keymap.set('v', 'zh', "<cmd>SearchReplaceSingleBufferVisualSelection<cr>")
+    end,
+    },
 
   {
     "lervag/vimtex",

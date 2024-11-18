@@ -1,4 +1,3 @@
-
 # Submodules
 tmp/*
 dotbot/*
@@ -10,6 +9,7 @@ config/zsh/.zsh_sessions/*
 config/sublime-text/Local/
 config/sublime-text/Trash/
 config/sublime-text/Log/
+config/nvim/lazy-lock.json
 
 # Linux
 *~
@@ -52,7 +52,6 @@ Temporary Items
 .apdisk
 
 *.icloud
-
 
 # VS Code
 .vscode/*
