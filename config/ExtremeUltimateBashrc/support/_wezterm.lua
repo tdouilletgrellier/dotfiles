@@ -27,13 +27,14 @@ end
 -- ===========================================================================
 
 -- Maximize the window on startup
---wezterm.on('gui-startup', function()
---	local tab, pane, window = mux.spawn_window({})
+-- Uses cmd for additional startup command-line arguments if provided
+--wezterm.on("gui-startup", function(cmd)
+--	local tab, pane, window = mux.spawn_window(cmd or {})
 --	window:gui_window():maximize()
 --end)
 
 -- Set initial window size in terms of character cells
-config.initial_cols = 148  -- Number of columns (width) 148/150
+config.initial_cols = 155  -- Number of columns (width) 148/150/155
 config.initial_rows = 40   -- Number of rows (height) 35/42/45
 
 -- Set the default terminal font size
@@ -41,22 +42,26 @@ config.font_size = 12
 
 -- Adjust this value to increase or decrease line spacing
 config.line_height = 1.0
+--config.line_height = 0.8
 
 -- Change the font size of the Command Palette
 config.command_palette_font_size = 11.5
 
 -- Set the background opacity of the window
-config.window_background_opacity = 0.78
+--config.window_background_opacity = 1.0
+--config.window_background_opacity = 0.78
+config.window_background_opacity = 0.80
+--config.window_background_opacity = 0.96
 
 -- Set the background opacity of text to 1.0 (fully opaque)
 config.text_background_opacity = 1.0
 
 -- Set a background image
---config.window_background_image = '/home/username/.local/share/wallpapers/Custom/Abstract/Dark Black Pattern.jpg'
+--config.window_background_image = '/home/jeff/.local/share/wallpapers/Custom/Abstract/Dark Black Pattern.jpg'
 
 config.window_background_image_hsb = {
 	-- Darken the background image - the lower the number, the darker
-	brightness = 0.33,
+	brightness = 1.0,
 
 	-- You can adjust the hue by scaling its value
 	-- a multiplier of 1.0 leaves the value unchanged
@@ -70,8 +75,38 @@ config.window_background_image_hsb = {
 -- Font weight options are "ExtraLight", "Light", "DemiLight",
 --   "Regular", "DemiBold", "Bold", "Medium", and "Black"
 -- Use a nerd font: https://www.nerdfonts.com/font-downloads
-config.font = wezterm.font('CaskaydiaCove Nerd Font', {
+--	weight = 'DemiLight',
+--	italic = false
+--})
+--config.font = wezterm.font('CartographCF Nerd Font', {
+--config.font = wezterm.font('Cascursive Nerd Font', {
+config.font = wezterm.font('Cascadia Code PL', {
+--config.font = wezterm.font('CaskaydiaCovePL Nerd Font', {
+--config.font = wezterm.font('CasmataPro Nerd Font', {
+--config.font = wezterm.font('CodeliaLigatures Nerd Font', {
+--config.font = wezterm.font('DankMono Nerd Font', {
+--config.font = wezterm.font('Exosevka Nerd Font', {
+--config.font = wezterm.font('FantasqueSansM Nerd Font', {
+--config.font = wezterm.font('FiraCode Nerd Font', {
+--config.font = wezterm.font('Hacked Nerd Font', {
+--config.font = wezterm.font('iMWritingMono Nerd Font', {
+--config.font = wezterm.font('InputMono Nerd Font', {
+--config.font = wezterm.font('IosevkaCustom Nerd Font', {
+--config.font = wezterm.font('JetBrainsMono Nerd Font', {
+--config.font = wezterm.font('JuliaMono Nerd Font', {
+--config.font = wezterm.font('Lilex Nerd Font', {
+--config.font = wezterm.font('M+CodeLat Nerd Font', {
+--config.font = wezterm.font('Monoid Nerd Font', {
+--config.font = wezterm.font('MonoLisa Nerd Font', {
+--config.font = wezterm.font('Mononoki Nerd Font', {
+--config.font = wezterm.font('PragmataProMonoLiga Nerd Font', {
+--config.font = wezterm.font('SpaceMono Nerd Font', {
+--config.font = wezterm.font('Sudo Nerd Font', {
+--config.font = wezterm.font('VictorMono Nerd Font', {
+--	weight = 'DemiBold',
 	weight = 'DemiLight',
+--	weight = 'Light',
+--	weight = 'Regular',
 	italic = false
 })
 
@@ -79,9 +114,11 @@ config.font_rules = {
 	-- Specify a different terminal font for italics
 	{
 		italic = true,
-		font = wezterm.font("VictorMono Nerd Font", {
-			weight = 'DemiBold',
-			italic = true
+		font = wezterm.font("CartographCF Nerd Font", {
+--		font = wezterm.font("VictorMono Nerd Font", {
+		weight = 'Regular',
+--		weight = 'DemiBold',
+		italic = true
 		}),
 	},
 }
@@ -125,7 +162,7 @@ config.scroll_to_bottom_on_input = true
 -- "RESIZE" - Enables only the resize controls allowing you to change window size
 -- "TITLE" - Shows only the title bar omitting other decorations like borders and buttons
 -- "TITLE|RESIZE" - Enables resize controls and the title bar, excluding window buttons
---config.window_decorations = "TITLE|RESIZE"
+config.window_decorations = "TITLE|RESIZE"
 
 -- Set the cursor to a blinking bar
 config.default_cursor_style = "BlinkingBar"
@@ -181,17 +218,17 @@ config.tab_bar_at_bottom = false
 
 -- Function to decode URL-encoded strings
 function urlDecode(url)
-    -- Check if the URL is nil to prevent errors
-    if url == nil then
-        return nil
-    end
-    -- Decode the URL encoded text
-    url = url:gsub("^file://", "")           -- Remove 'file://' prefix
-    url = url:gsub('+', ' ')                 -- Replace '+' with space
-           :gsub('%%(%x%x)', function(hex)   -- Find percent-encoded patterns
-                return string.char(tonumber(hex, 16)) -- Convert hex to chars
-           end)
-    return url                               -- Return the decoded URL
+	-- Check if the URL is nil to prevent errors
+	if url == nil then
+		return nil
+	end
+	-- Decode the URL encoded text
+	url = url:gsub("^file://", "")           -- Remove 'file://' prefix
+	url = url:gsub('+', ' ')                 -- Replace '+' with space
+		:gsub('%%(%x%x)', function(hex)   -- Find percent-encoded patterns
+				return string.char(tonumber(hex, 16)) -- Convert hex to chars
+		end)
+	return url                               -- Return the decoded URL
 end
 
 -- This OPTIONAL event listener is triggered for custom formatting the tab title
@@ -216,7 +253,7 @@ wezterm.on(
 
 		-- Getting the full directory path and removing 'file://' prefix if present
 		-- and decode URL entities like '%20' into their corresponding characters
-        local dir = urlDecode(pane.current_working_dir)
+		local dir = urlDecode(pane.current_working_dir)
 
 		-- Replacing the home directory path with '~'
 		local home_dir = os.getenv("HOME")

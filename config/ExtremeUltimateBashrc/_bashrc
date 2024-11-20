@@ -35,17 +35,18 @@
 # curl -L --output ~/.bashrc_help https://sourceforge.net/projects/ultimate-bashrc/files/_bashrc_help/download
 #######################################################
 # Supported Optional Applications/Dependencies:
-# 7z aria2 baca bash-completion bashmarks bashtop bat bc blesh bottom bpytop
-# broot btop btrfs bzip2 ccat cmatrix cod colordiff commacd curl delta doas dua
-# dust dym elinks enhancd exa exiftool eza fasd fd ffmpeg figlet frogmouth fx
-# fzf fzf-tab-completion fzy gawk gcal gdu gio git git-commander git-completion
-# git-delta gitalias gitui glances glow grc grv gtop gzip hBlock hstr htop
-# icdiff ifconfig iotop jless jp2a jq lazygit links links2 lnav lolcat lscolors
-# lsd lsof lsx lynx mc mcfly mdcat mdless micro mlocate moar multitail
-# mysql-colorize nano ncdu neovim nmon nnn paru qfc rar rem resh rhvoice ripgrep
-# rsync shellcheck shred silver_searcher skim source-highlight tar terminology
-# thefuck tig tmux toilet trash-cli tree tuifi ugit vivid vizex vlock w3m wget
-# xsel youtube-dl yt-dlp ytfzf ytop zellij zf zip zoxide
+# 7z apg aria2 aureport baca base64 bash-completion bashmarks bashtop bat batcat
+# bc blesh bottom bpytop broot btop btrfs bzip2 ccat cmatrix cod colordiff commacd
+# cracklib curl delta dircolors doas dua dust dym elinks enhancd exa exiftool eza
+# fasd fd ffmpeg figlet frogmouth fx fzf fzf-tab-completion fzy gawk gcal gdu gio
+# git git-commander git-completion git-delta gitalias gitui glances glow gpg grc
+# grv gtop gunzip gzip hBlock hstr htop icdiff ifconfig imagemagick iotop jless
+# jp2a jq lazygit links links2 lnav lolcat lscolors lsd lsof lsx lynx mc mcfly
+# mdcat mdless micro mlocate moar multitail mysql-colorize nano ncdu neovim nmon
+# nnn openssl paru pkill pwgen qfc rar rem resh rhvoice ripgrep rsync shellcheck
+# shred silver_searcher skim source-highlight sshpass tar terminology thefuck tig
+# tmux toilet trash-cli tree tuifi ugit vivid vizex vlock w3m wget xdotool xhost
+# xprop xrdb xsel youtube-dl yt-dlp ytfzf ytop zellij zf zip zoxide
 #
 # Supported Optional Huds:
 # neofetch, fastfetch, screenFetch, linux_logo, archey, pfetch
@@ -149,7 +150,7 @@ RESET="\033[0m"
 #######################################################
 
 # Loop through possible directories...
-for _TEMP_DIR_PATH in "${HOME}/.cache/tmp" "${HOME}/.tmp" "${HOME}/.temp" "${HOME}/.cache" "${TMPDIR}" "${TMP}" "/tmp" "/temp"; do
+for _TEMP_DIR_PATH in "${XDG_CACHE_HOME:-${HOME}/.cache}/tmp" "${HOME}/.tmp" "${HOME}/.temp" "${XDG_CACHE_HOME:-${HOME}/.cache}" "${TMPDIR}" "${TMP}" "/tmp" "/temp"; do
 	if [[ -d "${_TEMP_DIR_PATH}" ]]; then
 		TEMPDIR_LOCAL="${_TEMP_DIR_PATH}"
 		break # Found a valid directory, exit the loop
@@ -207,6 +208,22 @@ function hascommand() {
 			return 1  # Command or alias doesn't exist
 		fi
 	fi
+}
+
+# Check if Git is installed and cache the result since this is called often
+function hasgit() {
+	if [[ -z "${_IS_GIT_INSTALLED}" ]]; then
+		if hascommand --strict git; then
+			# Git is installed
+			_IS_GIT_INSTALLED=true
+		else
+			# Git is not installed
+			_IS_GIT_INSTALLED=false
+		fi
+	fi
+
+	# Return the cached value
+	[[ "${_IS_GIT_INSTALLED}" = true ]]
 }
 
 # Loop a list of common editors and check if installed
@@ -305,7 +322,12 @@ function edit() {
 	# Local variable to track if the immutable attribute was modified
 	local IMMUTABLE_SET=""
 
-	# Post-edit action function to handle specific file edits and reapply the immutable attribute if it was removed
+	# NOTE: The helper functions are defined inside this edit function to avoid
+	#  cluttering the global namespace and tab completion. They are specific to
+	#  the edit functionality and not intended to be used independently.
+
+	### Post-edit action function to handle specific file edits
+	# and reapply the immutable attribute if it was removed
 	function post_edit_action() {
 		# Convert the provided path to an absolute path
 		local ABSOLUTE_PATH=$(realpath "${1}" 2>/dev/null)
@@ -407,7 +429,7 @@ function edit() {
 				fi
 			;;
 
-			"${HOME}/.tmux.conf"|"${HOME}/.config/tmux/tmux.conf"|/etc/tmux.conf)
+			"${HOME}/.tmux.conf"|"${XDG_CONFIG_HOME:-${HOME}/.config}/tmux/tmux.conf"|/etc/tmux.conf)
 				# If editing .tmux.conf, refresh tmux configuration
 				# Check if tmux is installed and running
 				if hascommand tmux && tmux info &> /dev/null; then
@@ -428,7 +450,7 @@ function edit() {
 		esac
 	}
 
-	# Helper function to use the more secure sudoedit only if it's possible
+	### Helper function to use the more secure sudoedit only if it's possible
 	# since sudoedit cannot edit a file in a directory with write permissions
 	function sudo_edit() {
 
@@ -452,7 +474,7 @@ function edit() {
 		restore_tab
 	}
 
-	# Function to check and modify the immutable attribute of a file
+	### Function to check and modify the immutable attribute of a file
 	# Parameters:
 	#   $1 - The filename to check and potentially modify the immutable attribute
 	function immutable_remove() {
@@ -493,7 +515,7 @@ function edit() {
 		fi
 	}
 
-	# Reapply the immutable attribute if it was previously removed
+	### Reapply the immutable attribute if it was previously removed
 	function immutable_restore() {
 		# Check if the file and commands exists
 		if [[ -f "${1}" ]] && hascommand chattr; then
@@ -512,7 +534,7 @@ function edit() {
 		fi
 	}
 
-	# Helper function to rename the current Tmux or console tab if supported
+	### Helper function to rename the current Tmux or console tab if supported
 	function rename_tab() {
 		# Get the simple editor name
 		local _EDITOR_SHORT_NAME=$(basename "${EDITOR%% *}")
@@ -542,7 +564,7 @@ function edit() {
 		fi
 	}
 
-	# Helper function to restore the Tmux or Konsole tab name
+	### Helper function to restore the Tmux or Konsole tab name
 	function restore_tab() {
 		# If we are inside a Tmux session...
 		if [[ -n "${TMUX}" ]] && [[ -n "${_CURRENT_TAB_NAME}" ]] && hascommand tmux; then
@@ -566,7 +588,7 @@ function edit() {
 		fi
 	}
 
-	# Check if the file is a symlink
+	### Check if the file is a symlink
 	if [[ -L "${1}" ]]; then
 		# Resolve the symlink to the actual file
 		local ACTUAL_FILE=$(resolvesymlink "${1}")
@@ -578,7 +600,7 @@ function edit() {
 		local ACTUAL_FILE="${1}"
 	fi
 
-	# If the it does not contain a path and is not a file
+	### If it does not contain a path and is not a file
 	if [[ "$ACTUAL_FILE" != */* && ! -f "$ACTUAL_FILE" ]]; then
 		# Try to locate the full path using `which`
 		local FOUND_PATH=$(command which "$ACTUAL_FILE" 2>/dev/null)
@@ -589,7 +611,7 @@ function edit() {
 		fi
 	fi
 
-	# Check for special case of editing /etc/sudoers...
+	### Check for special case of editing /etc/sudoers...
 	if [[ "${ACTUAL_FILE}" == "/etc/sudoers" ]] && hascommand visudo; then
 		echo -ne "${BRIGHT_RED}Security alert:"
 		echo -e "${BRIGHT_YELLOW} Using visudo to edit ${BRIGHT_CYAN}${ACTUAL_FILE}${RESET}"
@@ -603,28 +625,47 @@ function edit() {
 		immutable_restore "${1}"
 		return
 
-	# Check if EDITOR is set...
+	### Check if EDITOR is set...
 	elif [ -z "${EDITOR}" ]; then
 		echo -ne "${BRIGHT_RED}Error: ${BRIGHT_CYAN}EDITOR environment variable is not set.${RESET}"
 		return 1
 
-	# No parameters passed, load the default editor...
+	### No parameters passed, load the default editor...
 	elif [[ $# -eq 0 ]]; then
 		rename_tab 'New File'
 		"${EDITOR}"
 		restore_tab
 		return
 
-	# Check if file exists and has read/write permissions...
+	### Check if file exists and has read/write permissions...
 	elif [[ -r "${ACTUAL_FILE}" ]] && [[ -w "${ACTUAL_FILE}" ]]; then
 		immutable_remove "${1}"
 		rename_tab "${ACTUAL_FILE}"
-		"${EDITOR}" "${ACTUAL_FILE}" && post_edit_action "${ACTUAL_FILE}"
+
+		# Get the initial modification time of the file
+		local INITIAL_MTIME=""
+		if [[ -f "${ACTUAL_FILE}" ]]; then
+			INITIAL_MTIME=$(stat -c %Y "${ACTUAL_FILE}")
+		fi
+
+		# Capture the exit status of the editor
+		"${EDITOR}" "${ACTUAL_FILE}"
+		local EDIT_STATUS=$?
+
+		# Check if the file was modified based on the modification time
+		if [[ -f "${ACTUAL_FILE}" ]]; then
+			if [[ "$(stat -c %Y "${ACTUAL_FILE}")" != "${INITIAL_MTIME}" ]]; then
+				post_edit_action "${ACTUAL_FILE}"
+			fi
+		else
+			post_edit_action "${ACTUAL_FILE}"
+		fi
+
 		restore_tab
 		immutable_restore "${1}"
-		return
+		return $EDIT_STATUS
 
-	# Check if the file exists but doesn't have write permission...
+	### Check if the file exists but doesn't have write permission...
 	elif [[ -f "${ACTUAL_FILE}" ]]; then
 		echo -ne "${BRIGHT_RED}Insufficient permissions:"
 		echo -e "${BRIGHT_YELLOW} Using super user to edit ${BRIGHT_CYAN}${ACTUAL_FILE}${RESET}"
@@ -633,7 +674,7 @@ function edit() {
 		immutable_restore "${1}"
 		return
 
-	# File doesn't exist, check if we can create it...
+	### File doesn't exist, check if we can create it...
 	elif [[ -w "$(dirname "${ACTUAL_FILE}")" ]]; then
 		# Attempt to edit the file
 		rename_tab "${ACTUAL_FILE}"
@@ -650,7 +691,7 @@ function edit() {
 			return
 		fi
 
-	# We need super user access to create the new file
+	### We need super user access to create the new file
 	else
 		echo -ne "${BRIGHT_RED}Insufficient permissions:"
 		echo -e "${BRIGHT_YELLOW} Using super user to create ${BRIGHT_CYAN}${ACTUAL_FILE}${RESET}"
@@ -658,6 +699,20 @@ function edit() {
 		return
 	fi
 }
+
+# Command-line completion for the edit command
+_edit_completion() {
+	local cur prev words cword
+	_init_completion -n = || return
+
+	case $prev in
+		edit|e)
+			_filedir
+			return
+			;;
+	esac
+}
+complete -F _edit_completion edit e
 
 # Shortcut for edit using root permissions
 alias se="sudoedit"
@@ -787,7 +842,7 @@ _SKIP_BDAY_REMINDER=false
 
 # Set the location for the birthday/anniversary reminder CSV file
 # The default location is "~/.config/birthdays.csv"
-_BDAY_FILE="${HOME}/.config/birthdays.csv"
+_BDAY_FILE="${XDG_CONFIG_HOME:-${HOME}/.config}/birthdays.csv"
 
 # Set the preferred birthday reminder font here (default is "future"):
 _BDAY_FONT=future
@@ -955,8 +1010,8 @@ if [[ -f "${HOME}/.env" ]]; then
 	builtin source "${HOME}/.env"
 fi
 
-if [[ -f "${HOME}/.config/bashrc/config" ]]; then
-	builtin source "${HOME}/.config/bashrc/config"
+if [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/config" ]]; then
+	builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/config"
 fi
 
 #######################################################
@@ -1012,7 +1067,7 @@ function editbashrc() {
 function bashrc() {
 	if [ $# -eq 0 ]; then
 		# Set the target directory
-		local target_dir="${HOME}/.config/bashrc"
+		local target_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc"
 
 		# Check if target directory exists
 		if [ -d "${target_dir}" ]; then
@@ -1041,8 +1096,8 @@ function bashrc() {
 alias {rbrc,reloadbashrc,bashrcreload}='command clear; builtin source ~/.bashrc'
 
 # Find the help file for this .bashrc file (type hlp or press CONTROL-H)
-if [[ -f "${HOME}/.config/bashrc/help" ]]; then
-	_BASHRC_HELP="${HOME}/.config/bashrc/help"
+if [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/help" ]]; then
+	_BASHRC_HELP="${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/help"
 	if [[ $_SKIP_HELP_KEYBIND = false ]]; then
 		bind -x '"\C-h":"less -f -r -n -S ~/.config/bashrc/help"'
 	fi
@@ -1082,11 +1137,11 @@ function bashrcupdate() {
 	declare -A FILES_TO_UPDATE=(
 		["${HOME}/.bashrc"]="https://sourceforge.net/projects/ultimate-bashrc/files/_bashrc/download"
 		["${HOME}/.bashrc_help"]="https://sourceforge.net/projects/ultimate-bashrc/files/_bashrc_help/download"
-		["${HOME}/.config/bashrc/help"]="https://sourceforge.net/projects/ultimate-bashrc/files/_bashrc_help/download"
+		["${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/help"]="https://sourceforge.net/projects/ultimate-bashrc/files/_bashrc_help/download"
 		["${HOME}/README.md"]="https://sourceforge.net/projects/ultimate-bashrc/files/README.md/download"
-		["${HOME}/.config/bashrc/README.md"]="https://sourceforge.net/projects/ultimate-bashrc/files/README.md/download"
+		["${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/README.md"]="https://sourceforge.net/projects/ultimate-bashrc/files/README.md/download"
 		["${HOME}/README.html"]="https://sourceforge.net/projects/ultimate-bashrc/files/README.html/download"
-		["${HOME}/.config/bashrc/README.html"]="https://sourceforge.net/projects/ultimate-bashrc/files/README.html/download"
+		["${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/README.html"]="https://sourceforge.net/projects/ultimate-bashrc/files/README.html/download"
 	)
 
 	if ! hascommand axel && ! hascommand aria2c && ! hascommand curl && ! hascommand wget; then
@@ -1245,34 +1300,34 @@ shopt -s cdable_vars
 # NOTE: These aliases are case sensitive where lower case is the local user
 #       directory and upper case is the global system directory
 declare -A ALIASES=(
-	["autostart"]="${HOME}/.config/autostart"
+	["autostart"]="${XDG_CONFIG_HOME:-${HOME}/.config}/autostart"
 	["bin"]="${HOME}/.local/bin"
 	["BIN"]="/usr/bin"
-	["cache"]="${HOME}/.cache"
-	["config"]="${HOME}/.config"
+	["cache"]="${XDG_CACHE_HOME:-${HOME}/.cache}"
+	["config"]="${XDG_CONFIG_HOME:-${HOME}/.config}"
 	["CONFIG"]="/etc"
 	["desktop"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir DESKTOP || echo "${HOME}/Desktop")"
 	["docs"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir DOCUMENTS || echo "${HOME}/Documents")"
 	["documents"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir DOCUMENTS || echo "${HOME}/Documents")"
 	["DOCS"]="/usr/local/man /usr/local/share/man /usr/share/man"
 	["downloads"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir DOWNLOAD || echo "${HOME}/Downloads")"
-	["fonts"]="${XDG_DATA_HOME:-$HOME/.local/share}/fonts ${HOME}/.local/share/fonts ${HOME}/.fonts"
+	["fonts"]="${XDG_DATA_HOME:-$HOME/.local/share}/fonts ${HOME}/.fonts"
 	["FONTS"]="/usr/share/fonts"
-	["icons"]="${XDG_DATA_HOME:-$HOME/.local/share}/icons ${HOME}/.local/share/icons ${HOME}/.icons"
+	["icons"]="${XDG_DATA_HOME:-$HOME/.local/share}/icons ${HOME}/.icons"
 	["ICONS"]="/usr/share/icons"
 	["music"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir MUSIC || echo "${HOME}/Music")"
 	["pics"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir PICTURES || echo "${HOME}/Pictures")"
 	["pictures"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir PICTURES || echo "${HOME}/Pictures")"
-	["share"]="${HOME}/.local/share"
+	["share"]="${XDG_DATA_HOME:-${HOME}/.local/share}"
 	["SHARE"]="/usr/share"
-	["shortcuts"]="${HOME}/.local/share/applications ${HOME}/.gnome/apps"
+	["shortcuts"]="${XDG_DATA_HOME:-${HOME}/.local/share}/applications ${HOME}/.gnome/apps"
 	["SHORTCUTS"]="/usr/share/applications /usr/local/share/applications"
-	["themes"]="${HOME}/.themes ${HOME}/.local/share/themes"
+	["themes"]="${HOME}/.themes ${XDG_DATA_HOME:-${HOME}/.local/share}/themes"
 	["THEMES"]="/usr/share/themes"
-	["tmp"]="${HOME}/tmp ${HOME}/.cache/tmp ${HOME}/.cache"
+	["tmp"]="${HOME}/tmp ${XDG_CACHE_HOME:-${HOME}/.cache}/tmp ${XDG_CACHE_HOME:-${HOME}/.cache}"
 	["TMP"]="${TMPDIR:-/tmp}"
 	["videos"]="$(command -v xdg-user-dir > /dev/null && xdg-user-dir VIDEOS || echo "${HOME}/Videos")"
-	["wallpaper"]="${HOME}/.local/share/wallpapers"
+	["wallpaper"]="${XDG_DATA_HOME:-${HOME}/.local/share}/wallpapers"
 	["WALLPAPER"]="/usr/share/backgrounds /usr/share/wallpapers"
 	["web"]="/srv/http /var/www/html /usr/share/nginx/html /opt/lampp/htdocs /usr/local/apache2/htdocs /usr/local/www/apache24/data"
 )
@@ -1283,8 +1338,8 @@ IFS=' '
 
 # Loop through the associative array and create aliases and exports for existing directories
 for ALIAS in "${!ALIASES[@]}"; do
-	read -ra ADDR <<< "${ALIASES[$ALIAS]}"
-	for DIRECTORY in "${ADDR[@]}"; do
+	DIRECTORIES=(${ALIASES[$ALIAS]})
+	for DIRECTORY in "${DIRECTORIES[@]}"; do
 		if [[ -d $DIRECTORY ]]; then
 			alias "${ALIAS}"="cd \"${DIRECTORY}\""
 			export "${ALIAS}"="${DIRECTORY}"
@@ -1297,14 +1352,14 @@ done
 IFS="${OLD_IFS}"
 
 # Clean up
-unset OLD_IFS DIRECTORY ADDR ALIAS ALIASES
+unset OLD_IFS DIRECTORY DIRECTORIES ALIAS ALIASES
 
 #######################################################
 ### GIT ALIASES
 #######################################################
 
 # If git is installed...
-if hascommand git; then
+if hasgit; then
 
 	# Git Alias: Provides many useful Git alias commands
 	# This alias will install/update the Git alias commands file
@@ -1342,40 +1397,61 @@ if hascommand git; then
 	}
 
 	# All Git aliases start with gg for speed
-	alias ggg='git status'
-	alias ggs='git status --short --branch'
-	alias ggf='git fetch'
-	alias ggprune='git fetch --prune'
-	alias ggp='git pull' # Fetch and merge
-	alias ggpu='git push'
-	alias ggm='git merge'
-	alias ggri='git rebase --interactive'
-	alias ggsquash='git reset $(git merge-base master $(git branch --show-current)) && git add --all && git commit --message "Squashed commits"'
-	alias ggb='gitbranch' # Change branch
-	alias gg-='git checkout -'
-	alias ggcb='git checkout -b' # Create new branch
-	alias ggcbforce='git checkout -B' # Create new branch - if the branch already exists it will reset it
-	#alias gglb='git branch --verbose'
-	alias {gglb,ggbl}='git for-each-ref --sort=-committerdate refs/heads/ --format="%(committerdate:short) %(refname:short)" | head -n 25'
-	alias gga='git add'
-	alias ggaa='git add --patch' # Interactively choose hunks
-	alias ggac='git add --all && git commit --verbose --message' # Add "commit message"
-	alias ggua='git reset' # Specify a file to "un-add" or no file to unstage all
-	alias ggr='git restore' # Specify a file to restore
-	alias ggrm='git rm' # Remove files and stage the deletion
-	alias ggc='git commit --verbose -m' # Add "commit message"
-	alias ggca='git commit --amend --verbose' # Modified most recent commit
-	alias ggd='git diff'
-	alias ggdc='git diff --cached'
-	alias ggdd='git remote update > /dev/null 2>&1 && git status -uno | grep -q "Your branch is behind" && git fetch origin; git diff origin/master..HEAD'
-	alias ggds='git diff --stat'
-	alias ggst='git stash'
-	alias ggsta='git stash --patch'
-	alias ggpop='git stash pop'
-	alias ggstlist='git stash list'
-	alias ggls='git ls-files'
-	alias ggrv='git remote --verbose'  # List all remote repositories and URLs
-	alias gglast='git show --stat'
+	alias ggg='git status'                    # Standard git status
+	alias ggs='git status --short --branch'   # Compact status with branch info
+	alias ggf='git fetch'                     # Fetch changes from remote
+	alias ggprune='git fetch --prune'         # Remove references to deleted remote branches
+	alias ggp='git pull'                      # Fetch and merge changes
+	alias ggpu='git push'                     # Push changes to remote
+	alias ggm='git merge'                     # Merge branches
+	alias ggri='git rebase --interactive'     # Start interactive rebase
+	alias ggsquash='git reset $(git merge-base $(git symbolic-ref refs/remotes/origin/HEAD | sed "s@^refs/remotes/origin/@@") $(git branch --show-current)) && \
+		git add --all && \
+		git commit --message "Squashed commits"' # Reset to default branch base and squash all commits
+
+	# Branch operations
+	alias ggb='gitbranch'                     # Change branch (custom function)
+	alias gg-='git checkout -'                # Switch to previous branch
+	alias ggback='git checkout HEAD~'         # Go back one commit
+	alias ggcb='git checkout -b'              # Create new branch
+	alias ggcbforce='git checkout -B'         # Create/reset branch
+	alias ggbdelete='ask "Are you sure you want to delete this branch? This cannot be undone." N || \
+		echo "Canceled" && git branch -D'     # Safe branch deletion
+	alias {gglb,ggbl}='git for-each-ref --sort=-committerdate refs/heads/ \
+		--format="%(committerdate:short) %(refname:short)" | head -n 25' # List branches sorted by last commit date
+
+	# Staging and committing
+	alias gga='git add'                       # Stage files
+	alias ggaa='git add --patch'              # Interactive staging
+	alias ggac='git add --all && git commit --verbose --message' # Stage all and commit
+	alias ggua='git reset'                    # Unstage files
+	alias ggundo='git reset --soft HEAD~1'    # Undo last commit, keep changes staged
+	alias ggr='git restore'                   # Restore files to HEAD
+	alias ggrm='git rm'                       # Remove and stage deletion
+	alias ggc='git commit --verbose -m'       # Commit with message
+	alias ggca='git commit --amend --verbose' # Modify last commit
+
+	# Searching and diffing
+	alias ggfind='git log --pretty=format:"%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]" --grep' # Search commit messages
+	alias ggd='git diff'                      # Show unstaged changes
+	alias ggdc='git diff --cached'            # Show staged changes
+	alias ggdd='git remote update > /dev/null 2>&1 && \
+		git status -uno | grep -q "Your branch is behind" && \
+		git fetch origin; \
+		git diff origin/$(git symbolic-ref refs/remotes/origin/HEAD | sed "s@^refs/remotes/origin/@@")..HEAD' # Compare with default branch
+
+	alias ggds='git diff --stat'              # Show changed files stats
+
+	# Stash operations
+	alias ggst='git stash'                    # Stash changes
+	alias ggsta='git stash --patch'           # Interactive stash
+	alias ggpop='git stash pop'               # Apply stashed changes
+	alias ggstlist='git stash list'           # List stashes
+
+	# Repository information
+	alias ggls='git ls-files'                 # List all tracked files
+	alias ggrv='git remote --verbose'         # List remote repositories
+	alias gglast='git show --stat'            # Show last commit changes
 
 	# Git alias for log tailored for local projects or office use
 	# Reference for Git Pretty Formats:
@@ -1393,7 +1469,7 @@ if hascommand git; then
 	# - %p:  Parent hashes of a commit (useful for merge commits)
 	# - %G?: GPG signature status code
 	# - %GS: GPG signature’s signer
-	alias ggl='git log --oneline --date=short --graph --decorate --pretty=format:"%C(magenta)%h%C(reset) - %C(green)(%cr)%C(reset) %s%C(auto)%d%C(reset) %C(bold brightblue)<%an>%C(reset)"'
+	alias ggl='git log --oneline --date=short --decorate --pretty=format:"%C(magenta)%h%C(reset) - %C(green)(%cr)%C(reset) %s%C(auto)%d%C(reset) %C(bold brightblue)<%an>%C(reset)"'
 
 	# Git alias for more detailed list log that is better for online collaberation
 	# The last 1 character field is the GPG signature for the commit
@@ -2382,7 +2458,7 @@ fi
 # Install: curl -Ls https://raw.githubusercontent.com/jarun/nnn/master/plugins/getplugs | sh
 # Plugins are installed to ${XDG_CONFIG_HOME:-$HOME/.config}/nnn/plugins
 if hascommand --strict nnn; then
-	if [[ -f "${HOME}/.config/nnn/plugins/finder" ]]; then
+	if [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/nnn/plugins/finder" ]]; then
 		export NNN_PLUG='f:finder;o:fzopen;p:mocplay;d:diffs;t:nmount;v:imgview'
 		alias nnnplugins='curl -Ls https://raw.githubusercontent.com/jarun/nnn/master/plugins/getplugs | sh'
 	fi
@@ -2399,7 +2475,7 @@ fi
 
 # If lsx enhanced directory navigation is found, source it
 # Link: https://github.com/souvikinator/lsx
-if [[ -f "${HOME}/.config/lsx/lsx.sh" ]]; then
+if [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/lsx/lsx.sh" ]]; then
 	builtin source ~/.config/lsx/lsx.sh
 
 	# If lsx is installed, alias it to see hidden directories
@@ -2426,19 +2502,19 @@ if hascommand broot; then
 	# Link: https://computingforgeeks.com/broot-easy-directory-trees-navigation-in-linux/
 
 	# To generate this source file, type: broot --install
-	if [[ -f "${HOME}/.config/broot/launcher/bash/br" ]]; then
+	if [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/broot/launcher/bash/br" ]]; then
 		# Source the br function
-		builtin source "${HOME}/.config/broot/launcher/bash/br"
+		builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/broot/launcher/bash/br"
 
 		# If Git is installed, enable the Git functionality
-		if hascommand git; then
+		if hasgit; then
 			alias {lb,tree}='br --sizes --dates --show-root-fs --hidden --show-git-info'
 		else
 			alias {lb,tree}='br --sizes --dates --show-root-fs --hidden'
 		fi
 	else
 		# If Git is installed, enable the Git functionality
-		if hascommand git; then
+		if hasgit; then
 			alias {lb,tree}='broot --sizes --dates --show-root-fs --hidden --show-git-info'
 		else
 			alias {lb,tree}='broot --sizes --dates --show-root-fs --hidden'
@@ -2452,7 +2528,11 @@ elif [[ $_SKIP_LSD = false ]] && hascommand lsd; then
 elif [[ $_SKIP_EXA = false ]] && hascommand exa; then
 	# If exa is installed...
 	# Link: https://github.com/ogham/exa
-	alias tree='exa --all --git --group-directories-first --header --long --tree'
+	if hasgit; then
+		alias tree='exa --all --git --group-directories-first --header --long --tree'
+	else
+		alias tree='exa --all --group-directories-first --header --long --tree'
+	fi
 elif hascommand tree; then
 	# If tree is installed...
 	# Link: https://www.tecmint.com/linux-tree-command-examples/
@@ -3352,7 +3432,7 @@ fi
 for TERMINAL_BROWSER in "w3m" "lynx" "elinks" "links2" "links"; do
 	if hascommand "${TERMINAL_BROWSER}"; then
 		# Show the Extreme Ultimate .bashrc README file in the available browser
-		if [[ -f "${HOME}/.config/bashrc/README.html" ]]; then
+		if [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/README.html" ]]; then
 			alias readme="${TERMINAL_BROWSER} ~/.config/bashrc/README.html"
 			break  # Exit the loop once the first available browser is found
 		elif [[ -f "${HOME}/README.html" ]]; then
@@ -3372,7 +3452,7 @@ if [[ $(type -t readme) != 'alias' ]]; then
 	for TERMINAL_MARKDOWN_VIEWER in "frogmouth" "glow" "mdcat" "mdless"; do
 		if hascommand "${TERMINAL_MARKDOWN_VIEWER}"; then
 			# If README.md exists in .config/bashrc, set 'readme' alias
-			if [[ -f "${HOME}/.config/bashrc/README.md" ]]; then
+			if [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/README.md" ]]; then
 				alias readme="${TERMINAL_MARKDOWN_VIEWER} ~/.config/bashrc/README.md"
 				break  # Exit the loop once the first available browser is found
 			# If README.md exists in home, set 'readme' alias
@@ -3526,7 +3606,7 @@ if hascommand --strict pigz; then
 	alias mkgz='tar --use-compress-program="pigz -9" -cvf'
 	alias ungz='tar --use-compress-program=pigz -xvf'
 else
-	alias mkgz='tar -9cvzf'
+	alias mkgz='tar -cvzf'
 	alias ungz='tar -xvzf'
 fi
 
@@ -4618,38 +4698,6 @@ function download() {
 		echo -e "${BRIGHT_WHITE}Options:${RESET} ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
 		return 1
 
-	# YouTube and other supported URLs
-	#elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be)/ ]]; then
-	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|rumble\.com|dailymotion\.com|amazon\.com/Prime-Video|twitter\.com|t\.co|x\.com)/ ]]; then
-
-		# yt-dlp is a feature-rich command-line audio/video downloader
-		# with support for thousands of sites
-		# Link: https://github.com/yt-dlp/yt-dlp
-		if hascommand yt-dlp; then
-			echo -e "${BRIGHT_YELLOW}Using yt-dlp for YouTube URL...${RESET}"
-
-			# Download highest quality video with best matching audio
-			(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestvideo[ext=mp4]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-			# Also download audio only in best quality
-			#(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestaudio/best' --extract-audio --audio-quality 0 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		# youtube-dl downloads videos from youtube.com or other video platforms
-		# Link: https://github.com/ytdl-org/youtube-dl
-		elif hascommand youtube-dl; then
-			echo -e "${BRIGHT_YELLOW}Using youtube-dl for YouTube URL...${RESET}"
-
-			# Download highest quality video with best matching audio
-			(cd "${DOWNLOAD_PATH}" && youtube-dl --format 'best[vcodec*=avc]+bestaudio' "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-			# Also download audio only in best quality
-			#(cd "${DOWNLOAD_PATH}" && youtube-dl -f 'bestaudio' --extract-audio --audio-format best --audio-quality 0 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
-
-		else
-			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable YouTube download tool found${RESET}"
-			return 1
-		fi
-
 	# Spotify URLs
 	elif [[ "${URL}" =~ ^https://open.spotify.com/ ]]; then
 
@@ -4685,17 +4733,69 @@ function download() {
 			return 1
 		fi
 
-	# SoundCloud URLs
-	elif [[ "${URL}" =~ ^https?://(www\.)?soundcloud.com/ ]]; then
-		# scdl is a script is able to download music from SoundCloud
-		# and can also set the id3tag to the downloaded music file
-		# Link: https://github.com/scdl-org/scdl
-		if hascommand scdl; then
+	# Soundcloud + scdl is a script is able to download music from SoundCloud
+	# and can also set the id3tag to the downloaded music file
+	# Link: https://github.com/scdl-org/scdl
+	elif [[ "${URL}" =~ ^https?://(www\.)?soundcloud.com/ ]] && hascommand scdl; then
+			# Download using the scdl script
 			echo -e "${BRIGHT_YELLOW}Using scdl for SoundCloud URL...${RESET}"
 			(scdl -l "${URL}" --path "${DOWNLOAD_PATH}" --onlymp3) || echo -e "${BRIGHT_RED}Download failed.${RESET}"
 
+	# SoundCloud, Youtube Music, Bandcamp and other audio-focused platforms
+	elif [[ "${URL}" =~ ^https?://(www\.)?(soundcloud\.com|bandcamp\.com|mixcloud\.com|audiomack\.com|audius\.co|hearthis\.at|play\.fm|clyp\.it|indieshuffle\.com|music\.youtube\.com)/ ]]; then
+		# yt-dlp is a feature-rich command-line audio/video downloader
+		# with support for thousands of sites
+		# Link: https://github.com/yt-dlp/yt-dlp
+		if hascommand yt-dlp; then
+			echo -e "${BRIGHT_YELLOW}Using yt-dlp for the audio URL...${RESET}"
+
+			if ask "Do you want to download the audio in MP3 format (choosing No will download the highest quality original format)?" Y; then
+				(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestaudio/best' --extract-audio --audio-format mp3 --audio-quality 0 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			else
+				(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestaudio/best' --extract-audio --audio-quality 0 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			fi
+
+		# youtube-dl downloads videos from youtube.com or other video platforms
+		# Link: https://github.com/ytdl-org/youtube-dl
+		elif hascommand youtube-dl; then
+			echo -e "${BRIGHT_YELLOW}Using youtube-dl for the audio URL...${RESET}"
+
+			if ask "Do you want to download the audio in MP3 format (choosing No will download the highest quality original format)?" Y; then
+				(cd "${DOWNLOAD_PATH}" && youtube-dl -f 'bestaudio' --extract-audio --audio-format mp3 --audio-quality 0 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			else
+				(cd "${DOWNLOAD_PATH}" && youtube-dl -f 'bestaudio' --extract-audio --audio-format best --audio-quality 0 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			fi
+
 		else
-			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable SoundCloud download tool found${RESET}"
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable audio download tool found${RESET}"
+			return 1
+		fi
+
+	# YouTube and other video-focused platforms
+	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|vimeo\.com|twitch\.tv|twitter\.com|reddit\.com|facebook\.com|instagram\.com|tiktok\.com|vk\.com|ok\.ru|flickr\.com|dailymotion\.com|metacafe\.com|vine\.co|tumblr\.com|linkedin\.com|pinterest\.com|imgur\.com|gfycat\.com|giphy\.com|streamable\.com|wistia\.com|ustream\.tv|vevo\.com|viddler\.com|vidme\.com|ted\.com)/ ]]; then
+
+		# Found yt-dlp command-line audio/video downloader
+		if hascommand yt-dlp; then
+			echo -e "${BRIGHT_YELLOW}Using yt-dlp for the video URL...${RESET}"
+
+			if ask "Do you want to download the highest available video quality (choosing No will limit to 1080p)?" N; then
+				(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestvideo[ext=mp4]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			else
+				(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestvideo[ext=mp4][height<=1080]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			fi
+
+		# Found youtube-dl command-line audio/video downloader
+		elif hascommand youtube-dl; then
+			echo -e "${BRIGHT_YELLOW}Using youtube-dl for the video URL...${RESET}"
+
+			if ask "Do you want to download the highest available video quality (choosing No will limit to 1080p)?" N; then
+				(cd "${DOWNLOAD_PATH}" && youtube-dl --format 'best[vcodec*=avc]+bestaudio' "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			else
+				(cd "${DOWNLOAD_PATH}" && youtube-dl --format 'best[vcodec*=avc][height<=1080]+bestaudio' "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			fi
+
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable video download tool found${RESET}"
 			return 1
 		fi
 
@@ -5045,10 +5145,10 @@ function trash() {
 		kioclient5 move "${@}" trash:/ && return 0
 
 	# Check for various trash directories
-	elif [[ -d "${HOME}/.local/share/Trash/files" ]]; then
-		command mv -i "${@}" "${HOME}/.local/share/Trash/files/" && return 0
-	elif [[ -d "${HOME}/.local/share/trash/files" ]]; then
-		command mv -i "${@}" "${HOME}/.local/share/trash/files/" && return 0
+	elif [[ -d "${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files" ]]; then
+		command mv -i "${@}" "${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files/" && return 0
+	elif [[ -d "${XDG_DATA_HOME:-${HOME}/.local/share}/trash/files" ]]; then
+		command mv -i "${@}" "${XDG_DATA_HOME:-${HOME}/.local/share}/trash/files/" && return 0
 	elif [[ -d "${HOME}/.Trash" ]]; then
 		command mv -i "${@}" "${HOME}/.Trash/" && return 0
 	elif [[ -d "${HOME}/.trash" ]]; then
@@ -5056,8 +5156,8 @@ function trash() {
 
 	# Create the trash directory per the XDG specification if none exists
 	else
-		command mkdir -p "${HOME}/.local/share/Trash/files"
-		command mv -i "${@}" "${HOME}/.local/share/Trash/files/" && return 0
+		command mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files"
+		command mv -i "${@}" "${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files/" && return 0
 	fi
 
 	# If none of the methods succeeded, return an error
@@ -5084,10 +5184,10 @@ function trashlist() {
 	elif hascommand --strict kioclient5; then
 		kioclient5 ls trash:/
 	# Check for alternative trash directories and list files
-	elif [[ -d ${HOME}/.local/share/Trash/files ]]; then
-		ls -l ${HOME}/.local/share/Trash/files/
-	elif [[ -d ${HOME}/.local/share/trash/files ]]; then
-		ls -l ${HOME}/.local/share/trash/files/
+	elif [[ -d ${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files ]]; then
+		ls -l ${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files/
+	elif [[ -d ${XDG_DATA_HOME:-${HOME}/.local/share}/trash/files ]]; then
+		ls -l ${XDG_DATA_HOME:-${HOME}/.local/share}/trash/files/
 	elif [[ -d ${HOME}/.Trash ]]; then
 		ls -l ${HOME}/.Trash/
 	elif [[ -d ${HOME}/.trash ]]; then
@@ -5118,10 +5218,10 @@ function trashempty() {
 		elif hascommand --strict kioclient5; then
 			kioclient5 empty trash:/
 		# Check for alternative trash directories and delete files
-		elif [[ -d ${HOME}/.local/share/Trash/files ]]; then
-			rm -rf ${HOME}/.local/share/Trash/files/{..?*,.[!.]*,*} 2>/dev/null
-		elif [[ -d ${HOME}/.local/share/trash/files ]]; then
-			rm -rf ${HOME}/.local/share/trash/files/{..?*,.[!.]*,*} 2>/dev/null
+		elif [[ -d ${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files ]]; then
+			rm -rf ${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files/{..?*,.[!.]*,*} 2>/dev/null
+		elif [[ -d ${XDG_DATA_HOME:-${HOME}/.local/share}/trash/files ]]; then
+			rm -rf ${XDG_DATA_HOME:-${HOME}/.local/share}/trash/files/{..?*,.[!.]*,*} 2>/dev/null
 		elif [[ -d ${HOME}/.Trash ]]; then
 			rm -rf ${HOME}/.Trash/{..?*,.[!.]*,*} 2>/dev/null
 		elif [[ -d ${HOME}/.trash ]]; then
@@ -5175,7 +5275,7 @@ if [[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]; then
 		fi
 
 		# Search in both system-wide and user-specific application directories
-		local directories=("/usr/share/applications" "${HOME}/.local/share/applications")
+		local directories=("/usr/share/applications" "${XDG_DATA_HOME:-${HOME}/.local/share}/applications")
 
 		echo -e "\e[1;36mApplications matching\e[0m '\e[33m$search_term\e[0m':"
 		echo -e "\e[1;90m------------------------------------\e[0m"
@@ -7872,10 +7972,18 @@ function trim() {
 # If we are NOT root or in a virtual terminal console or TMUX or Git Bash...
 if [[ $EUID -ne 0 ]] && \
 	[[ ! "$(tty)" =~ /dev/tty ]] && \
-	[[ ! "$TERM" =~ screen ]] && \
-	[[ -z "$TMUX" ]] && \
-	[[ "$_KERNEL_NAME" != "MINGW" ]] && \
-	[[ "$_KERNEL_NAME" != "CYGWI" ]] && \
+	[[ ! "${TERM}" =~ screen ]] && \
+	[[ -z "${TMUX}" ]] && \
+	[[ "${_KERNEL_NAME}" != "MINGW" ]] && \
+	[[ "${_KERNEL_NAME}" != "CYGWI" ]] && \
+	[[ -z "${INSIDE_EMACS}" ]] && \
+	[[ -z "${VIM_TERMINAL}" ]] && \
+	[[ ! "${TERM}" =~ vim ]] && \
+	[[ ! "${TERM}" =~ nvim ]] && \
+	[[ "${TERM_PROGRAM}" != "vscode" ]] && \
+	[[ "${TERMINAL_EMULATOR}" != "JetBrains-JediTerm" ]] && \
+	[[ "${TERM_PROGRAM}" != "Sublime_Terminal" ]] && \
+	[[ "${TERM_PROGRAM}" != "atom" ]] && \
 	[[ $_SKIP_SYSTEM_INFO = false ]]; then
 
 	# Link: https://github.com/LinusDierheimer/fastfetch
@@ -7972,7 +8080,7 @@ fi
 ################################################################################
 
 # Make an alias to edit the birthday csv file
-if [[ -f "${HOME}/.config/birthdays.csv" ]]; then
+if [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/birthdays.csv" ]]; then
 	alias ebd="edit ~/.config/birthdays.csv"
 elif [[ -f "${_BDAY_FILE}" ]]; then
 	alias ebd="edit ${_BDAY_FILE}"
@@ -8054,8 +8162,8 @@ fi
 # If bashmarks is installed, load it
 if [[ -f "${HOME}/bashmarks/bashmarks.sh" ]]; then
 	builtin source "${HOME}/bashmarks/bashmarks.sh"
-elif [[ -f "${HOME}/.config/bashrc/bashmarks/bashmarks.sh" ]]; then
-	builtin source "${HOME}/.config/bashrc/bashmarks/bashmarks.sh"
+elif [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/bashmarks/bashmarks.sh" ]]; then
+	builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/bashmarks/bashmarks.sh"
 elif [[ -f "${HOME}/.local/bin/bashmarks.sh" ]]; then
 	builtin source "${HOME}/.local/bin/bashmarks.sh"
 elif [[ -f /usr/share/bashmarks/bashmarks.sh ]]; then
@@ -8173,8 +8281,8 @@ if [[ -f "${HOME}/.qfc/bin/qfc.sh" ]]; then
 	builtin source "${HOME}/.qfc/bin/qfc.sh"
 	qfc_quick_command 'cd' '\C-_' 'cd "$0"'
 	qfc_quick_command 'edit' '\C-e' 'edit $0'
-elif [[ -f "${HOME}/.config/bashrc/.qfc/bin/qfc.sh" ]]; then
-	builtin source "${HOME}/.config/bashrc/.qfc/bin/qfc.sh"
+elif [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/.qfc/bin/qfc.sh" ]]; then
+	builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/.qfc/bin/qfc.sh"
 	qfc_quick_command 'cd' '\C-_' 'cd "$0"'
 	qfc_quick_command 'edit' '\C-e' 'edit $0'
 elif [[ -f /usr/share/qfc/qfc.sh ]]; then
@@ -8291,9 +8399,9 @@ if hascommand --strict vivid; then
 	# Vivid is installed
 	export LS_COLORS="$(vivid generate snazzy)"
 	_LS_COLORS_SOURCE="Vivid"
-elif [[ -f "${HOME}/.local/share/lscolors.sh" ]]; then
+elif [[ -f "${XDG_DATA_HOME:-${HOME}/.local/share}/lscolors.sh" ]]; then
 	# LS_COLORS is installed locally
-	builtin source "${HOME}/.local/share/lscolors.sh"
+	builtin source "${XDG_DATA_HOME:-${HOME}/.local/share}/lscolors.sh"
 	_LS_COLORS_SOURCE="LS_COLORS Local"
 elif [[ -f /usr/share/LS_COLORS/dircolors.sh ]]; then
 	# LS_COLORS is installed system wide
@@ -8609,10 +8717,10 @@ if [[ ! ${_SKIP_BASH_COMPLETION} = true ]]; then
 		builtin source "/etc/bash_completion"
 	elif [[ -f "${HOME}/bash_completion" ]]; then
 		builtin source "${HOME}/bash_completion"
-	elif [[ -f "${HOME}/.local/share/bash_completion" ]]; then
-		builtin source "${HOME}/.local/share/bash_completion"
-	elif [[ -f "${HOME}/.config/bash_completion" ]]; then
-		builtin source "${HOME}/.config/bash_completion"
+	elif [[ -f "${XDG_DATA_HOME:-${HOME}/.local/share}/bash_completion" ]]; then
+		builtin source "${XDG_DATA_HOME:-${HOME}/.local/share}/bash_completion"
+	elif [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bash_completion" ]]; then
+		builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bash_completion"
 	fi
 fi
 
@@ -8660,9 +8768,9 @@ elif [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 	if hascommand node; then
 		alias node='node -r ${HOME}/fzf-tab-completion/node/fzf-node-completion.js'
 	fi
-elif [[ -f "${HOME}/.config/bashrc/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
+elif [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 	# Source the fzf bash completion script if git cloned
-	builtin source "${HOME}/.config/bashrc/fzf-tab-completion/bash/fzf-bash-completion.sh"
+	builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/fzf-tab-completion/bash/fzf-bash-completion.sh"
 
 	# Bind the tab key to the fzf_bash_completion function
 	bind -x '"\t": fzf_bash_completion'
@@ -8672,7 +8780,7 @@ elif [[ -f "${HOME}/.config/bashrc/fzf-tab-completion/bash/fzf-bash-completion.s
 
 	# If nodejs is installed, enable fzf-tab-completion for nodejs repl
 	if hascommand node; then
-		alias node='node -r ${HOME}/.config/bashrc/fzf-tab-completion/node/fzf-node-completion.js'
+		alias node='node -r ${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/fzf-tab-completion/node/fzf-node-completion.js'
 	fi
 fi
 
@@ -8891,8 +8999,8 @@ shopt -s no_empty_cmd_completion
 
 if [[ -f "${HOME}/.bash_aliases" ]]; then
 	builtin source "${HOME}/.bash_aliases"
-elif [[ -f "${HOME}/.config/bashrc/aliases" ]]; then
-	builtin source "${HOME}/.config/bashrc/aliases"
+elif [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/aliases" ]]; then
+	builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/aliases"
 fi
 
 #######################################################
@@ -8911,10 +9019,10 @@ elif [[ -f "${HOME}/enhancd/init.sh" ]]; then
 	ENHANCD_FILTER=fzy:sk:fzf:peco:percol:pick:icepick:selecta:sentaku:zf
 	export ENHANCD_FILTER
 	builtin source "${HOME}/enhancd/init.sh"
-elif [[ -f "${HOME}/.config/bashrc/enhancd/init.sh" ]]; then
+elif [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/enhancd/init.sh" ]]; then
 	ENHANCD_FILTER=fzy:sk:fzf:peco:percol:pick:icepick:selecta:sentaku:zf
 	export ENHANCD_FILTER
-	builtin source "${HOME}/.config/bashrc/enhancd/init.sh"
+	builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/enhancd/init.sh"
 fi
 
 #######################################################
@@ -8940,18 +9048,63 @@ fi
 # Automatically source node.js and npm
 #######################################################
 
-# Load the npm configuration and bash completion
+# Check if npm command exists
 if hascommand --strict npm; then
-	export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-	[ -s "$NVM_DIR/nvm.sh" ] && builtin source "$NVM_DIR/nvm.sh" # This loads nvm
 
-	# This loads nvm bash_completion
-	[ -s "$NVM_DIR/bash_completion" ] && builtin source "$NVM_DIR/bash_completion"
-fi
+	# Define an array to store possible locations of NVM initialization files
+	# Order of the locations matters as this will use the first file it finds
+	_NVM_FILE_LOCATIONS=(
+		"${HOME}/.nvm/init-nvm.sh"
+		"${HOME}/.nvm/nvm.sh"
+		"${XDG_DATA_HOME:-${HOME}/.local/share}/nvm/init-nvm.sh"
+		"${XDG_DATA_HOME:-${HOME}/.local/share}/nvm/nvm.sh"
+		"${XDG_CONFIG_HOME:-${HOME}/.config}/nvm/init-nvm.sh"
+		"${XDG_CONFIG_HOME:-${HOME}/.config}/nvm/nvm.sh"
+		"/usr/share/nvm/init-nvm.sh"
+		"/opt/nvm/init-nvm.sh"
+		"/opt/nvm/nvm.sh"
+		"/usr/share/nvm/nvm.sh"
+	)
 
-# Source Node Version Manager to manage multiple active node.js versions
-if [[ -f "/usr/share/nvm/init-nvm.sh" ]]; then
-	builtin source "/usr/share/nvm/init-nvm.sh"
+	# Iterate over the locations
+	for _NVM_FILE in "${_NVM_FILE_LOCATIONS[@]}"; do
+		# Check if the current file exists
+		if [[ -L "${_NVM_FILE}" || -f "${_NVM_FILE}" ]]; then
+			# If the file exists, source it to initialize NVM and set the
+			# NVM_DIR based on the directory of the found initialization file
+			if _RESOLVED_PATH="$(resolvesymlink "${_NVM_FILE}" 2>/dev/null)" && \
+				[[ -n "${_RESOLVED_PATH}" ]] && [[ -f "${_RESOLVED_PATH}" ]] && \
+				builtin source "${_RESOLVED_PATH}" 2>/dev/null && \
+				NVM_DIR="$(builtin cd "$(command dirname "${_RESOLVED_PATH}")" && command pwd 2>/dev/null)"; then
+
+				export NVM_DIR
+				break # Break out of the loop
+			fi
+		fi
+	done
+
+	# Define an array to store possible locations of the bash_completion file
+	_NVM_FILE_LOCATIONS=(
+		"${NVM_DIR}/bash_completion"
+		"${HOME}/.nvm/bash_completion"
+		"${XDG_DATA_HOME:-${HOME}/.local/share}/nvm/bash_completion"
+		"${XDG_CONFIG_HOME:-${HOME}/.config}/nvm/bash_completion"
+		"/usr/share/nvm/bash_completion"
+		"/opt/nvm/bash_completion"
+	)
+
+	# Iterate over the locations
+	for _NVM_FILE in "${_NVM_FILE_LOCATIONS[@]}"; do
+		# Check if the current bash_completion file exists
+		if [[ -f "${_NVM_FILE}" ]]; then
+			# If the file exists, source it to load NVM bash completion
+			builtin source "${_NVM_FILE}" 2>/dev/null
+			break # Break out of the loop
+		fi
+	done
+
+	# Clean up
+	unset _RESOLVED_PATH _NVM_FILE_LOCATIONS _NVM_FILE
 fi
 
 #######################################################
@@ -8960,23 +9113,28 @@ fi
 #######################################################
 
 # If the auto-source folder exists and has files in it...
-if [[ -d "${HOME}/.config/bashrc/bashrc.d" ]]; then
+if [[ -d "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/bashrc.d" ]]; then
 
 	# If the directory is not empty...
-	if [[ "$(command ls -A ${HOME}/.config/bashrc/bashrc.d)" ]]; then
+	if [[ "$(command ls -A ${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/bashrc.d)" ]]; then
 
 		# Loop through files (in alphabetical order) and source them
 		# To specify a load order, files can be prefixed with numbers
 		# (e.g. 00--filename, 50--filename, 95--filename)
-		for file in ${HOME}/.config/bashrc/bashrc.d/*; do
+		for file in ${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/bashrc.d/*; do
 			builtin source "${file}"
 		done
 	fi
 fi
 
 #######################################################
-# This default prompt will be used if another prompt is not installed
+# Custom Bash Prompt Configuration
+# This script configures a personalized, attractive, and informative Bash prompt
+# that displays useful information such as the current user, date, time, working
+# directory, and Git repository status organized by an attractive color scheme
+# NOTE This default prompt will be used if another prompt is not installed
 # Link: https://ezprompt.net/ (some modifications below)
+#######################################################
 # Git Code Reference:
 # > Renamed
 # * Ahead
@@ -8987,29 +9145,34 @@ fi
 #######################################################
 
 # Get current branch in Git repo
-function _parse_git_branch() {
-	if [[ $_GIT_IS_SLOW = false ]]; then
-		BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
-		if [[ ! "${BRANCH}" == "" ]]; then
-			STAT=`_parse_git_dirty`
-			echo " [${BRANCH}${STAT}]"
+function _prompt_git_branch() {
+	if hasgit; then
+		if [[ $_GIT_IS_SLOW = false ]]; then
+			BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+			if [[ -n "${BRANCH}" ]]; then
+				STAT=$(_prompt_git_status)
+				echo " [${BRANCH}${STAT}]"
+			else
+				echo ""
+			fi
 		else
-			echo ""
+			_prompt_git_fast "${@}"
 		fi
 	else
-		_fast_git_ps1 "${@}"
+		# Git is not installed, return empty string
+		echo ""
 	fi
 }
 
 # Get current status of Git repo
-function _parse_git_dirty {
+function _prompt_git_status() {
 	# Check if we are in a git directory
 	if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
 		echo ""
 		return
 	fi
 
-	# Get git status only once
+	# Cache the git status
 	local status=$(git status --porcelain 2>&1)
 
 	# Check for conditions using pattern matching
@@ -9022,41 +9185,52 @@ function _parse_git_dirty {
 
 	# Build the status string
 	local bits=''
-	[ ${renamed:-0} -ne 0 ] && bits=">${bits}"
-	[ ${ahead:-0} -ne 0 ]   && bits="*${bits}"
-	[ ${newfile:-0} -ne 0 ] && bits="+${bits}"
+	[ ${renamed:-0} -ne 0 ]   && bits=">${bits}"
+	[ ${ahead:-0} -ne 0 ]     && bits="*${bits}"
+	[ ${newfile:-0} -ne 0 ]   && bits="+${bits}"
 	[ ${untracked:-0} -ne 0 ] && bits="?${bits}"
-	[ ${deleted:-0} -ne 0 ] && bits="x${bits}"
-	[ ${dirty:-0} -ne 0 ]   && bits="!${bits}"
+	[ ${deleted:-0} -ne 0 ]   && bits="x${bits}"
+	[ ${dirty:-0} -ne 0 ]     && bits="!${bits}"
 
 	# Output result
-	[ ! -z "${bits}" ] && echo " ${bits}" || echo ""
+	[ -n "${bits}" ] && echo " ${bits}" || echo ""
 }
 
 # Faster Git information for Git Bash and slow networks
 # https://stackoverflow.com/questions/4485059/git-bash-is-extremely-slow-in-windows-7-x64/19500237#19500237
 # https://stackoverflow.com/questions/4485059/git-bash-is-extremely-slow-in-windows-7-x64/13476961#13476961
 # https://stackoverflow.com/questions/39518124/check-if-directory-is-git-repository-without-having-to-cd-into-it/39518382#39518382
-function _fast_git_ps1 () {
-	git -C . rev-parse 2>/dev/null && echo " [$((git symbolic-ref --short -q HEAD || git rev-parse -q --short HEAD) 2> /dev/null)]"
+function _prompt_git_fast() {
+	if hasgit; then
+		git -C . rev-parse 2>/dev/null && \
+		echo " [$((git symbolic-ref --short -q HEAD || \
+			git rev-parse -q --short HEAD) 2> /dev/null)]"
+	else
+		# Git is not installed, return empty string
+		echo ""
+	fi
 }
 
-# Return the path for the "full path" multi-line prompt
-function _pwd() {
+# Return the path for the multi-line prompt
+function _prompt_pwd_full() {
 	# Returns the full path but still shows the home directory as ~
-	echo $PWD | sed 's@'${HOME}'@~@'
+	echo $PWD | sed "s@${HOME}@~@"
 }
 
 # Clear out the prompt command before we begin
-# Some environments can set this and cause errors
+# (Some environments can set this and cause errors)
 export PROMPT_COMMAND=''
 
-# Set the prompt
-# If using Git Bash or Cygwin...
+# Set the prompt based on the environment
 if [[ "$_KERNEL_NAME" = "MINGW" ]] || [[ "$_KERNEL_NAME" = "CYGWI" ]]; then
 
-	# Prompt using faster and less intensive functions on Git Bash
-	export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %d} \[\033[0;36m\]\A \[\033[0;33m\]\w\[\033[0;31m\]\`_fast_git_ps1\`\[\033[0m\]\n\\$ "
+	# If using Git Bash or Cygwin use faster and less intensive functions
+	export PS1="\[\033[0;35m\]\u \
+\[\033[0;34m\]\D{%b %d} \
+\[\033[0;36m\]\A \
+\[\033[0;33m\]\w\
+\[\033[0;31m\]\$(_prompt_git_fast)\
+\[\033[0m\]\n\\$ "
 
 else # Standard default prompt
 
@@ -9071,22 +9245,46 @@ else # Standard default prompt
 	# https://manpages.ubuntu.com/manpages/xenial/man3/strftime.3.html
 	# https://www.cyberciti.biz/faq/linux-unix-formatting-dates-for-display/
 
-	# Only if connected SSH, show the host
+	# Ff connected SSH, show the host...
 	if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 		if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 			# Remote SSH with short path (1 line)
-			export PS1="\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1="\[\033[0;35m\]\u\
+@\[\033[1;35m\]\h \
+\[\033[0;34m\]\D{%b %-d} \
+\[\033[0;36m\]\D{%-H:%M} \
+\[\033[0;33m\]\w\
+\[\033[0;31m\]\$(_prompt_git_branch) \
+\[${_COLOR_USER}\]>\[\033[0m\] "
 		else
 			# Remote SSH with full path (2 lines)
-			export PS1="\[\033[0;35m\]\u@\[\033[1;35m\]\h \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1="\[\033[0;35m\]\u\
+@\[\033[1;35m\]\h \
+\[\033[0;34m\]\D{%b %-d} \
+\[\033[0;36m\]\D{%-H:%M:%S} \
+\[\033[0;33m\]\$(_prompt_pwd_full)\
+\[\033[0;31m\]\$(_prompt_git_branch)\
+\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
 		fi
-	else # Otherwise, only show the name
+
+	else # Local prompt - only show the name
+
 		if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
 			# Local with short path (1 line)
-			export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M} \[\033[0;33m\]\w\[\033[0;31m\]\`_parse_git_branch\` \[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1="\[\033[0;35m\]\u \
+\[\033[0;34m\]\D{%b %-d} \
+\[\033[0;36m\]\D{%-H:%M} \
+\[\033[0;33m\]\w\
+\[\033[0;31m\]\$(_prompt_git_branch) \
+\[${_COLOR_USER}\]>\[\033[0m\] "
 		else
 			# Local with full path (2 lines)
-			export PS1="\[\033[0;35m\]\u \[\033[0;34m\]\D{%b %-d} \[\033[0;36m\]\D{%-H:%M:%S} \[\033[0;33m\]\$(_pwd)\[\033[0;31m\]\`_parse_git_branch\`\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
+			export PS1="\[\033[0;35m\]\u \
+\[\033[0;34m\]\D{%b %-d} \
+\[\033[0;36m\]\D{%-H:%M:%S} \
+\[\033[0;33m\]\$(_prompt_pwd_full)\
+\[\033[0;31m\]\$(_prompt_git_branch)\
+\[\033[0m\]\n\[${_COLOR_USER}\]>\[\033[0m\] "
 		fi
 	fi
 fi
@@ -9100,8 +9298,8 @@ fi
 # The original older Extreme Ultimate .bashrc File prompt with added Git support
 if [[ -f "${HOME}/.bashrc_prompt" ]] && [[ $_SKIP_PROMPT_ORIGINAL = false ]]; then
 	builtin source "${HOME}/.bashrc_prompt"
-elif [[ -f "${HOME}/.config/bashrc/prompt" ]] && [[ $_SKIP_PROMPT_ORIGINAL = false ]]; then
-	builtin source "${HOME}/.config/bashrc/prompt"
+elif [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/prompt" ]] && [[ $_SKIP_PROMPT_ORIGINAL = false ]]; then
+	builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/prompt"
 
 # Trueline Bash (true 24-bit color and glyph support)
 # This is the preferred prompt since it looks amazing,
@@ -9115,8 +9313,8 @@ elif hascommand --strict trueline && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
 	builtin source "$(command which trueline)"
 elif [[ -f /usr/bin/trueline ]] && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
 	builtin source /usr/bin/trueline
-elif [[ -f "${HOME}/.config/bashrc/trueline.sh" ]] && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
-	builtin source "${HOME}/.config/bashrc/trueline.sh"
+elif [[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/trueline.sh" ]] && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
+	builtin source "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/trueline.sh"
 elif [[ -f "${HOME}/trueline/trueline.sh" ]] && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
 	builtin source "${HOME}/trueline/trueline.sh"
 elif [[ -f "${HOME}/trueline.sh" ]] && [[ $_SKIP_PROMPT_TRUELINE = false ]]; then
@@ -9257,10 +9455,10 @@ fi
 
 # Define an array of possible locations for ble.sh (checked in order)
 _BLESH_PATHS=(
-	"${HOME}/.local/share/blesh/ble.sh"     # User-level installation
-	"${HOME}/.local/share/doc/blesh/ble.sh" # User-level installation
-	"${HOME}/ble.sh/out/ble.sh"             # Local Git installation
-	"/usr/share/blesh/ble.sh"               # System-wide installation
+	"${XDG_DATA_HOME:-${HOME}/.local/share}/blesh/ble.sh"     # User-level installation
+	"${XDG_DATA_HOME:-${HOME}/.local/share}/doc/blesh/ble.sh" # User-level installation
+	"${HOME}/ble.sh/out/ble.sh"                               # Local Git installation
+	"/usr/share/blesh/ble.sh"                                 # System-wide installation
 )
 
 # Loop through each potential path to find where ble.sh might be located

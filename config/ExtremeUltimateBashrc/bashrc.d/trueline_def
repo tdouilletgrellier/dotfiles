@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Server: sfs-consume-7 -->
+<!-- Server: sfs-consume-3 -->
 <html class="no-js" lang="en">
     <head>
         
@@ -17,14 +17,14 @@
         
 
 
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1731449177"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-cmp-top.js?1732039941"></script>
 
 
         
 
     
     
-    <link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1731449177">
+    <link rel="stylesheet" href="//a.fsdn.com/con/css/sftheme/sandiego/cmp.css?1732039941">
     
     <script>
         window.bizx.cmp.init({
@@ -42,11 +42,11 @@
             if (!window.net.sf) { window.net.sf = {}; }
             SF.Ads = {};
             SF.cdn = '//a.fsdn.com/con';
-            SF.deploy_time = '1731449177';
+            SF.deploy_time = '1732039941';
             SF.sandiego = true;
             SF.sandiego_chrome = true;
             SF.variant = 'sf';
-            SF.fpid = 'a94281df-d75a-4fc0-b0b4-2cbbbe371c1b';
+            SF.fpid = 'be9b90af-99ee-442d-989e-bd3eb24e38dc';
             SF.billboard_route = '/software/product/$slug/';
             
             SF.Breakpoints = {
@@ -77,14 +77,14 @@
     
     
     
-    <link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1731449177">
+    <link rel="stylesheet" href="//a.fsdn.com/con/css/lato.css?1732039941">
 
         
         
         
-        <link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1731449177">
+        <link rel="stylesheet" href="//a.fsdn.com/con/css/sandiego.css?1732039941">
         
-        <link rel="stylesheet" href="//a.fsdn.com/con/css/disallow.css?1731449177">
+        <link rel="stylesheet" href="//a.fsdn.com/con/css/disallow.css?1732039941">
 
         
         
@@ -101,7 +101,7 @@
             /*global unescape, window, console, jQuery, $, net, SF, DD_belatedPNG, bizx  */
             if (!window.SF) {
                 window.SF = {};
-            }SF.EU_country_codes = ["DE","MQ","IS","IE","JE","CH","HR","LT","BL","LI","NO","MT","TC","IT","SX","TF","SH","NL","CY","PT","GP","MS","RE","EE","LU","SE","PM","DK","GL","WF","KY","FI","PN","CW","ME","PF","FR","AW","BE","PL","NC","CZ","LV","HU","AX","BM","SI","FK","ES","VG","GS","GB","MF","RO","GF","YT","GG","GI","AT","SK","AI","BG","IO","GR"];
+            }SF.EU_country_codes = ["IS","ES","AW","NC","NL","CH","DE","PF","SX","BL","SE","NO","VG","LV","ME","PL","MT","GF","GI","RO","YT","MQ","LI","KY","PN","MS","IE","MF","JE","CW","GS","PT","BE","EE","CZ","FI","SI","GP","WF","TC","GG","CY","IT","FR","AI","GB","IO","SH","HR","GR","BM","TF","HU","RE","AX","DK","AT","SK","BG","FK","PM","LU","GL","LT"];
             SF.unknown_country_codes = ["","A1","A2","O1"];
         </script>
         
@@ -110,15 +110,15 @@
     
     
 
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1731449177"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-head.js?1732039941"></script>
 
 
 
-        <style>.i062199082f4fca19a6b65e4d4715ebb11b6cadcd { display: none !important; }</style>
+        <style>.p428cbaf40cb1e60ac66061321cc24cb42c222f09 { display: none !important; }</style>
 
         
 <script>SF.adblock = true;</script>  
-<script src="//a.fsdn.com/con/js/adpopup.js?1731449177"></script>
+<script src="//a.fsdn.com/con/js/adpopup.js?1732039941"></script>
 
  
 
@@ -145,7 +145,7 @@
             var interval = 6 * 60 * 60 * 1000; // 6 hrs, expressed in ms
             var vid_date = new Date(localStorage.getItem('vid_date'));
             if (new Date() - vid_date >= interval) {
-                var data = {firstparty_id: "a94281df-d75a-4fc0-b0b4-2cbbbe371c1b", do_not_sell: false, is_commercial_page: "False" };
+                var data = {firstparty_id: "be9b90af-99ee-442d-989e-bd3eb24e38dc", do_not_sell: false, is_commercial_page: "False" };
                 bizx.cmp.ifConsent({ purposes: ['ads'], vendors: 'sdm'}, function() {},
                     function(){
                         // no consent (opt-out)
@@ -371,16 +371,15 @@
             <div class="search">
                 
                 
-                    <div class="main-nav-button">
+<div class="main-nav-link">
     
     
-    <a href="https://shift.com/?utm_source=sourceforge&utm_medium=unitad&utm_campaign=1024" rel="nofollow" target="_blank" id="main-nav-badge-link" data-label="MaxNav">
-        <img src="//a.fsdn.com/con/images/sandiego/shift-nav.png?1" srcset="//a.fsdn.com/con/images/sandiego/shift-nav-2x.png 2x" alt="Shift browser" id="main-nav-badge"/>
-
+    <a href="https://brightdata.com/?utm_source=brand&utm_campaign=brnd-mkt_content_partner_slashdot_banner&hs_signup=1" rel="nofollow" target="_blank" id="main-nav-badge-link" data-label="BrightData">
+        <img src="//a.fsdn.com/con/images/sandiego/maxnav.png?1" srcset="//a.fsdn.com/con/images/sandiego/maxnav-2x.png 2x" alt="Bright Data - scale up your web scraping" id="main-nav-image"/>
     </a>
 </div>
 
-                
+
                 
                     
                 
@@ -571,7 +570,7 @@
         
 
 
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1731449177"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-base.js?1732039941"></script>
 
 
     <script>
@@ -581,7 +580,7 @@
         
 
 
-<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1731449177"></script>
+<script src="//a.fsdn.com/con/js/min/sf.sandiego-foundation-base.js?1732039941"></script>
 
 
 
@@ -622,7 +621,7 @@
 
         
         function loadimg(params, dimension_prefix) {
-            params = Object.assign({"idsite":1,"rec":1,"rand":29647,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
+            params = Object.assign({"idsite":1,"rec":1,"rand":42014,"dimension2":"error-content","url":"https://sourceforge.net/error/document","action_name":"Page not found\n    - SourceForge.net"}, params);
             for (var key in params) {
                 if (params.hasOwnProperty(key) && key.indexOf('dimension') === 0 && params[key] !== undefined) {
                     params[key] = (dimension_prefix||'') + params[key];
@@ -673,7 +672,7 @@
             /*global _ml:true, window */
             _ml = window._ml || {};
             _ml.eid = '771';
-            _ml.fp = 'a94281df-d75a-4fc0-b0b4-2cbbbe371c1b';  
+            _ml.fp = 'be9b90af-99ee-442d-989e-bd3eb24e38dc';  
             var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');
             mltag.type = 'text/javascript';
             mltag.async = true;
@@ -704,17 +703,17 @@
             <form class="dropzone small-12" action="/api/instrumentation/gpt" id="blockthisForm" method="POST">
                 <div class="row small-12">
                     <div class="column description small-12">
-                        <input type="hidden" name="_visit_cookie" value="a94281df-d75a-4fc0-b0b4-2cbbbe371c1b"/>
-                            <input type='hidden' name='timestamp' value='1731514766'/>
-                            <input type='hidden' name='spinner' value='XNJztBybS7sRUyHZoS7uAW06Fycg'/>
-                            <p class='i062199082f4fca19a6b65e4d4715ebb11b6cadcd'><label for='XM8O0woJpQ8Krw57DtBrCvsOyQzXDuMK8C8OKYgzDlQ'>You seem to have CSS turned off.
-             Please don't fill out this field.</label><input id='XM8O0woJpQ8Krw57DtBrCvsOyQzXDuMK8C8OKYgzDlQ' name='XMsO0woJpQ8Krw57CiiJMXRYIwofDkMOfwqlAw5TDjA' type=
+                        <input type="hidden" name="_visit_cookie" value="be9b90af-99ee-442d-989e-bd3eb24e38dc"/>
+                            <input type='hidden' name='timestamp' value='1732102032'/>
+                            <input type='hidden' name='spinner' value='XuJAOafeSLVqY8Hg9161meH:8Hfc'/>
+                            <p class='p428cbaf40cb1e60ac66061321cc24cb42c222f09'><label for='Xwr_DuGEHwpLDqx1qH1_DjjDDknYkw5DDrW0oXw'>You seem to have CSS turned off.
+             Please don't fill out this field.</label><input id='Xwr_DuGEHwpLDqx1qH1_DjjDDknYkw5DDrW0oXw' name='Xwr7DuGEHwpLDqx3DnTdGdTgMw6_DjsOqwq7CicK1CQ' type=
              'text'/></p>
-                            <p class='i062199082f4fca19a6b65e4d4715ebb11b6cadcd'><label for='XM8O0woJpQ8Krw57DtRrCvsOyQzXDuMK8C8OKYgzDlQ'>You seem to have CSS turned off.
-             Please don't fill out this field.</label><input id='XM8O0woJpQ8Krw57DtRrCvsOyQzXDuMK8C8OKYgzDlQ' name='XMsO0woJpQ8Krw5_CiiJMXRYIwofDkMOfwqlAw5TDjA' type=
+                            <p class='p428cbaf40cb1e60ac66061321cc24cb42c222f09'><label for='Xwr_DuGEHwpLDqx1rH1_DjjDDknYkw5DDrW0oXw'>You seem to have CSS turned off.
+             Please don't fill out this field.</label><input id='Xwr_DuGEHwpLDqx1rH1_DjjDDknYkw5DDrW0oXw' name='Xwr7DuGEHwpLDqxzDnTdGdTgMw6_DjsOqwq7CicK1CQ' type=
              'text'/></p>
                         Briefly describe the problem (required):
-                        <input name="XP8O4woh0RcKgwofCtCDCoRkGBcONBHAww4bDtcKY" type="text" required>
+                        <input name="XwrPDtGsawpTDoEQqw6zCmRdTUALDkHV6Z19f" type="text" required>
                     </div>
                 </div>
                 <div class="column small-12">
@@ -751,9 +750,9 @@
                     </div>
                     <div class="column large-7 small-6">
                         <p>Ad destination/click URL:
-                        <input name="XPcO_woFuRcK5wrHCsSbCpDgew4_CkMO:GHLDlU0v" type="url" required>
+                        <input name="XwrHDs2IAwpTDuXIvw6rCnMO_wpJhwqBjwqM9FMKPJg" type="url" required>
                         </p>
-                        <textarea id="gpt-info" name="XMMO4woxzR8KcwphAf8K2NVQbP2fCnlPCgcO1wrU"></textarea>
+                        <textarea id="gpt-info" name="XwrzDtG8dwpYVwoLDrMKVw7XCo39_P8K3TcOXQlof"></textarea>
                         <input class="button" type="submit" id="btn-blockthis-submit" value="Submit Report">
                     </div>
                 </div>

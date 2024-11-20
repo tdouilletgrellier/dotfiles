@@ -214,6 +214,7 @@ return {
 
   {
     "NvChad/nvim-colorizer.lua",
+    commit = "f134063618a65cad4d7415fddbd96ff7e0c5b4ae",
     opts = {
       filetypes = {
         "*",
