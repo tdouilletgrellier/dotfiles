@@ -15,14 +15,12 @@ curl -L --output ./_wezterm.lua https://sourceforge.net/projects/ultimate-bashrc
 curl -L --output ./_Xmodmap https://sourceforge.net/projects/ultimate-bashrc/files/support/_Xmodmap/download
 curl -L --output ./_xprofile https://sourceforge.net/projects/ultimate-bashrc/files/support/_xprofile/download
 curl -L --output ./_Xresources https://sourceforge.net/projects/ultimate-bashrc/files/support/_Xresources/download
-curl -L --output ./_zshrc https://sourceforge.net/projects/ultimate-bashrc/files/support/_zshrc/download
 cd ..
 #
 cd bashrc.d/
 curl -L --output ./arch_mirrors_support https://sourceforge.net/projects/ultimate-bashrc/files/bashrc.d/arch_mirrors_support/download
 curl -L --output ./clear_color_spark https://sourceforge.net/projects/ultimate-bashrc/files/bashrc.d/clear_color_spark/download
 curl -L --output ./trueline_config https://sourceforge.net/projects/ultimate-bashrc/files/bashrc.d/trueline_config/download
-curl -L --output ./trueline_def https://sourceforge.net/projects/ultimate-bashrc/files/bashrc.d/trueline_def/download
 curl -L --output ./tty_terminal_color_scheme https://sourceforge.net/projects/ultimate-bashrc/files/bashrc.d/tty_terminal_color_scheme/download
 cd ..
 
