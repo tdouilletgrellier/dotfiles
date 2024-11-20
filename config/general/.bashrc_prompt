@@ -236,9 +236,9 @@ function __my_setprompt
 	if [[ $_GIT_IS_SLOW = true ]]; then
 		# Prompt using faster and less intensive functions on Git Bash
 		if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
-			PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${MAGENTA}\]@\[${MAGENTA}\]\h\[${MAGENTA}\]) \[${BROWN}\]{\w}\[${RED}\]\`_fast_git_ps1\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
+			PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${MAGENTA}\]@\[${MAGENTA}\]\h\[${MAGENTA}\]) \[${BROWN}\]{\w}\[${RED}\]\`_prompt_git_fast\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
 		else
-			PS1=${PS1}"\[${GREEN}\]\[${BROWN}\]{\w}\[${RED}\]\`_fast_git_ps1\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "	
+			PS1=${PS1}"\[${GREEN}\]\[${BROWN}\]{\w}\[${RED}\]\`_prompt_git_fast\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "	
 		fi
 
 	else
