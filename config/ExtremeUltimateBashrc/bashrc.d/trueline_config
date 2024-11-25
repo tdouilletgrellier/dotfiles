@@ -80,7 +80,7 @@ if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 		'exit_status,bright_white,red,bold'
 #		'cmd_duration,black,grey,normal'
 		'cmd_duration_modified,black,grey,normal'
-#		'newline,green,black,bold'
+#		'newline,black,green,bold'
 	)
 
 elif [[ -f /.dockerenv ]] || [[ -f /run/.containerenv ]]; then
@@ -98,7 +98,7 @@ elif [[ -f /.dockerenv ]] || [[ -f /run/.containerenv ]]; then
 		'exit_status,bright_white,red,bold'
 #		'cmd_duration,black,grey,normal'
 		'cmd_duration_modified,black,grey,normal'
-#		'newline,green,black,bold'
+#		'newline,black,green,bold'
 	)
 
 # Prompt segments and order if we are logged in as root...
@@ -136,7 +136,7 @@ else
 		'exit_status,bright_white,red,bold'
 #		'cmd_duration,black,grey,normal'
 		'cmd_duration_modified,black,grey,normal'
-#		'newline,green,black,bold'
+#		'newline,black,green,bold'
 	)
 fi
 
@@ -198,8 +198,9 @@ else # We are not in a TTY terminal so use Unicode
 		#[newline]=' 👤'
 		#[newline]=' 💻'
 		#[newline]=' 👨 '
-		#[newline]=' ❯ '
+		#[newline]=' > '
 		[newline]='  '
+		#[newline]=' ━'
 		#[newline]=' ❯'
 		#[newline]='  '
 		#[newline]=' ⮞ '

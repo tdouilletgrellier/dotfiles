@@ -3,29 +3,21 @@
 # ┏━╸╻ ╻╺┳╸┏━┓┏━╸┏┳┓┏━╸   ╻ ╻╻  ╺┳╸╻┏┳┓┏━┓╺┳╸┏━╸    ┏┓ ┏━┓┏━┓╻ ╻┏━┓┏━╸
 # ┣╸ ┏╋┛ ┃ ┣┳┛┣╸ ┃┃┃┣╸    ┃ ┃┃   ┃ ┃┃┃┃┣━┫ ┃ ┣╸     ┣┻┓┣━┫┗━┓┣━┫┣┳┛┃
 # ┗━╸╹ ╹ ╹ ╹┗╸┗━╸╹ ╹┗━╸   ┗━┛┗━╸ ╹ ╹╹ ╹╹ ╹ ╹ ┗━╸   ╹┗━┛╹ ╹┗━┛╹ ╹╹┗╸┗━╸
-# Extreme Ultimate .bashrc File sources are free and
-# open software released under the MIT License (MIT)
 # https://sourceforge.net/projects/ultimate-bashrc/files/
+# Extreme Ultimate .bashrc File sources are free and
+# open software released under the Zero-Clause BSD License (0BSD)
+# https://opensource.org/license/0BSD
 #
-# The MIT License (MIT)
-# Copyright © 2024
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the “Software”), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted.
 #
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED “AS IS” AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+# AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+# OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+# PERFORMANCE OF THIS SOFTWARE.
 #######################################################
 # To Install or Update:
 # wget -O ~/.bashrc https://sourceforge.net/projects/ultimate-bashrc/files/_bashrc/download
@@ -4771,8 +4763,26 @@ function download() {
 			return 1
 		fi
 
-	# YouTube and other video-focused platforms
-	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|vimeo\.com|twitch\.tv|twitter\.com|reddit\.com|facebook\.com|instagram\.com|tiktok\.com|vk\.com|ok\.ru|flickr\.com|dailymotion\.com|metacafe\.com|vine\.co|tumblr\.com|linkedin\.com|pinterest\.com|imgur\.com|gfycat\.com|giphy\.com|streamable\.com|wistia\.com|ustream\.tv|vevo\.com|viddler\.com|vidme\.com|ted\.com)/ ]]; then
+	# Simple video platforms (Odysee, Rumble, Bitchute, etc) - basic format selection
+	elif [[ "${URL}" =~ ^https?://(www\.)?(odysee\.com|bitchute\.com|rumble\.com|lbry\.tv|peertube\.[a-zA-Z]+|metacafe\.com|streamable\.com|wistia\.com|viddler\.com|ted\.com)/ ]]; then
+
+		# Found yt-dlp command-line audio/video downloader
+		if hascommand yt-dlp; then
+			echo -e "${BRIGHT_YELLOW}Using yt-dlp for the video URL...${RESET}"
+ 			(cd "${DOWNLOAD_PATH}" && yt-dlp --format "best" --progress --no-warnings --geo-bypass "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		# Found youtube-dl command-line audio/video downloader
+		elif hascommand youtube-dl; then
+			echo -e "${BRIGHT_YELLOW}Using youtube-dl for the video URL...${RESET}"
+			(cd "${DOWNLOAD_PATH}" && youtube-dl --format "best" --progress --no-warnings --geo-bypass "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+
+		else
+			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}No suitable video download tool found${RESET}"
+			return 1
+		fi
+
+	# Major streaming platforms (YouTube, Twitch, etc) - advanced format handling
+	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|vimeo\.com|twitch\.tv|twitter\.com|facebook\.com|instagram\.com|tiktok\.com|dailymotion\.com|linkedin\.com|reddit\.com|vk\.com|ok\.ru|tumblr\.com|vevo\.com)/ ]]; then
 
 		# Found yt-dlp command-line audio/video downloader
 		if hascommand yt-dlp; then
