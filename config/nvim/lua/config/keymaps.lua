@@ -23,7 +23,7 @@
 --   --vim.api.nvim_set_keymap("n", "<BS>", msg, { noremap = true, silent = false })
 -- end
 
-vim.keymap.set("n", "oo", "O<Esc>", { desc = "Insert New Line (Below)" })
+vim.keymap.set("n", "oo", "o<Esc>", { desc = "Insert New Line (Below)" })
 vim.keymap.set("n", "OO", "O<Esc>", { desc = "Insert New Line (Above)" })
 
 -- Make Y behave like C or D
