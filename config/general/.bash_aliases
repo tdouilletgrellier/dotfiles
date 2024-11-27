@@ -283,6 +283,8 @@ if hascommand --strict eza; then
 	alias ldir="eza -lD"
 	unalias lfile
 	alias lfile="eza -lf --color=always | grep -v /"
+	alias lsh="eza ${_EZA_COMMON_FLAGS} --group-directories-first --hyperlink"
+	alias llh="eza ${_EZA_LONG_FLAGS} --hyperlink"
 fi
 if hascommand --strict nvim; then
 	alias {v,vi,vim}='nvim'
@@ -387,11 +389,11 @@ if hascommand --strict fzf; then
 	if hascommand --strict fdfind; then
 		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude '.git'"
 	elif hascommand --strict fd; then
-		export FZF_DEFAULT_COMMAND="fd --hidden --exclude '.git'"		
+		export FZF_DEFAULT_COMMAND="fd --hidden --exclude '.git'"
 	fi
 	if hascommand --strict bat; then
 		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
-	elif hascommand --strict batcat; then	
+	elif hascommand --strict batcat; then
 		export FZF_PREVIEW_COMMAND_FILE='batcat -n --color=always -r :500 {}'
 	else
 		export FZF_PREVIEW_COMMAND_FILE='cat -n {}'
@@ -400,13 +402,13 @@ if hascommand --strict fzf; then
 		export FZF_PREVIEW_COMMAND_DIR='eza --tree --level 1 --color=always --icons {}'
 	else
 		export FZF_PREVIEW_COMMAND_DIR='tree -C {}'
-	fi	
+	fi
 	if [[ $TERM = xterm-kitty ]]; then
 		export FZF_PREVIEW_COMMAND_IMG='kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {}'
-		export FZF_PREVIEW_COMMAND_IMG_CLEAR='printf "\x1b_Ga=d,d=A\x1b\\" &&' 
+		export FZF_PREVIEW_COMMAND_IMG_CLEAR='printf "\x1b_Ga=d,d=A\x1b\\" &&'
 	else
 		export FZF_PREVIEW_COMMAND_IMG='echo image: {}'
-		export FZF_PREVIEW_COMMAND_IMG_CLEAR="" 
+		export FZF_PREVIEW_COMMAND_IMG_CLEAR=""
 	fi
 	export FZF_PREVIEW_COMMAND_DEFAULT='echo {}'
 	export FZF_PREVIEW_COMMAND_FILE=''${FZF_PREVIEW_COMMAND_IMG_CLEAR}' [[ $(file --mime {}) =~ image ]] && '${FZF_PREVIEW_COMMAND_IMG}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
@@ -427,11 +429,11 @@ if hascommand --strict fzf; then
   	--walker-skip .git,node_modules,target
   	--preview '${FZF_PREVIEW_COMMAND_DIR}'
   	--preview-window 'right:60%:wrap'
-  	--bind 'ctrl-/:change-preview-window(right|hidden|)'  	
+  	--bind 'ctrl-/:change-preview-window(right|hidden|)'
   	--bind 'ctrl-u:preview-half-page-up'
   	--bind 'ctrl-d:preview-half-page-down'
   	--bind 'ctrl-x:reload("$FZF_ALT_C_COMMAND")'
-  	--bind 'ctrl-w:reload("$FZF_ALT_C_COMMAND" --max-depth 1)'"  	
+  	--bind 'ctrl-w:reload("$FZF_ALT_C_COMMAND" --max-depth 1)'"
 	export FZF_CTRL_R_OPTS="
 	--preview 'echo {}' --preview-window down:3:hidden:wrap
 	--bind 'ctrl-/:toggle-preview'"
@@ -496,5 +498,6 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 if [[ $TERM = xterm-kitty ]]; then
 	alias ssh='kitten ssh'
 	alias icat="kitten icat"
+	alias hg="kitten hyperlinked-grep"
 fi
 #-------------------------------------------------------------
