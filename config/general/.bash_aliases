@@ -342,8 +342,10 @@ if [[ "${SHLVL}" -lt 2 ]]; then
 	# Fortune message
 	if hascommand --strict lolcat; then
 		if [[ $BORING = true ]]; then
-			echo -e '\e[m'
-			echo -e "$COLOR_S$(/usr/games/fortune -s)${NC}"
+			if [ -x /usr/games/fortune ]; then
+				echo -e '\e[m'
+				echo -e "$COLOR_S$(/usr/games/fortune -s)${NC}"
+			fi
 			echo -e '\e[m'
 			echo -e "$COLOR_S$(sparkbars)${NC}"
 		else
