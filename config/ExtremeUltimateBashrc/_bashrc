@@ -4764,12 +4764,12 @@ function download() {
 		fi
 
 	# Simple video platforms (Odysee, Rumble, Bitchute, etc) - basic format selection
-	elif [[ "${URL}" =~ ^https?://(www\.)?(odysee\.com|bitchute\.com|rumble\.com|lbry\.tv|peertube\.[a-zA-Z]+|metacafe\.com|streamable\.com|wistia\.com|viddler\.com|ted\.com)/ ]]; then
+	elif [[ "${URL}" =~ ^https?://(www\.)?(bitchute\.com|dailymotion\.com|facebook\.com|instagram\.com|lbry\.tv|linkedin\.com|metacafe\.com|odysee\.com|ok\.ru|peertube\.[a-zA-Z]+|reddit\.com|rumble\.com|streamable\.com|ted\.com|tiktok\.com|tumblr\.com|twitch\.tv|twitter\.com|vevo\.com|viddler\.com|vimeo\.com|vk\.com|wistia\.com)/ ]]; then
 
 		# Found yt-dlp command-line audio/video downloader
 		if hascommand yt-dlp; then
 			echo -e "${BRIGHT_YELLOW}Using yt-dlp for the video URL...${RESET}"
- 			(cd "${DOWNLOAD_PATH}" && yt-dlp --format "best" --progress --no-warnings --geo-bypass "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+			(cd "${DOWNLOAD_PATH}" && yt-dlp --format "best" --progress --no-warnings --geo-bypass "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
 
 		# Found youtube-dl command-line audio/video downloader
 		elif hascommand youtube-dl; then
@@ -4782,16 +4782,16 @@ function download() {
 		fi
 
 	# Major streaming platforms (YouTube, Twitch, etc) - advanced format handling
-	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|vimeo\.com|twitch\.tv|twitter\.com|facebook\.com|instagram\.com|tiktok\.com|dailymotion\.com|linkedin\.com|reddit\.com|vk\.com|ok\.ru|tumblr\.com|vevo\.com)/ ]]; then
+	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be)/ ]]; then
 
 		# Found yt-dlp command-line audio/video downloader
 		if hascommand yt-dlp; then
 			echo -e "${BRIGHT_YELLOW}Using yt-dlp for the video URL...${RESET}"
 
 			if ask "Do you want to download the highest available video quality (choosing No will limit to 1080p)?" N; then
-				(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestvideo[ext=mp4]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+				(cd "${DOWNLOAD_PATH}" && yt-dlp -o "%(title)s.%(ext)s" -f 'bestvideo[ext=mp4]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
 			else
-				(cd "${DOWNLOAD_PATH}" && yt-dlp -f 'bestvideo[ext=mp4][height<=1080]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+				(cd "${DOWNLOAD_PATH}" && yt-dlp -o "%(title)s.%(ext)s" -f 'bestvideo[ext=mp4][height<=1080]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
 			fi
 
 		# Found youtube-dl command-line audio/video downloader
@@ -7958,7 +7958,10 @@ function timeelapsed() {
 	echo -e "${message} ${BRIGHT_MAGENTA}${total_days} total days${BRIGHT_CYAN} ago which is ${BRIGHT_YELLOW}${years} years${BRIGHT_CYAN}, ${BRIGHT_YELLOW}${months} months${BRIGHT_CYAN}, and ${BRIGHT_YELLOW}${days} days${BRIGHT_CYAN}!${RESET}"
 }
 
-# For some reason, rot13 pops up everywhere
+# ROT13 (rotate by 13 positions) is a simple letter substitution cipher that
+# replaces each letter with the letter 13 positions after it in the alphabet
+# NOTE: Since the English alphabet has 26 letters, ROT13 acts as its own inverse
+#       applying it twice gets you back to the original text.
 function rot13() {
 	if [[ $# -eq 0 ]]; then
 		tr '[a-m][n-z][A-M][N-Z]' '[n-z][a-m][N-Z][A-M]'
@@ -7967,12 +7970,328 @@ function rot13() {
 	fi
 }
 
+# Transform text using common string formatting and case operations
+function formattext() {
+	local text=""
+	local params=()
+
+	# Internal function to show help message
+	function _show_help() {
+		echo -e "${BRIGHT_CYAN}formattext${RESET}: Format text with various transformations"
+		echo -e "${BRIGHT_WHITE}Note:${RESET} Text is processed in order of the parameters specified"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}formattext${RESET} ${BRIGHT_YELLOW}[options]${RESET} ${BRIGHT_GREEN}\"text\"${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}                     Display this help message"
+		echo -e "  ${BRIGHT_YELLOW}-i, --input${RESET}                    Specify input text (-i=text or -i text)"
+		echo -e "  ${BRIGHT_YELLOW}-c, --capitalize${RESET}               Capitalize every word"
+		echo -e "  ${BRIGHT_YELLOW}-C, --titlecase${RESET}                Convert text to title case"
+		echo -e "  ${BRIGHT_YELLOW}-d, --dashes-to-spaces${RESET}         Replace dashes with spaces"
+		echo -e "  ${BRIGHT_YELLOW}-f, --filename-friendly${RESET}        Replace characters difficult for filenames"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}                     Display this help message"
+		echo -e "  ${BRIGHT_YELLOW}-l, --lowercase${RESET}                Convert text to lowercase"
+		echo -e "  ${BRIGHT_YELLOW}-q, --smart-quotes${RESET}             Convert quotes to smart quotes"
+		echo -e "  ${BRIGHT_YELLOW}-Q, --unsmart-quotes${RESET}           Smart quotes to regular quotes"
+		echo -e "  ${BRIGHT_YELLOW}-r, --remove-duplicate-spaces${RESET}  Remove duplicate spaces"
+		echo -e "  ${BRIGHT_YELLOW}-s, --spaces-to-dashes${RESET}         Replace spaces with dashes"
+		echo -e "  ${BRIGHT_YELLOW}-S, --spaces-to-underscores${RESET}    Replace spaces with underscores"
+		echo -e "  ${BRIGHT_YELLOW}-t, --trim${RESET}                     Trim leading and trailing whitespace"
+		echo -e "  ${BRIGHT_YELLOW}-T, --tabs-to-spaces${RESET}           Replace tabs with spaces"
+		echo -e "  ${BRIGHT_YELLOW}-u, --uppercase${RESET}                Convert text to uppercase"
+		echo -e "  ${BRIGHT_YELLOW}-U, --underscores-to-spaces${RESET}    Replace underscores with spaces"
+		echo -e "${BRIGHT_WHITE}Example:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}formattext${RESET} ${BRIGHT_YELLOW}--remove-duplicate-spaces --titlecase${RESET} ${BRIGHT_GREEN}'hello   for the world'${RESET}"
+		echo -e "  ${BRIGHT_CYAN}formattext${RESET} ${BRIGHT_YELLOW}--trim --capitalize --input${RESET}=${BRIGHT_GREEN}\"  hello world \"${RESET}"
+		echo -e "  ${BRIGHT_CYAN}formattext${RESET} ${BRIGHT_YELLOW}-u -i${RESET} ${BRIGHT_GREEN}\"hello\"${RESET} ${BRIGHT_YELLOW}-i${RESET} ${BRIGHT_GREEN}\"world\"${RESET} ${BRIGHT_GREEN}\"example\"${RESET}"
+		return 0
+	}
+
+	# Show help if no parameters provided
+	if [[ $# -eq 0 ]]; then
+		_show_help
+		return 0
+	fi
+
+	# Parse command line options
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+			-h|--help)
+				_show_help
+				return 0
+				;;
+			-i=*|--input=*)
+				if [[ -z "$text" ]]; then
+					text="${1#*=}"  # If text is empty, set it
+				else
+					text+=" ${1#*=}"  # Otherwise append with space
+				fi
+				shift
+				;;
+			-i|--input)
+				if [[ -n "$2" ]] && [[ "$2" != -* ]]; then
+					if [[ -z "$text" ]]; then
+						text="$2"  # If text is empty, set it
+					else
+						text+=" $2"  # Otherwise append with space
+					fi
+					shift 2
+				else
+					echo "Error: --input requires an argument" >&2
+					return 1
+				fi
+				;;
+			-*)
+				params+=("$1")
+				shift
+				;;
+			*)
+				if [[ -z "$text" ]]; then
+					text="$1"  # First word without space
+				else
+					text+=" $1"  # Subsequent words with space
+				fi
+				shift
+				;;
+		esac
+	done
+
+	# Check if no text is provided
+	if [[ -z "$text" ]]; then
+		return 1
+	fi
+
+	# Apply transformations in the specified order
+	for param in "${params[@]}"; do
+		case "$param" in
+			-c|--capitalize)
+				text=$(IFS=' ' read -ra words <<< "$text" && (IFS=' '; echo "${words[@]^}"))
+				;;
+			-C|--titlecase)
+				local result=""
+				local smallWords="a|an|and|as|at|but|by|en|for|if|in|nor|of|on|or|per|the|to|vs?\\.?|via"
+				local capitalize_next=true
+				for word in $text; do
+					if $capitalize_next || ! [[ $word =~ ^($smallWords)$ ]]; then
+						result+="${word^} "
+						capitalize_next=false
+					else
+						result+="${word,,} "
+					fi
+					# Check if we should capitalize the next word
+					if [[ ${word: -1} =~ [:.?!-] ]]; then
+						capitalize_next=true
+					fi
+				done
+				text="${result%% }"
+				;;
+			-d|--dashes-to-spaces)
+				text="${text//-/ }"
+				;;
+			-f|--filename-friendly)
+				local result=""
+				for ((i=0; i<${#text}; i++)); do
+					char="${text:i:1}"
+					case "$char" in
+						"<") result+="＜" ;;
+						">") result+="＞" ;;
+						":") result+="：" ;;
+						"\"") result+="＂" ;;
+						"/") result+="／" ;;
+						"\\") result+="＼" ;;
+						"|") result+="｜" ;;
+						"?") result+="？" ;;
+						"*") result+="＊" ;;
+						[[:cntrl:]]) result+=" " ;;
+						*) result+="$char" ;;
+					esac
+				done
+				text="$result"
+				;;
+			-l|--lowercase)
+				text="${text,,}"
+				;;
+			-q|--smart-quotes)
+				if ! hascommand sed; then
+					echo -e "${BRIGHT_RED}Error:${RESET} ${BRIGHT_CYAN}Smart quotes requires ${BRIGHT_YELLOW}sed${RESET}"
+					return 1
+				fi
+
+				# Get the actual Unicode characters for smart quotes
+				local ldq=$(echo -ne '\u201C')  # Left double quote "
+				local rdq=$(echo -ne '\u201D')  # Right double quote "
+				local lsq=$(echo -ne '\u2018')  # Left single quote '
+				local rsq=$(echo -ne '\u2019')  # Right single quote '
+
+				# First convert doubles
+				text=$(echo "$text" | sed -e "s/\"/$ldq/g") # Replace all " with opening "
+				text=$(echo "$text" | sed -e "s/$ldq\([^$rdq]*\)$/$ldq\1/g") # Fix lone opening quotes at end
+				text=$(echo "$text" | sed -e "s/$ldq\([^$rdq]*\)$ldq/$ldq\1$rdq/g") # Fix pairs
+
+				# Then convert singles
+				text=$(echo "$text" | sed -e "s/'/$lsq/g") # Replace all ' with opening '
+				text=$(echo "$text" | sed -e "s/$lsq\([^$rsq]*\)$/$lsq\1/g") # Fix lone opening quotes at end
+				text=$(echo "$text" | sed -e "s/$lsq\([^$rsq]*\)$lsq/$lsq\1$rsq/g") # Fix pairs
+				;;
+			-Q|--unsmart-quotes)
+				# Convert from smart quotes back to regular
+				text=${text//‘/\'}
+				text=${text//’/\'}
+				text=${text//“/\"}
+				text=${text//”/\"}
+				;;
+			-r|--remove-duplicate-spaces)
+				while [[ "$text" =~ "  " ]]; do
+					text="${text//  / }"
+				done
+				;;
+			-s|--spaces-to-dashes)
+				# First remove duplicate spaces, then convert to dashes
+				while [[ "$text" =~ "  " ]]; do
+					text="${text//  / }"
+				done
+				text="${text// /-}"
+				;;
+			-S|--spaces-to-underscores)
+				text="${text// /_}"
+				;;
+			-t|--trim)
+				text="${text#"${text%%[![:space:]]*}"}"
+				text="${text%"${text##*[![:space:]]}"}"
+				;;
+			-T|--tabs-to-spaces)
+				text="${text//	/ }"
+				;;
+			-u|--uppercase)
+				text="${text^^}"
+				;;
+			-U|--underscores-to-spaces)
+				text="${text//_/ }"
+				;;
+		esac
+	done
+
+	echo "$text"
+}
+
 # Trim leading and trailing spaces
 function trim() {
-	local var=$@
-	var="${var#"${var%%[![:space:]]*}"}"  # remove leading whitespace characters
-	var="${var%"${var##*[![:space:]]}"}"  # remove trailing whitespace characters
-	echo -n "$var"
+	formattext --trim --input "${*}"
+}
+
+# Replace multiple spaces, tabs, and underscores with a single space
+function fixspaces() {
+	formattext --tabs-to-spaces --underscores-to-spaces --remove-duplicate-spaces --input "${*}"
+}
+
+# Convert a string to lowercase
+function lowercase() {
+	formattext --lowercase --input "${*}"
+}
+
+# Convert a string to uppercase
+function uppercase() {
+	formattext --uppercase --input "${*}"
+}
+
+# Capitalize every word in a string
+function capitalize() {
+	formattext --capitalize --input "${*}"
+}
+
+# Convert a string to title case
+function titlecase() {
+	formattext --titlecase --input "${*}"
+}
+
+# Convert regular quotes to smart quotes
+function smartquotes() {
+	formattext --smart-quotes --input "${*}"
+}
+
+# Convert smart quotes to regular quotes
+function unsmartquotes() {
+	formattext --unsmart-quotes --input "${*}"
+}
+
+# Reverse the text in a string
+function reversetext() {
+	local reversed=""
+
+	# Iterate over each character in the string in reverse order
+	for (( i=${#1}-1; i>=0; i-- )); do
+		reversed+="${1:$i:1}"
+	done
+
+	echo "${reversed}"
+}
+
+# Count the number of characters in a string
+function countchars() {
+	# Use wc -m to count the number of characters
+	echo "$1" | wc -m
+}
+
+# Count the number of words in a string
+function countwords() {
+	# Use wc -w to count the number of words
+	echo "$1" | wc -w
+}
+
+# Function to check if a string starts with a specific substring
+function startswith() {
+	# Use parameter expansion to check if the string starts with the substring
+	if [[ "$1" == "$2"* ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+# Function to check if a string ends with a specific substring
+function endswith() {
+	# Use parameter expansion to check if the string ends with the substring
+	if [[ "$1" == *"$2" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+# Fix specified filenames by trimming whitespace, replacing multiple spaces,
+# tabs, and underscores with a single space, and converting to title case
+function fixfilename() {
+	for file in "$@"; do
+		if [[ -f "$file" ]]; then
+			local directory=$(dirname "$file")
+			local filename=$(basename "$file")
+
+			# Use formattext with multiple transformations:
+			local new_filename=$(formattext \
+				--tabs-to-spaces \
+				--underscores-to-spaces \
+				--titlecase \
+				--filename-friendly \
+				--remove-duplicate-spaces \
+				--trim \
+				"${filename##-}")
+
+			if [[ "$filename" != "$new_filename" ]]; then
+				local new_filepath="$directory/$new_filename"
+				echo -e "${BRIGHT_CYAN}Rename: ${BRIGHT_YELLOW}${filename}${RESET}"
+				echo -e "${BRIGHT_CYAN}    To: ${BRIGHT_YELLOW}${new_filename}${RESET}"
+				if ask "${BRIGHT_WHITE}Continue?${RESET}" Y; then
+					mv -i "$file" "$new_filepath"
+					echo -e "${BRIGHT_GREEN}Renamed to ${BRIGHT_YELLOW}${new_filename}${RESET}"
+				else
+					echo -e "${BRIGHT_CYAN}Skipped renaming ${BRIGHT_YELLOW}${filename}${RESET}"
+				fi
+			else
+				echo -e "${BRIGHT_MAGENTA}No changes needed for ${BRIGHT_YELLOW}${filename}${RESET}"
+			fi
+		else
+			echo -e "${BRIGHT_RED}File not found: ${BRIGHT_YELLOW}${file}${RESET}"
+		fi
+	done
 }
 
 #######################################################
