@@ -500,6 +500,6 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 if [[ $TERM = xterm-kitty ]]; then
 	alias ssh='kitten ssh'
 	alias icat="kitten icat"
-	alias hg="kitten hyperlinked-grep"
+	alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
 fi
 #-------------------------------------------------------------
