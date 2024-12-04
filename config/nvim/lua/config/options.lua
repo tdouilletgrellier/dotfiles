@@ -2,7 +2,6 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
-
 -- Custom syntax highlighting  colors for EPX
 vim.cmd("highlight epxNumber      ctermfg=red  guifg=#cd0000")
 vim.cmd("highlight epxWord        ctermfg=white  guifg=#ffffff")
