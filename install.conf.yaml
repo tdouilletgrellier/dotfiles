@@ -55,9 +55,6 @@
     #profile
     ~/.profile: config/general/.profile
 
-    #zsh
-    ~/.zshrc: config/ExtremeUltimateBashrc/support/_zshrc
-
     #vimrc
     ~/.vimrc: config/general/.vimrc
     ~/.vim_runtime: config/vim
@@ -101,6 +98,13 @@
 
     #kitty
     ~/.config/kitty: config/kitty
+
+    #oh_my-zsh
+    ~/.oh-my-zsh: config/oh-my-zsh    
+
+    #zsh
+    ~/.zshrc: config/zsh/.zshrc 
+    ~/.zsh_custom: config/zsh/custom    
 
     #tools
     ~/bin:

@@ -20,3 +20,6 @@
 [submodule "config/fzf-tab-completion"]
 	path = config/fzf-tab-completion
 	url = https://github.com/lincheney/fzf-tab-completion
+[submodule "config/oh-my-zsh"]
+	path = config/oh-my-zsh
+	url = https://github.com/ohmyzsh/ohmyzsh.git
