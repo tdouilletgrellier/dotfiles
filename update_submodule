@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+cd "${BASEDIR}"
+git submodule foreach --recursive git reset --hard
+git submodule foreach --recursive git clean -fdx
+git submodule update --remote --merge
