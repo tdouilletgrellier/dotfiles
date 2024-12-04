@@ -1948,6 +1948,7 @@ if hasgit; then
 			"♻️ ${BRIGHT_CYAN}refactor${RESET}: refactoring production code, eg. renaming a variable"
 			"💅 ${BRIGHT_CYAN}style${RESET}: formatting, missing semi colons, etc; no production code change"
 			"🧪 ${BRIGHT_CYAN}test${RESET}: adding missing tests, refactoring tests; no production code change"
+			"🚧 ${BRIGHT_CYAN}wip${RESET}: work in progress"
 			"🔀 ${BRIGHT_CYAN}merge${RESET}: choose this if this is a merge"
 		)
 
@@ -1960,6 +1961,7 @@ if hasgit; then
 			"♻️ refactor: "
 			"💅 style: "
 			"🧪 test: "
+			"🚧 wip: "
 		)
 
 		# Prompt the user to select the type of commit from the list
@@ -1972,16 +1974,15 @@ if hasgit; then
 		echo -ne "${BRIGHT_YELLOW}Enter the number corresponding to the commit type${RESET}: "
 		read -r commit_type_number
 
-
 		# Validate the selection
-		if ! [[ "$commit_type_number" =~ ^[1-8]$ ]]; then
+		if ! [[ "$commit_type_number" =~ ^[1-9]$ ]]; then
 			echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}Invalid selection${RESET}"
 			return 1
 		fi
 
-		# If this is a git merge
-		if [[ "$commit_type_number" -eq 8 ]]; then
-
+		# Handle special cases (merge and wip)
+		if [[ "$commit_type_number" -eq 9 ]]; then
+			# Merge commit
 			echo -ne "${BRIGHT_YELLOW}Enter the ${BRIGHT_CYAN}source branch${BRIGHT_YELLOW} you are merging ${BRIGHT_CYAN}from${BRIGHT_YELLOW}${RESET}: "
 			read -r source_branch
 
@@ -2003,8 +2004,12 @@ if hasgit; then
 			# Construct the merge commit message
 			full_commit_message="🔀 Merged branch ${source_branch} into ${destination_branch}"
 
-		else
+		elif [[ "$commit_type_number" -eq 8 ]]; then
+			# WIP commit
+			full_commit_message="🚧 work in progress [$(date +%H:%M)]"
 
+		else
+			# Regular commit
 			# Get the corresponding commit prefix
 			local commit_prefix="${commit_prefixes[$((commit_type_number-1))]}"
 
@@ -4764,7 +4769,7 @@ function download() {
 		fi
 
 	# Simple video platforms (Odysee, Rumble, Bitchute, etc) - basic format selection
-	elif [[ "${URL}" =~ ^https?://(www\.)?(bitchute\.com|dailymotion\.com|facebook\.com|instagram\.com|lbry\.tv|linkedin\.com|metacafe\.com|odysee\.com|ok\.ru|peertube\.[a-zA-Z]+|reddit\.com|rumble\.com|streamable\.com|ted\.com|tiktok\.com|tumblr\.com|twitch\.tv|twitter\.com|vevo\.com|viddler\.com|vimeo\.com|vk\.com|wistia\.com)/ ]]; then
+	elif [[ "${URL}" =~ ^https?://(www\.)?(bitchute\.com|lbry\.tv|metacafe\.com|odysee\.com|peertube\.[a-zA-Z]+|rumble\.com|streamable\.com|ted\.com|viddler\.com|wistia\.com)/ ]]; then
 
 		# Found yt-dlp command-line audio/video downloader
 		if hascommand yt-dlp; then
@@ -4782,7 +4787,7 @@ function download() {
 		fi
 
 	# Major streaming platforms (YouTube, Twitch, etc) - advanced format handling
-	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be)/ ]]; then
+	elif [[ "${URL}" =~ ^https?://(www\.)?(youtube\.com|youtu\.be|dailymotion\.com|facebook\.com|instagram\.com|linkedin\.com|ok\.ru|reddit\.com|tiktok\.com|tumblr\.com|twitch\.tv|twitter\.com|vevo\.com|vimeo\.com|vk\.com)/ ]]; then
 
 		# Found yt-dlp command-line audio/video downloader
 		if hascommand yt-dlp; then
@@ -8175,7 +8180,7 @@ function formattext() {
 
 # Trim leading and trailing spaces
 function trim() {
-	formattext --trim --input "${*}"
+	formattext --trim --input="${*}"
 }
 
 # Replace multiple spaces, tabs, and underscores with a single space
@@ -8185,32 +8190,32 @@ function fixspaces() {
 
 # Convert a string to lowercase
 function lowercase() {
-	formattext --lowercase --input "${*}"
+	formattext --lowercase --input="${*}"
 }
 
 # Convert a string to uppercase
 function uppercase() {
-	formattext --uppercase --input "${*}"
+	formattext --uppercase --input="${*}"
 }
 
 # Capitalize every word in a string
 function capitalize() {
-	formattext --capitalize --input "${*}"
+	formattext --capitalize --input="${*}"
 }
 
 # Convert a string to title case
 function titlecase() {
-	formattext --titlecase --input "${*}"
+	formattext --titlecase --input="${*}"
 }
 
 # Convert regular quotes to smart quotes
 function smartquotes() {
-	formattext --smart-quotes --input "${*}"
+	formattext --smart-quotes --input="${*}"
 }
 
 # Convert smart quotes to regular quotes
 function unsmartquotes() {
-	formattext --unsmart-quotes --input "${*}"
+	formattext --unsmart-quotes --input="${*}"
 }
 
 # Reverse the text in a string
@@ -8273,7 +8278,7 @@ function fixfilename() {
 				--filename-friendly \
 				--remove-duplicate-spaces \
 				--trim \
-				"${filename##-}")
+				--input="${filename##-}")
 
 			if [[ "$filename" != "$new_filename" ]]; then
 				local new_filepath="$directory/$new_filename"
