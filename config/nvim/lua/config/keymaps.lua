@@ -1,69 +1,80 @@
--- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
+-- Keymaps Configuration
+-- Add or override keymaps for Neovim using LazyVim
 
-vim.keymap.set("n", "oo", "o<Esc>", { desc = "Insert New Line (Below)" })
-vim.keymap.set("n", "OO", "O<Esc>", { desc = "Insert New Line (Above)" })
+-- Keymap helper for cleaner code
+local keymap = vim.keymap.set
 
--- Make Y behave like C or D
-vim.keymap.set("n", "Y", "y$", { desc = "Copy Until End of Line" })
+-- ========================
+-- NORMAL MODE KEYMAPS
+-- ========================
+-- New lines without entering insert mode
+keymap("n", "oo", "o<Esc>", { desc = "Insert New Line (Below)" })
+keymap("n", "OO", "O<Esc>", { desc = "Insert New Line (Above)" })
 
--- Keep window centered when going up/down
-vim.keymap.set("n", "J", "mzJ`z", { desc = "Join Lines" })
-vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll Down" })
-vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll Up" })
-vim.keymap.set("n", "n", "nzzzv", { desc = "Next Result" })
-vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous Result" })
+-- Yank until end of line (Y behaves like D)
+keymap("n", "Y", "y$", { desc = "Copy Until End of Line" })
 
--- Replace word under cursor across entire buffer
-vim.keymap.set(
-  "n",
-  "<leader>sf",
-  [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
-  { desc = "Replace word under cursor" }
-)
+-- Center cursor when scrolling or searching
+keymap("n", "J", "mzJ`z", { desc = "Join Lines" })
+keymap("n", "<C-d>", "<C-d>zz", { desc = "Scroll Down" })
+keymap("n", "<C-u>", "<C-u>zz", { desc = "Scroll Up" })
+keymap("n", "n", "nzzzv", { desc = "Next Result" })
+keymap("n", "N", "Nzzzv", { desc = "Previous Result" })
 
--- Live Grep (args)
-vim.keymap.set(
-  "n",
-  "<leader>fs",
-  require("telescope").extensions.live_grep_args.live_grep_args,
-  { desc = "Live Grep (args)" }
-)
+-- Replace word under cursor across buffer
+keymap("n", "<leader>sf", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+  { desc = "Replace Word Under Cursor" })
 
--- Resize window using <ctrl> arrow keys
-vim.keymap.set("n", "<A-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
-vim.keymap.set("n", "<A-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
-vim.keymap.set("n", "<A-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
-vim.keymap.set("n", "<A-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
+-- Live Grep (args) with Telescope
+keymap("n", "<leader>fs", require("telescope").extensions.live_grep_args.live_grep_args,
+  { desc = "Live Grep (args)" })
 
--- Visual --
--- Stay in indent mode
-vim.keymap.set("v", "<", "<gv", { desc = "Indent Right" })
-vim.keymap.set("v", ">", ">gv", { desc = "Indent Left" })
+-- Resize splits
+keymap("n", "<A-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
+keymap("n", "<A-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
+keymap("n", "<A-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
+keymap("n", "<A-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
 
--- Move block
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move Block Down" })
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move Block Up" })
+-- Move lines up and down
+keymap("n", "<A-k>", "<CMD>m .-2<CR>==", { desc = "Move Line Up", silent = true  })
+keymap("n", "<A-j>", "<CMD>m .+1<CR>==", { desc = "Move Line Down", silent = true  })
 
--- Search for highlighted text in buffer
-vim.keymap.set("v", "//", 'y/<C-R>"<CR>', { desc = "Search for highlighted text" })
-
--- -- Move line up and down (insert+normal+visual)
-vim.keymap.set("i", "<A-k>", "<CMD>m .-2<CR>==", { desc = "󰜸 Move line up" })
-vim.keymap.set("i", "<A-j>", "<CMD>m .+1<CR>==", { desc = "󰜸 Move line down" })
-vim.keymap.set("n", "<A-k>", "<CMD>m .-2<CR>==", { desc = "󰜸 Move line up" })
-vim.keymap.set("n", "<A-j>", "<CMD>m .+1<CR>==", { desc = "󰜯 Move line down" })
-vim.keymap.set("v", "<A-k>", ":m'<-2<CR>gv=gv", { desc = "󰜸 Move selection up" }, { opts = { silent = true } })
-vim.keymap.set("v", "<A-j>", ":m'>+1<CR>gv=gv", { desc = "󰜯 Move selection down" }, { opts = { silent = true } })
-
--- -- Navigate (insert+normal+visual)
-vim.keymap.set("i", "<A-h>", "<ESC>I", { desc = " Move to beginning of line" })
-vim.keymap.set("i", "<A-l>", "<ESC>A", { desc = " Move to end of line" })
-vim.keymap.set("n", "<A-h>", "<ESC>_", { desc = "󰜲 Move to beginning of line" })
-vim.keymap.set("n", "<A-l>", "<ESC>$", { desc = "󰜵 Move to end of line" })
-vim.keymap.set("v", "<A-h>", "<ESC>_", { desc = "󰜲 Move to beginning of line" })
-vim.keymap.set("v", "<A-l>", "<ESC>$", { desc = "󰜵 Move to end of line" })
+-- Navigate to line start and end
+keymap("n", "<A-h>", "^", { desc = "Move to Beginning of Line" })
+keymap("n", "<A-l>", "$", { desc = "Move to End of Line" })
 
 -- Select all
-vim.keymap.set("n", "<C-a>", "gg0vG", { desc = " Select all" })
+keymap("n", "<C-a>", "ggVG", { desc = "Select All" })
+
+-- ========================
+-- VISUAL MODE KEYMAPS
+-- ========================
+-- Stay in indent mode
+keymap("v", "<", "<gv", { desc = "Indent Left" })
+keymap("v", ">", ">gv", { desc = "Indent Right" })
+
+-- Move blocks up and down
+keymap("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move Block Down" })
+keymap("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move Block Up" })
+
+-- Search for highlighted text
+keymap("v", "//", 'y/<C-R>"<CR>', { desc = "Search Highlighted Text" })
+
+-- Move lines up and down
+keymap("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move Selection Up", silent = true  })
+keymap("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move Selection Down", silent = true  })
+
+-- Navigate to line start and end
+keymap("v", "<A-h>", "^", { desc = "Move to Beginning of Line" })
+keymap("v", "<A-l>", "$", { desc = "Move to End of Line" })
+
+-- ========================
+-- INSERT MODE KEYMAPS
+-- ========================
+-- Move lines up and down
+keymap("i", "<A-k>", "<CMD>m .-2<CR>==", { desc = "Move Line Up" })
+keymap("i", "<A-j>", "<CMD>m .+1<CR>==", { desc = "Move Line Down" })
+
+-- Navigate to line start and end
+keymap("i", "<A-h>", "<ESC>I", { desc = "Move to Beginning of Line" })
+keymap("i", "<A-l>", "<ESC>A", { desc = "Move to End of Line" })

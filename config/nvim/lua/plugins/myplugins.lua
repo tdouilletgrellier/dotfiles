@@ -26,6 +26,7 @@ return {
 
   {
     "nvim-neo-tree/neo-tree.nvim",
+    cmd = "Neotree",
     config = function()
       require("neo-tree").setup({
         close_if_last_window = true,
@@ -153,6 +154,10 @@ return {
       cr_char = "←",
       enabled = true,
     },
+    vim.keymap.set("n", "<leader>uw", function()
+  vim.cmd("VisualWhitespaceToggle")
+end, { desc = "Toggle Visual Whitespace" })
+
   },
 
   {
@@ -228,6 +233,7 @@ return {
 
   {
     "m4xshen/hardtime.nvim",
+    event = { "CursorMoved", "InsertEnter" },
     dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
     lazy = false,
     keys = {
@@ -309,6 +315,7 @@ return {
 
   {
     "lukas-reineke/indent-blankline.nvim",
+    event = "BufReadPre",
     config = function()
       require("ibl").setup({
         exclude = { filetypes = { "dashboard" } },
