@@ -244,7 +244,6 @@ return {
 
   {
     "hiphish/rainbow-delimiters.nvim",
-    config = true,
   },
 
   {
