@@ -155,9 +155,8 @@ return {
       enabled = true,
     },
     vim.keymap.set("n", "<leader>uw", function()
-  vim.cmd("VisualWhitespaceToggle")
-end, { desc = "Toggle Visual Whitespace" })
-
+      vim.cmd("VisualWhitespaceToggle")
+    end, { desc = "Toggle Visual Whitespace" }),
   },
 
   {
@@ -245,7 +244,7 @@ end, { desc = "Toggle Visual Whitespace" })
 
   {
     "hiphish/rainbow-delimiters.nvim",
-    convig = true,
+    config = true,
   },
 
   {
