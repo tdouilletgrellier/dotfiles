@@ -1,7 +1,7 @@
 return {
   {
     "NvChad/nvim-colorizer.lua",
-    commit = "f134063618a65cad4d7415fddbd96ff7e0c5b4ae", -- Pin to a specific commit for stability
+    -- commit = "f134063618a65cad4d7415fddbd96ff7e0c5b4ae", -- Pin to a specific commit for stability
     opts = {
       -- Enable for specific filetypes; "*" enables it globally
       filetypes = { "*", "cmp_docs", "cmp_menu" },
