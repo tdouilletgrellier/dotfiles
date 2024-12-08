@@ -12,4 +12,4 @@ require("config.telescope")
 require("config.cursorline")
 
 -- Indent guides + Rainbow
-require("config.ibl")
+require("config.indent-blankline")
