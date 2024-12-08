@@ -1,8 +1,6 @@
-return{
-
+return {
   {
     "lukas-reineke/indent-blankline.nvim",
-    event = "BufReadPre",
     config = function()
       require("ibl").setup({
         exclude = { filetypes = { "dashboard" } },
@@ -12,5 +10,4 @@ return{
       })
     end,
   },
-
 }

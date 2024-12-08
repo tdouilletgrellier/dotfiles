@@ -1,7 +1,9 @@
 return{
 
-  {
-    "sheerun/vim-polyglot",
-  },
+{
+  "sheerun/vim-polyglot",
+  lazy = true,
+  event = { "BufReadPre", "BufNewFile" },
+}
 
 }

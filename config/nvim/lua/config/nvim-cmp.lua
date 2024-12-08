@@ -1,4 +1,5 @@
 -- lua/config/nvim-cmp.lua
+-- Load nvim-cmp configuration
 
 local cmp = require("cmp")
 

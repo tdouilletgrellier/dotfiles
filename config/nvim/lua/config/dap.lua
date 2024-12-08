@@ -1,4 +1,5 @@
 -- lua/config/dap.lua
+-- Load DAP configurations
 
 local dap = require("dap")
 

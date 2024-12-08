@@ -1,4 +1,5 @@
 -- lua/config/lsp.lua
+-- Load LSP configurations
 
 -- C/C++ LSP setup with clangd
 require("lspconfig").clangd.setup({
