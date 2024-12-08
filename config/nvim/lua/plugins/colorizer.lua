@@ -1,32 +1,30 @@
-return{
-
+return {
   {
     "NvChad/nvim-colorizer.lua",
-    commit = "f134063618a65cad4d7415fddbd96ff7e0c5b4ae",
+    commit = "f134063618a65cad4d7415fddbd96ff7e0c5b4ae", -- Pin to a specific commit for stability
     opts = {
-      filetypes = {
-        "*",
-        cmp_docs = { always_update = true },
-        cmp_menu = { always_update = true },
-      },
+      -- Enable for specific filetypes; "*" enables it globally
+      filetypes = { "*", "cmp_docs", "cmp_menu" },
+
       user_default_options = {
-        names = false,
-        RRGGBBAA = true,
-        rgb_fn = true,
-        tailwind = true,
-        RGB = true,
-        RRGGBB = true,
-        AARRGGBB = true,
-        hsl_fn = true,
-        css = true,
-        css_fn = true,
-        mode = "background",
-        sass = { enable = true, parsers = { "css" } },
-        mode = "background", -- Available methods are false / true / "normal" / "lsp" / "both"
-        virtualtext = "■",
-        always_update = true,
+        RGB = true,          -- Highlight RGB color values (#RRGGBB)
+        RRGGBB = true,       -- Same as above
+        RRGGBBAA = true,     -- Highlight #RRGGBBAA
+        AARRGGBB = true,     -- Highlight #AARRGGBB
+        names = false,       -- Disable color names like "red" or "blue"
+        rgb_fn = true,       -- Enable rgb(255, 255, 255) function highlighting
+        hsl_fn = true,       -- Enable hsl() function highlighting
+        css = true,          -- Enable highlighting in CSS files
+        css_fn = true,       -- Enable CSS functions like `rgba()`, `hsla()`
+        tailwind = true,     -- Support Tailwind CSS colors
+        sass = {             -- Enable SASS highlighting
+          enable = true,
+          parsers = { "css" },
+        },
+        mode = "background", -- Use background to display colors
+        virtualtext = "■",   -- Use "■" for virtual text indicator
+        always_update = true, -- Ensure the highlights are updated in real-time
       },
     },
   },
-    
 }
