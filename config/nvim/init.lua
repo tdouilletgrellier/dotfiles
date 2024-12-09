@@ -13,3 +13,6 @@ require("config.cursorline")
 
 -- Indent guides + Rainbow
 require("config.indent-blankline")
+
+-- LSP settings
+require("config.lsp")
