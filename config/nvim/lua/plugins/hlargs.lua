@@ -13,10 +13,10 @@ return {
       -- Setup hlargs with valid options
       require("hlargs").setup(opts)
 
-      -- Define custom highlights using the custom color palette
-      vim.api.nvim_set_hl(0, "Hlargs", { fg = palette.green, bg = palette.bgAlt, bold = true }) -- Green with bgAlt
-      vim.api.nvim_set_hl(0, "HlargsNamedParameter", { fg = palette.orange, bg = palette.bg }) -- Orange for named parameters
-      vim.api.nvim_set_hl(0, "HlargsParameter", { fg = palette.fg, bg = palette.bg }) -- White for generic parameters
+      -- Define custom highlights using the custom color palette with suggested foreground colors
+      vim.api.nvim_set_hl(0, "Hlargs", { fg = palette.yellow, bg = palette.bgAlt, bold = true })        -- Yellow with bgAlt
+      vim.api.nvim_set_hl(0, "HlargsNamedParameter", { fg = palette.purple, bg = palette.bgAlt })       -- Purple for named parameters
+      vim.api.nvim_set_hl(0, "HlargsParameter", { fg = palette.grey, bg = palette.bgAlt })              -- Grey for generic parameters
     end,
   },
 }

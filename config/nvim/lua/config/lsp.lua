@@ -36,6 +36,6 @@ require("lspconfig").bashls.setup({
 local palette = require("colors.palette_custom")
 
 -- Highlight group for LSP references
-vim.api.nvim_set_hl(0, "LspReferenceText", { bg = palette.bgAlt, fg = palette.fg }) -- Text references
-vim.api.nvim_set_hl(0, "LspReferenceRead", { bg = palette.bgAlt, fg = palette.green }) -- Read references
-vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = palette.bgAlt, fg = palette.orange }) -- Write references
+vim.api.nvim_set_hl(0, "LspReferenceText", { bg = palette.bgHighlight, fg = palette.fg }) -- Text references
+vim.api.nvim_set_hl(0, "LspReferenceRead", { bg = palette.bgHighlight, fg = palette.green }) -- Read references
+vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = palette.bgHighlight, fg = palette.orange }) -- Write references
