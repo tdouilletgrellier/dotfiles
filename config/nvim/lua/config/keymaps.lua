@@ -22,12 +22,15 @@ keymap("n", "n", "nzzzv", { desc = "Next Result" })
 keymap("n", "N", "Nzzzv", { desc = "Previous Result" })
 
 -- Replace word under cursor across buffer
-keymap("n", "<leader>sf", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
-  { desc = "Replace Word Under Cursor" })
+keymap(
+  "n",
+  "<leader>sf",
+  [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+  { desc = "Replace Word Under Cursor" }
+)
 
 -- Live Grep (args) with Telescope
-keymap("n", "<leader>fs", require("telescope").extensions.live_grep_args.live_grep_args,
-  { desc = "Live Grep (args)" })
+keymap("n", "<leader>fs", require("telescope").extensions.live_grep_args.live_grep_args, { desc = "Live Grep (args)" })
 
 -- Resize splits
 keymap("n", "<A-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
@@ -36,8 +39,8 @@ keymap("n", "<A-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window
 keymap("n", "<A-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
 
 -- Move lines up and down
-keymap("n", "<A-k>", "<CMD>m .-2<CR>==", { desc = "Move Line Up", silent = true  })
-keymap("n", "<A-j>", "<CMD>m .+1<CR>==", { desc = "Move Line Down", silent = true  })
+keymap("n", "<A-k>", "<CMD>m .-2<CR>==", { desc = "Move Line Up", silent = true })
+keymap("n", "<A-j>", "<CMD>m .+1<CR>==", { desc = "Move Line Down", silent = true })
 
 -- Navigate to line start and end
 keymap("n", "<A-h>", "^", { desc = "Move to Beginning of Line" })
@@ -45,6 +48,18 @@ keymap("n", "<A-l>", "$", { desc = "Move to End of Line" })
 
 -- Select all
 keymap("n", "<C-a>", "ggVG", { desc = "Select All" })
+
+-- ========================
+-- COMMAND MODE KEYMAPS
+-- ========================
+-- Accept completion in command line with Enter
+keymap("c", "<CR>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<C-y>" -- Confirm selection in the popup menu
+  else
+    return "<CR>" -- Normal Enter behavior
+  end
+end, { expr = true, noremap = true, desc = "Accept completion with Enter" })
 
 -- ========================
 -- VISUAL MODE KEYMAPS
@@ -61,8 +76,8 @@ keymap("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move Block Up" })
 keymap("v", "//", 'y/<C-R>"<CR>', { desc = "Search Highlighted Text" })
 
 -- Move lines up and down
-keymap("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move Selection Up", silent = true  })
-keymap("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move Selection Down", silent = true  })
+keymap("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move Selection Up", silent = true })
+keymap("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move Selection Down", silent = true })
 
 -- Navigate to line start and end
 keymap("v", "<A-h>", "^", { desc = "Move to Beginning of Line" })
@@ -78,3 +93,10 @@ keymap("i", "<A-j>", "<CMD>m .+1<CR>==", { desc = "Move Line Down" })
 -- Navigate to line start and end
 keymap("i", "<A-h>", "<ESC>I", { desc = "Move to Beginning of Line" })
 keymap("i", "<A-l>", "<ESC>A", { desc = "Move to End of Line" })
+
+-- ========================
+-- BLACK HOLE REGISTER PREFIX
+-- ========================
+-- Use <leader>d as a prefix for "delete without copying"
+keymap("n", "Z", '"_', { desc = "Use Black Hole Register Prefix" })
+keymap("v", "Z", '"_', { desc = "Use Black Hole Register Prefix" })
