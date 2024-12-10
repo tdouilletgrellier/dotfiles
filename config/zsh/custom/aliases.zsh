@@ -217,7 +217,9 @@ fi
 #-------------------------------------------------------------
 
 # Path prepend
-export PATH="/opt/nvim/bin/":$PATH
-export PATH="${HOME}/CASTEM2022/bin":$PATH
-export PATH="/opt/cmake/bin":$PATH
-export PATH="/opt/tmux/":$PATH
+add_to_path() {
+    for dir in "$@"; do
+        [[ ":$PATH:" != *":$dir:"* ]] && export PATH="$dir:$PATH"
+    done
+}
+add_to_path /opt/nvim/bin ~/CASTEM2022/bin /opt/cmake/bin /opt/tmux

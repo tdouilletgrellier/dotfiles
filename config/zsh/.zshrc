@@ -71,10 +71,36 @@ ZSH_CUSTOM=~/.zsh_custom
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git eza fzf tmux zoxide kitty zsh-bat zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(
+    git
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    fzf
+    eza
+    zoxide
+    zsh-bat
+    tmux
+    kitty
+)
 
 #Fix errors
 ZSH_DISABLE_COMPFIX="true"
+
+# Faster startup
+autoload -Uz compinit && compinit -u
+
+# Cache completions to reduce startup time
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path ~/.zsh/cache
+
+# Optimize history behavior
+setopt SHARE_HISTORY          # Share history across sessions
+setopt HIST_IGNORE_DUPS       # Ignore duplicate commands
+setopt INC_APPEND_HISTORY     # Add commands as they're typed
+setopt HIST_EXPIRE_DUPS_FIRST # Remove oldest duplicates first
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
 
 source $ZSH/oh-my-zsh.sh
 

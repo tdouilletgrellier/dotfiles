@@ -496,6 +496,11 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
+# Reduce pdf size with gs
+# gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/prepress -dNOPAUSE -dQUIET -dBATCH -sOutputFile=output.pdf input.pdf
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
 # Change ssh alias if kitty otherwise $TERM is unknown
 if [[ $TERM = xterm-kitty ]]; then
 	alias ssh='kitten ssh'
