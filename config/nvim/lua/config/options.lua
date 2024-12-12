@@ -4,18 +4,28 @@
 -- ========================
 -- Custom Syntax Highlighting for EPX
 -- ========================
+-- Load the custom palette
+local palette = require("colors.palette_custom")
+
+-- Define the highlights using the custom palette
 local highlights = {
-  epxNumber    = { fg = "#cd0000" },
-  epxWord      = { fg = "#ffffff" },
-  epxKeywords  = { fg = "#386bd7" },
-  epxKeywords0 = { fg = "#98d62d" },
-  epxVariable  = { fg = "#db67e6" },
-  epxEqual     = { fg = "#79ff0f" },
-  epxString    = { fg = "#f3d64e" },
-  epxComment   = { fg = "#666666" },
-  epxTitle     = { fg = "#ffbd5e" },
-  epxDescBlock = { fg = "#666666" },
+  epxNumber    = { fg = palette.red },          -- Use 'red' from custom palette
+  epxWord      = { fg = palette.fg },           -- Use 'fg' (foreground) for general words
+  epxKeywords  = { fg = palette.blue },         -- Use 'blue' for primary keywords
+  epxKeywords0 = { fg = palette.green }, -- Use 'successGreen' for alternate keywords
+  epxVariable  = { fg = palette.magenta },      -- Use 'magenta' for variables
+  epxEqual     = { fg = palette.green },        -- Use 'green' for equality operators
+  epxString    = { fg = palette.yellow },   -- Use 'neonYellow' for strings
+  epxComment   = { fg = palette.bgHighlight },  -- Use 'bgHighlight' for comments
+  epxTitle     = { fg = palette.orange },       -- Use 'orange' for titles
+  epxDescBlock = { fg = palette.grey },         -- Use 'grey' for descriptive blocks
 }
+
+-- Apply the highlights
+for group, style in pairs(highlights) do
+  vim.api.nvim_set_hl(0, group, style)
+end
+
 
 for group, settings in pairs(highlights) do
   vim.api.nvim_set_hl(0, group, settings)

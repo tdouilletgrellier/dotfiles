@@ -41,5 +41,6 @@ return {
   highlightPurple = "#b349be", -- Bold purple (vibrant, ideal for contrast and emphasis)
   infoBlue = "#66ccff", -- Soft blue (calming, used for informational highlights or links)
   successGreen = "#66ff66", -- Light green (soothing, represents success or positive outcomes)
+  darkGreen = "#98d62d", -- Dark green (strong, good for trustworthy results)
   calmBlue = "#709aed", -- Muted blue (gentle blue for secondary highlights or soft emphasis)
 }
