@@ -503,9 +503,11 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 
 #-------------------------------------------------------------
 # Change ssh alias if kitty otherwise $TERM is unknown
+if [ ! -n "$SSH_CLIENT" ]; then
 if [[ $TERM = xterm-kitty ]]; then
 	alias ssh='kitten ssh'
 	alias icat="kitten icat"
 	alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
+fi
 fi
 #-------------------------------------------------------------
