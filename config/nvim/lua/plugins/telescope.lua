@@ -1,9 +1,10 @@
 return {
   {
     "nvim-telescope/telescope.nvim",
+
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim", -- For advanced search functionality
-      "nvim-telescope/telescope-fzf-native.nvim",     -- For faster fuzzy searching
+      "nvim-telescope/telescope-fzf-native.nvim", -- For faster fuzzy searching
     },
     config = function()
       local telescope = require("telescope")
@@ -11,6 +12,7 @@ return {
 
       -- Setup telescope with keymaps and extensions
       telescope.setup({
+
         defaults = {
           prompt_prefix = "🔍 ",
           selection_caret = " ",
@@ -27,6 +29,7 @@ return {
           sorting_strategy = "ascending", -- Use ascending sorting for results
           layout_strategy = "horizontal", -- Horizontal layout for results
         },
+
         extensions = {
           live_grep_args = {
             auto_quoting = true, -- Automatically add quotes for search args
