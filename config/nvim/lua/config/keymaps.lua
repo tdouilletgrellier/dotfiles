@@ -30,7 +30,7 @@ keymap(
 )
 
 -- Live Grep (args) with Telescope
-keymap("n", "<leader>fs", require("telescope").extensions.live_grep_args.live_grep_args, { desc = "Live Grep (args)" })
+-- keymap("n", "<leader>fs", require("telescope").extensions.live_grep_args.live_grep_args, { desc = "Live Grep (args)" })
 
 -- Resize splits
 keymap("n", "<A-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })

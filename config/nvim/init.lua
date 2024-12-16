@@ -6,7 +6,7 @@ require("config.colorscheme")
 require("config.lualine")
 
 -- Telescope settings
-require("config.telescope")
+-- require("config.telescope")
 
 -- Cursorline highlights
 require("config.cursorline")
