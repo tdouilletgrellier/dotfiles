@@ -141,12 +141,22 @@ RESET="\033[0m"
 # Find a temp directory where local is preferred
 #######################################################
 
-# Loop through possible directories...
-for _TEMP_DIR_PATH in "${XDG_CACHE_HOME:-${HOME}/.cache}/tmp" "${HOME}/.tmp" "${HOME}/.temp" "${XDG_CACHE_HOME:-${HOME}/.cache}" "${TMPDIR}" "${TMP}" "/tmp" "/temp"; do
-	if [[ -d "${_TEMP_DIR_PATH}" ]]; then
-		TEMPDIR_LOCAL="${_TEMP_DIR_PATH}"
-		break # Found a valid directory, exit the loop
-	fi
+# Loop through potential temporary directories in order of preference
+for _TEMP_DIR_PATH in \
+    "${XDG_CACHE_HOME:-${HOME}/.cache}/tmp" \
+    "${HOME}/.tmp" \
+    "${HOME}/.temp" \
+    "${XDG_CACHE_HOME:-${HOME}/.cache}" \
+    "${TMPDIR}" \
+    "${TMP}" \
+    "/tmp" \
+    "/temp"; do
+
+    # Check if directory exists
+    if [[ -d "${_TEMP_DIR_PATH}" ]]; then
+        TEMPDIR_LOCAL="${_TEMP_DIR_PATH}"
+        break # Exit loop after finding first valid directory
+    fi
 done
 
 # Clean up
@@ -466,7 +476,7 @@ function edit() {
 		restore_tab
 	}
 
-	### Function to check and modify the immutable attribute of a file
+	### Check and modify the immutable attribute of a file
 	# Parameters:
 	#   $1 - The filename to check and potentially modify the immutable attribute
 	function immutable_remove() {
@@ -949,7 +959,7 @@ function pathprepend() {
 	done
 }
 
-# Function to append to an existing alias or otherwise create the new alias
+# Append to an existing alias or otherwise create the new alias
 aliasappend() {
 	# Display help if less than two arguments are provided
 	if [ "$#" -lt 2 ]; then
@@ -1057,21 +1067,22 @@ function editbashrc() {
 
 # Change into the bashrc directory
 function bashrc() {
-	if [ $# -eq 0 ]; then
+	if [[ $# -eq 0 ]]; then
 		# Set the target directory
-		local target_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc"
+		local TARGET_DIR="${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc"
 
 		# Check if target directory exists
-		if [ -d "${target_dir}" ]; then
+		if [[ -d "${TARGET_DIR}" ]]; then
 			# Check for the presence of specific files or a non-empty subdirectory
-			if [ -f "${target_dir}/aliases" ] || \
-			[ -f "${target_dir}/bashhelp" ] || \
-			[ -f "${target_dir}/config" ] || \
-			[ -f "${target_dir}/help" ] || \
-			[ -f "${target_dir}/README.md" ] || \
-			[ -f "${target_dir}/README.html" ] || \
-			( [ -d "${target_dir}/bashrc.d" ] && [ "$(ls -A "${target_dir}/bashrc.d")" ] ); then
-				cd "${target_dir}"
+			if [[ -f "${TARGET_DIR}/aliases" ]] || \
+			[[ -f "${TARGET_DIR}/bashhelp" ]] || \
+			[[ -f "${TARGET_DIR}/config" ]] || \
+			[[ -f "${TARGET_DIR}/help" ]] || \
+			[[ -f "${TARGET_DIR}/README.md" ]] || \
+			[[ -f "${TARGET_DIR}/README.html" ]] || \
+			( [[ -d "${TARGET_DIR}/bashrc.d" ]] && \
+			  [[ "$(ls -A "${TARGET_DIR}/bashrc.d")" ]] ); then
+				cd "${TARGET_DIR}"
 			else
 				cd "${HOME}"
 			fi
@@ -1777,7 +1788,7 @@ if hasgit; then
 		fi
 	}
 
-	# Function to retrieve a specific version of a file from Git history
+	# Retrieve a specific version of a file from Git history
 	function gitfileversion() {
 		# Constants
 		local NO_ARGS=0
@@ -1786,7 +1797,7 @@ if hasgit; then
 		local FILE_NOT_IN_GIT_ERROR=3
 		local NO_SELECTION_MADE=4
 
-		# Function to display help
+		# Display help
 		function display_help() {
 			echo -e "${BRIGHT_BLUE}Usage:${RESET} git_file_version ${BRIGHT_GREEN}<file path>${RESET} [${BRIGHT_YELLOW}output file${RESET}]"
 			echo -e "${BRIGHT_BLUE}Description:${RESET} Retrieves a specific version of a file from Git history"
@@ -3669,7 +3680,7 @@ if hascommand tmux; then
 	# this will freeze the size of the Tmux session window and not auto-resize
 	#tmux resize-window -A &> /dev/null
 
-	# Function to load TMUX with default session defined by _TMUX_LOAD_SESSION_NAME
+	# Load TMUX with default session defined by _TMUX_LOAD_SESSION_NAME
 	# If TMUX is already running, switch to a session name passed in as a parameter
 	# TIP: Use CTRL+d to detach your session which closes but leaves the session
 	# running. CTRL+d will also exit bash once outside of TMUX.
@@ -3861,7 +3872,7 @@ fi
 # Aliases for Zellij terminal multiplexer if installed
 if hascommand zellij; then
 
-	# Function to load Zellij with a default session named the logged in user
+	# Load Zellij with a default session named the logged in user
 	# You can also pass in a specific session name as a parameter
 	function znew() {
 		# Get the passed in or default session name
@@ -4287,7 +4298,7 @@ fi
 # General Function "Aliases"
 #######################################################
 
-# Function to run upon exit of shell
+# Run this function upon exit of the shell
 function _exit() {
 	# Show who logged out
 	local COLOR="${BRIGHT_RED}"     # Light Red
@@ -4794,9 +4805,9 @@ function download() {
 			echo -e "${BRIGHT_YELLOW}Using yt-dlp for the video URL...${RESET}"
 
 			if ask "Do you want to download the highest available video quality (choosing No will limit to 1080p)?" N; then
-				(cd "${DOWNLOAD_PATH}" && yt-dlp -o "%(title)s.%(ext)s" -f 'bestvideo[ext=mp4]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+				(cd "${DOWNLOAD_PATH}" && yt-dlp -o "%(title)s.%(ext)s" -f 'bestvideo[ext=mp4]+bestaudio' --merge-output-format mp4 "${URL}" || yt-dlp -o "video.%(ext)s" -f 'bestvideo[ext=mp4]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
 			else
-				(cd "${DOWNLOAD_PATH}" && yt-dlp -o "%(title)s.%(ext)s" -f 'bestvideo[ext=mp4][height<=1080]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
+				(cd "${DOWNLOAD_PATH}" && yt-dlp -o "%(title)s.%(ext)s" -f 'bestvideo[ext=mp4][height<=1080]+bestaudio' --merge-output-format mp4 "${URL}" || yt-dlp -o "video.%(ext)s" -f 'bestvideo[ext=mp4][height<=1080]+bestaudio' --merge-output-format mp4 "${URL}") || echo -e "${BRIGHT_RED}Download failed.${RESET}"
 			fi
 
 		# Found youtube-dl command-line audio/video downloader
@@ -5072,7 +5083,7 @@ function popd() {
 	dirs -v
 }
 
-# Function to remove duplicate directories in the directory stack for pushd
+# Remove duplicate directories in the directory stack for pushd
 function dirsdedup() {
 	# Declare an array to hold the new directory stack without duplicates
 	declare -a NEW_STACK=()
@@ -5279,7 +5290,7 @@ function checksha256() {
 
 # If we are in a graphical desktop environment...
 if [[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DISPLAY" ]]; then
-	# Function to search Desktop applications
+	# Search Desktop applications
 	function findapps() {
 		local search_term="$1" # The keyword to search for
 
@@ -5793,7 +5804,7 @@ function showfunctions() {
 	uniq -f 1
 }
 
-# Function to swap indentations between tabs and spaces
+# Swap indentations between tabs and spaces
 function swapindent() {
 	# This is the default number of spaces that a tab will be converted to
 	local DEFAULT_TAB_SPACING=4
@@ -5875,7 +5886,7 @@ function swapindent() {
 	fi
 }
 
-# Function to copy a file or directory with a progress bar
+# Copy a file or directory with a progress bar
 function cpp() {
 	# Check the parameters
 	if [[ -z "${1}" ]]; then
@@ -5916,7 +5927,7 @@ function cpp() {
 	fi
 }
 
-# Function to copy a file and optionally go to the directory
+# Copy a file and optionally go to the directory
 function cpg() {
 	# Check the parameters
 	if [[ -z "${1}" ]]; then
@@ -5936,7 +5947,7 @@ function cpg() {
 	fi
 }
 
-# Function to move a file or directory and optionally go to the directory
+# Move a file or directory and optionally go to the directory
 function mvg() {
 	# Check the parameters
 	if [[ -z "${1}" ]]; then
@@ -5957,7 +5968,7 @@ function mvg() {
 	fi
 }
 
-# Function to create and go to the directory
+# Create and go to the directory
 alias md='mkdirg'
 function mkdirg() {
 	# Check if any arguments are provided
@@ -6654,7 +6665,7 @@ function chmodcalc() {
 	fi
 }
 
-# Function to recursively set permissions for only files
+# Recursively set permissions for only files
 function chmodfiles() {
 	# Initialize local variables
 	local _DIRECTORY="${2:-${PWD}}" # Default to current directory if no directory is provided
@@ -6693,7 +6704,7 @@ function chmodfiles() {
 	fi
 }
 
-# Function to recursively set permissions for only directories
+# Recursively set permissions for only directories
 alias chmoddirectories='chmoddirs'
 alias chmodfolders='chmoddirs'
 function chmoddirs() {
@@ -7975,6 +7986,62 @@ function rot13() {
 	fi
 }
 
+# Command to spell check command line input
+# Example: spellcheck "definately"
+# Example: spellcheck "I sincerly reccomend programing"
+spellcheck() {
+
+    # Check if any spell checker is installed
+    if type -P aspell >/dev/null; then
+        local SPELLCHECKER="aspell -a"
+    elif type -P hunspell >/dev/null; then
+        local SPELLCHECKER="hunspell"
+    else
+        echo -e "${BRIGHT_RED}No spell checker found: ${BRIGHT_CYAN}Please install aspell or hunspell${RESET}"
+        return 1
+    fi
+
+    # Check if any arguments were provided
+    if [ $# -eq 0 ]; then
+        echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_GREEN}spellcheck ${BRIGHT_YELLOW}[text to check]${RESET}"
+        return 1
+    fi
+
+    # Combine all arguments into a single string
+    local text="$*"
+
+    # Run spell checker and process the output
+    echo "$text" | $SPELLCHECKER | while read -r line; do
+        # Skip the version header line
+        if [[ $line == @\(#\)* || $line == Hunspell* ]]; then
+            continue
+        # Skip lines that just show '*' (correctly spelled words)
+        elif [[ $line == \** && ${#line} -eq 1 ]]; then
+            continue
+        # Process spell check suggestions
+        elif [[ $line == \&* ]]; then
+            # Extract the misspelled word and suggestions
+            local word=$(echo "$line" | cut -d' ' -f2)
+            # Get everything after the ':' or last number for suggestions
+            if [[ $SPELLCHECKER == "hunspell" ]]; then
+                # Hunspell format: "& word num offset: suggestion1, suggestion2"
+                local suggestions=$(echo "$line" | cut -d':' -f2- | sed 's/^[ ]*//')
+                # If no colon, get everything after the last number
+                if [[ -z "$suggestions" ]]; then
+                    suggestions=$(echo "$line" | sed 's/^& [^ ]* [0-9]* [0-9]* //')
+                fi
+            else
+                # Aspell format
+                local suggestions=$(echo "$line" | cut -d':' -f2- | sed 's/^[ ]*//')
+            fi
+
+            echo -e "${BRIGHT_RED}X Misspelled: ${BRIGHT_CYAN}${word}${RESET}"
+            echo -e "${BRIGHT_GREEN}✓ Suggestions:${RESET} ${BRIGHT_YELLOW}${suggestions}${RESET}"
+            echo
+        fi
+    done
+}
+
 # Transform text using common string formatting and case operations
 function formattext() {
 	local text=""
@@ -8242,7 +8309,7 @@ function countwords() {
 	echo "$1" | wc -w
 }
 
-# Function to check if a string starts with a specific substring
+# Check if a string starts with a specific substring
 function startswith() {
 	# Use parameter expansion to check if the string starts with the substring
 	if [[ "$1" == "$2"* ]]; then
@@ -8252,7 +8319,7 @@ function startswith() {
 	fi
 }
 
-# Function to check if a string ends with a specific substring
+# Check if a string ends with a specific substring
 function endswith() {
 	# Use parameter expansion to check if the string ends with the substring
 	if [[ "$1" == *"$2" ]]; then
