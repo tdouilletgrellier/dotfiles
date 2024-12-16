@@ -55,3 +55,6 @@ vim.opt.mouse = "a"
 
 -- Disable "copy on select"
 vim.g.overrideCopy = false
+
+-- Disable all snacks animations
+vim.g.snacks_animate = false
