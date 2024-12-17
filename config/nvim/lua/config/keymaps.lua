@@ -49,6 +49,15 @@ keymap("n", "<A-l>", "$", { desc = "Move to End of Line" })
 -- Select all
 keymap("n", "<C-a>", "ggVG", { desc = "Select All" })
 
+-- Remap delete and change to not copy text
+keymap("n", "d", '"_d', { desc = "Delete without copying" })
+keymap("n", "dd", '"_dd', { desc = "Delete line without copying" })
+keymap("n", "c", '"_c', { desc = "Change without copying" })
+keymap("n", "cc", '"_cc', { desc = "Change line without copying" })
+keymap("n", "x", '"_x', { desc = "Delete single character without copying" })
+keymap("n", "D", '"_D', { desc = "Delete line without copying" })
+keymap("n", "C", '"_C', { desc = "Change line without copying" })
+
 -- ========================
 -- COMMAND MODE KEYMAPS
 -- ========================
@@ -83,6 +92,11 @@ keymap("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move Selection Down", silent 
 keymap("v", "<A-h>", "^", { desc = "Move to Beginning of Line" })
 keymap("v", "<A-l>", "$", { desc = "Move to End of Line" })
 
+-- Remap delete and change to not copy text
+keymap("v", "d", '"_d', { desc = "Delete without copying (visual)" })
+keymap("v", "c", '"_c', { desc = "Change without copying (visual)" })
+keymap("v", "X", '"_x', { desc = "Delete block without copying (visual)" })
+
 -- ========================
 -- INSERT MODE KEYMAPS
 -- ========================
@@ -97,6 +111,6 @@ keymap("i", "<A-l>", "<ESC>A", { desc = "Move to End of Line" })
 -- ========================
 -- BLACK HOLE REGISTER PREFIX
 -- ========================
--- Use <leader>d as a prefix for "delete without copying"
+-- Use Z as a prefix for "delete without copying"
 keymap("n", "Z", '"_', { desc = "Use Black Hole Register Prefix" })
 keymap("v", "Z", '"_', { desc = "Use Black Hole Register Prefix" })
