@@ -273,6 +273,14 @@ if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
 		fi
 	fi
 fi
+if [[ -f "${HOME}/dev/manta/devtools/env.sh" ]]; then
+	alias mantaenv="source ${HOME}/dev/manta/devtools/env.sh"
+	if [[ "${SHLVL}" -lt 2 ]]; then
+		if [ -z "${TMUX}" ]; then
+			mantaenv 1>/dev/null
+		fi
+	fi
+fi
 if [[ -f "${HOME}/arm/forge/22.1.2/bin/ddt" ]]; then
 	alias ddt="${HOME}/arm/forge/22.1.2/bin/ddt &"
 fi
@@ -504,10 +512,10 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 #-------------------------------------------------------------
 # Change ssh alias if kitty otherwise $TERM is unknown
 if [ ! -n "$SSH_CLIENT" ]; then
-if [[ $TERM = xterm-kitty ]]; then
-	alias ssh='kitten ssh'
-	alias icat="kitten icat"
-	alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
-fi
+	if [[ $TERM = xterm-kitty ]]; then
+		alias ssh='kitten ssh'
+		alias icat="kitten icat"
+		alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
+	fi
 fi
 #-------------------------------------------------------------
