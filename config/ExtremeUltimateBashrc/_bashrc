@@ -143,20 +143,20 @@ RESET="\033[0m"
 
 # Loop through potential temporary directories in order of preference
 for _TEMP_DIR_PATH in \
-    "${XDG_CACHE_HOME:-${HOME}/.cache}/tmp" \
-    "${HOME}/.tmp" \
-    "${HOME}/.temp" \
-    "${XDG_CACHE_HOME:-${HOME}/.cache}" \
-    "${TMPDIR}" \
-    "${TMP}" \
-    "/tmp" \
-    "/temp"; do
+	"${XDG_CACHE_HOME:-${HOME}/.cache}/tmp" \
+	"${HOME}/.tmp" \
+	"${HOME}/.temp" \
+	"${XDG_CACHE_HOME:-${HOME}/.cache}" \
+	"${TMPDIR}" \
+	"${TMP}" \
+	"/tmp" \
+	"/temp"; do
 
-    # Check if directory exists
-    if [[ -d "${_TEMP_DIR_PATH}" ]]; then
-        TEMPDIR_LOCAL="${_TEMP_DIR_PATH}"
-        break # Exit loop after finding first valid directory
-    fi
+	# Check if directory exists
+	if [[ -d "${_TEMP_DIR_PATH}" ]]; then
+		TEMPDIR_LOCAL="${_TEMP_DIR_PATH}"
+		break # Exit loop after finding first valid directory
+	fi
 done
 
 # Clean up
@@ -1081,7 +1081,7 @@ function bashrc() {
 			[[ -f "${TARGET_DIR}/README.md" ]] || \
 			[[ -f "${TARGET_DIR}/README.html" ]] || \
 			( [[ -d "${TARGET_DIR}/bashrc.d" ]] && \
-			  [[ "$(ls -A "${TARGET_DIR}/bashrc.d")" ]] ); then
+			[[ "$(ls -A "${TARGET_DIR}/bashrc.d")" ]] ); then
 				cd "${TARGET_DIR}"
 			else
 				cd "${HOME}"
@@ -4463,7 +4463,7 @@ function createmenu() {
 	for ARG in "$@"; do
 		if [[ "$ARG" == --picker=* ]]; then
 			_PICKER="${ARG#*=}"
-			if hascommand "${_PICKER}"; then
+			if type "${_PICKER}" &>/dev/null; then
 				_FOUND_PICKER=true
 			else
 				echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}The picker ${BRIGHT_YELLOW}${_PICKER}${BRIGHT_CYAN} is not available or installed${RESET}"
@@ -4479,7 +4479,7 @@ function createmenu() {
 	if [ "$_FOUND_PICKER" == false ]; then
 		# Loop through the list and see if one of them is installed
 		for _PICKER in $_VALID_PICKERS; do
-			if hascommand $_PICKER; then
+			if type $_PICKER &>/dev/null; then
 				_FOUND_PICKER=true
 				break
 			fi
@@ -7991,55 +7991,55 @@ function rot13() {
 # Example: spellcheck "I sincerly reccomend programing"
 spellcheck() {
 
-    # Check if any spell checker is installed
-    if type -P aspell >/dev/null; then
-        local SPELLCHECKER="aspell -a"
-    elif type -P hunspell >/dev/null; then
-        local SPELLCHECKER="hunspell"
-    else
-        echo -e "${BRIGHT_RED}No spell checker found: ${BRIGHT_CYAN}Please install aspell or hunspell${RESET}"
-        return 1
-    fi
+	# Check if any spell checker is installed
+	if type -P aspell >/dev/null; then
+		local SPELLCHECKER="aspell -a"
+	elif type -P hunspell >/dev/null; then
+		local SPELLCHECKER="hunspell"
+	else
+		echo -e "${BRIGHT_RED}No spell checker found: ${BRIGHT_CYAN}Please install aspell or hunspell${RESET}"
+		return 1
+	fi
 
-    # Check if any arguments were provided
-    if [ $# -eq 0 ]; then
-        echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_GREEN}spellcheck ${BRIGHT_YELLOW}[text to check]${RESET}"
-        return 1
-    fi
+	# Check if any arguments were provided
+	if [ $# -eq 0 ]; then
+		echo -e "${BRIGHT_WHITE}Usage: ${BRIGHT_GREEN}spellcheck ${BRIGHT_YELLOW}[text to check]${RESET}"
+		return 1
+	fi
 
-    # Combine all arguments into a single string
-    local text="$*"
+	# Combine all arguments into a single string
+	local text="$*"
 
-    # Run spell checker and process the output
-    echo "$text" | $SPELLCHECKER | while read -r line; do
-        # Skip the version header line
-        if [[ $line == @\(#\)* || $line == Hunspell* ]]; then
-            continue
-        # Skip lines that just show '*' (correctly spelled words)
-        elif [[ $line == \** && ${#line} -eq 1 ]]; then
-            continue
-        # Process spell check suggestions
-        elif [[ $line == \&* ]]; then
-            # Extract the misspelled word and suggestions
-            local word=$(echo "$line" | cut -d' ' -f2)
-            # Get everything after the ':' or last number for suggestions
-            if [[ $SPELLCHECKER == "hunspell" ]]; then
-                # Hunspell format: "& word num offset: suggestion1, suggestion2"
-                local suggestions=$(echo "$line" | cut -d':' -f2- | sed 's/^[ ]*//')
-                # If no colon, get everything after the last number
-                if [[ -z "$suggestions" ]]; then
-                    suggestions=$(echo "$line" | sed 's/^& [^ ]* [0-9]* [0-9]* //')
-                fi
-            else
-                # Aspell format
-                local suggestions=$(echo "$line" | cut -d':' -f2- | sed 's/^[ ]*//')
-            fi
+	# Run spell checker and process the output
+	echo "$text" | $SPELLCHECKER | while read -r line; do
+		# Skip the version header line
+		if [[ $line == @\(#\)* || $line == Hunspell* ]]; then
+			continue
+		# Skip lines that just show '*' (correctly spelled words)
+		elif [[ $line == \** && ${#line} -eq 1 ]]; then
+			continue
+		# Process spell check suggestions
+		elif [[ $line == \&* ]]; then
+			# Extract the misspelled word and suggestions
+			local word=$(echo "$line" | cut -d' ' -f2)
+			# Get everything after the ':' or last number for suggestions
+			if [[ $SPELLCHECKER == "hunspell" ]]; then
+				# Hunspell format: "& word num offset: suggestion1, suggestion2"
+				local suggestions=$(echo "$line" | cut -d':' -f2- | sed 's/^[ ]*//')
+				# If no colon, get everything after the last number
+				if [[ -z "$suggestions" ]]; then
+					suggestions=$(echo "$line" | sed 's/^& [^ ]* [0-9]* [0-9]* //')
+				fi
+			else
+				# Aspell format
+				local suggestions=$(echo "$line" | cut -d':' -f2- | sed 's/^[ ]*//')
+			fi
 
-            echo -e "${BRIGHT_RED}X Misspelled: ${BRIGHT_CYAN}${word}${RESET}"
-            echo -e "${BRIGHT_GREEN}✓ Suggestions:${RESET} ${BRIGHT_YELLOW}${suggestions}${RESET}"
-            echo
-        fi
-    done
+			echo -e "${BRIGHT_RED}X Misspelled: ${BRIGHT_CYAN}${word}${RESET}"
+			echo -e "${BRIGHT_GREEN}✓ Suggestions:${RESET} ${BRIGHT_YELLOW}${suggestions}${RESET}"
+			echo
+		fi
+	done
 }
 
 # Transform text using common string formatting and case operations
@@ -8078,8 +8078,20 @@ function formattext() {
 		return 0
 	}
 
-	# Show help if no parameters provided
-	if [[ $# -eq 0 ]]; then
+	# Check for piped input
+	if [ ! -t 0 ]; then
+		# Read from stdin (pipe) line by line
+		while IFS= read -r line; do
+			if [ -z "$text" ]; then
+				text="$line"
+			else
+				text="$text\n$line"
+			fi
+		done
+
+	# Else check to make sure we have parameters
+	elif [[ $# -eq 0 ]]; then
+		# Show help if no parameters provided
 		_show_help
 		return 0
 	fi
@@ -8227,8 +8239,8 @@ function formattext() {
 				text="${text// /_}"
 				;;
 			-t|--trim)
-				text="${text#"${text%%[![:space:]]*}"}"
-				text="${text%"${text##*[![:space:]]}"}"
+				text="${text#"${text%%[![:space:]]*}"}"  # trim leading
+				text="${text%"${text##*[![:space:]]}"}"  # trim trailing
 				;;
 			-T|--tabs-to-spaces)
 				text="${text//	/ }"
@@ -8250,48 +8262,100 @@ function trim() {
 	formattext --trim --input="${*}"
 }
 
+# Trim leading and trailing spaces
+function trim() {
+if [ ! -t 0 ]; then
+	formattext --trim
+else
+	formattext --trim --input="$*"
+fi
+}
+
 # Replace multiple spaces, tabs, and underscores with a single space
 function fixspaces() {
-	formattext --tabs-to-spaces --underscores-to-spaces --remove-duplicate-spaces --input "${*}"
+if [ ! -t 0 ]; then
+	formattext --tabs-to-spaces --underscores-to-spaces --remove-duplicate-spaces
+else
+	formattext --tabs-to-spaces --underscores-to-spaces --remove-duplicate-spaces --input="$*"
+fi
 }
 
 # Convert a string to lowercase
 function lowercase() {
-	formattext --lowercase --input="${*}"
+if [ ! -t 0 ]; then
+	formattext --lowercase
+else
+	formattext --lowercase --input="$*"
+fi
 }
 
 # Convert a string to uppercase
 function uppercase() {
-	formattext --uppercase --input="${*}"
+if [ ! -t 0 ]; then
+	formattext --uppercase
+else
+	formattext --uppercase --input="$*"
+fi
 }
 
 # Capitalize every word in a string
 function capitalize() {
-	formattext --capitalize --input="${*}"
+if [ ! -t 0 ]; then
+	formattext --capitalize
+else
+	formattext --capitalize --input="$*"
+fi
 }
 
 # Convert a string to title case
 function titlecase() {
-	formattext --titlecase --input="${*}"
+if [ ! -t 0 ]; then
+	formattext --titlecase
+else
+	formattext --titlecase --input="$*"
+fi
 }
 
 # Convert regular quotes to smart quotes
 function smartquotes() {
-	formattext --smart-quotes --input="${*}"
+if [ ! -t 0 ]; then
+	formattext --smart-quotes
+else
+	formattext --smart-quotes --input="$*"
+fi
 }
 
 # Convert smart quotes to regular quotes
 function unsmartquotes() {
-	formattext --unsmart-quotes --input="${*}"
+if [ ! -t 0 ]; then
+	formattext --unsmart-quotes
+else
+	formattext --unsmart-quotes --input="$*"
+fi
 }
 
 # Reverse the text in a string
 function reversetext() {
+	local text=""
 	local reversed=""
 
+	# Check for piped input
+	if [ ! -t 0 ]; then
+		# Read from stdin (pipe) line by line
+		while IFS= read -r line; do
+			if [ -z "$text" ]; then
+				text="$line"
+			else
+				text="$text\n$line"
+			fi
+		done
+	else
+		text="$*"
+	fi
+
 	# Iterate over each character in the string in reverse order
-	for (( i=${#1}-1; i>=0; i-- )); do
-		reversed+="${1:$i:1}"
+	for (( i=${#text}-1; i>=0; i-- )); do
+		reversed+="${text:$i:1}"
 	done
 
 	echo "${reversed}"
