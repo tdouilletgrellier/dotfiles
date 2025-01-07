@@ -19,7 +19,7 @@ return {
 
   -- Custom Background and Highlighting
   bgAlt = "#121212", -- Dark grey background (alternative background for panels or sidebars)
-  bgHighlight = "#2a2a2a", -- Slightly darker highlight background for better visibility
+  bgHighlight = "#4a4a4a", -- Slightly darker highlight background for better visibility
 
   -- Colorful Tones (based on custom palette)
   green = "#79ff0f", -- Bright green (actionable items, success)
