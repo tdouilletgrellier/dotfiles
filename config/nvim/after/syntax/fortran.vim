@@ -4,4 +4,5 @@
 autocmd FileType fortran setlocal commentstring=C\ %s
 
 " Modern form Fortran comments
-autocmd FileType fortran setlocal commentstring=! %s
+autocmd FileType fortran setlocal commentstring=!\ %s
+
