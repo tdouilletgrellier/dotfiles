@@ -196,7 +196,7 @@ function load_intel() {
 	elif [ -d /projets/europlexus ]; then
 		module load ifort/2018.1.038 icc/2018.1.038 mkl/2018.1.038 impi/2018.1.038
 	elif [ -d /software/restricted ]; then
-		module load intel/2020
+		module load intel/2023
 	elif [ $INTEL_INSTALL_DIR ]; then
 		module use --append $(find $INTEL_INSTALL_DIR -name modulefiles)
 		module load icc mkl mpi
