@@ -447,7 +447,7 @@ if hascommand --strict fzf; then
 	export FZF_CTRL_R_OPTS="
 	--preview 'echo {}' --preview-window down:3:hidden:wrap
 	--bind 'ctrl-/:toggle-preview'"
-	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up"
+	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up --cycle"
 	# --- setup fzf theme ---
 	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
  	--color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#2a2a2a
