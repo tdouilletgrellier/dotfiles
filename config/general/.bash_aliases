@@ -510,6 +510,17 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
+# Change ssh alias if kitty otherwise $TERM is unknown
+if [ ! -n "$SSH_CLIENT" ]; then
+	if [[ $TERM = xterm-kitty ]]; then
+		alias ssh='kitten ssh'
+		alias icat="kitten icat"
+		alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
+	fi
+fi
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
 # Find directories name
 function finddirs() {
     if [ -z "$1" ]; then
@@ -524,34 +535,23 @@ function finddirs() {
         return 1
     fi
 
-    if hascommand --strict rg; then
-        if hascommand --strict fdfind; then
-            fdfind --type d --color=always "$1" | rg --color=always --passthru "$1"
-        elif hascommand --strict fd; then
-            fd --type d --color=always "$1" | rg --color=always --passthru "$1"
-        else
-            find . -name "*$1*" -type d | rg --color=always --passthru "$1"
-        fi
+    # Determine the best search tool
+    if hascommand --strict fdfind; then
+        FINDER=(fdfind --type d --color=always "$1")
+    elif hascommand --strict fd; then
+        FINDER=(fd --type d --color=always "$1")
     else
-        if hascommand --strict fdfind; then
-            fdfind --type d --color=always "$1" | grep --color=auto "$1"
-        elif hascommand --strict fd; then
-            fd --type d --color=always "$1" | grep --color=auto "$1"
-        else
-            find . -name "*$1*" -type d | grep --color=auto "$1"
-        fi
+        FINDER=(find . -name "*$1*" -type d)
     fi
+
+    # Determine the best highlighter
+    if hascommand --strict rg; then
+        HIGHLIGHTER=(rg --color=always --passthru "$1")
+    else
+        HIGHLIGHTER=(grep --color=auto "$1")
+    fi
+
+    # Run the selected tools   
+    "${FINDER[@]}" | "${HIGHLIGHTER[@]}"
 }
-#-------------------------------------------------------------
-
-
-#-------------------------------------------------------------
-# Change ssh alias if kitty otherwise $TERM is unknown
-if [ ! -n "$SSH_CLIENT" ]; then
-	if [[ $TERM = xterm-kitty ]]; then
-		alias ssh='kitten ssh'
-		alias icat="kitten icat"
-		alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
-	fi
-fi
 #-------------------------------------------------------------
