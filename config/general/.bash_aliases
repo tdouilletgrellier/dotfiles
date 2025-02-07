@@ -510,6 +510,42 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
+# Find directories name
+function finddirs() {
+    if [ -z "$1" ]; then
+        echo -e "${BRIGHT_WHITE}finddir:${RESET} Searches for directories recursively"
+        echo -e "You can search for directories using ${BRIGHT_YELLOW}substring matches${RESET}"
+        echo -e "The function automatically selects the best available tool (${BRIGHT_CYAN}fdfind, fd, find, grep, or rg${RESET})"
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}finddir${RESET} ${BRIGHT_YELLOW}[directory_name]${RESET}"
+        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}finddir${RESET} ${BRIGHT_YELLOW}'verif'${RESET}"
+        echo -e "  ${BRIGHT_CYAN}finddir${RESET} ${BRIGHT_YELLOW}'build'${RESET}"
+        return 1
+    fi
+
+    if hascommand --strict rg; then
+        if hascommand --strict fdfind; then
+            fdfind --type d --color=always "$1" | rg --color=always --passthru "$1"
+        elif hascommand --strict fd; then
+            fd --type d --color=always "$1" | rg --color=always --passthru "$1"
+        else
+            find . -name "*$1*" -type d | rg --color=always --passthru "$1"
+        fi
+    else
+        if hascommand --strict fdfind; then
+            fdfind --type d --color=always "$1" | grep --color=auto "$1"
+        elif hascommand --strict fd; then
+            fd --type d --color=always "$1" | grep --color=auto "$1"
+        else
+            find . -name "*$1*" -type d | grep --color=auto "$1"
+        fi
+    fi
+}
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
 # Change ssh alias if kitty otherwise $TERM is unknown
 if [ ! -n "$SSH_CLIENT" ]; then
 	if [[ $TERM = xterm-kitty ]]; then
