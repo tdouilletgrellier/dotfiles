@@ -727,7 +727,7 @@ alias se="sudoedit"
 # ~/.config/bashrc/config
 #######################################################
 
-# Determines if CTRL+h will show help
+# Determines if CTRL-h will show help
 # Ctrl+h (for help) and Ctrl+Backspace share the same key binding
 # in some terminal emulators so we default to skip this keybind
 _SKIP_HELP_KEYBIND=true
@@ -837,7 +837,7 @@ _GCAL_COUNTRY_CODE=US_AK
 # Month,Day,Year,"Message"
 # Jan,1,1985,"This is a message!"
 #
-# Toilet application is an optional dependency
+# Figlet and/or Toilet application is an optional dependency
 # Install Arch/Manjaro:  sudo pacman -S toilet
 # Install Ubuntu/Debian: sudo apt-get install toilet
 _SKIP_BDAY_REMINDER=false
@@ -853,11 +853,6 @@ _BDAY_FONT=future
 # This might be necessary on slow connections or networked directories
 # Also if set to true, will remove eza/exa's --git flag (use lsg for Git info)
 _GIT_IS_SLOW=false
-
-# Recognize the depreciated _PROMPT_BUILTIN_FASTER_GIT option
-if [[ ${_PROMPT_BUILTIN_FASTER_GIT} = true ]]; then
-	_GIT_IS_SLOW=true
-fi
 
 # Optional original prompt from 2014 version now with newly added Git support
 # download the optional .bashrc_prompt script file and place it in either your
@@ -929,6 +924,11 @@ _SKIP_PROMPT_LIQUIDPROMPT=false
 # NOTE: Requires Python and can be used with Trueline in Bash
 # WARNING: This path may change or break in the future with new Python versions
 _SKIP_PROMPT_POWERLINE=false
+
+# Recognize the depreciated _PROMPT_BUILTIN_FASTER_GIT option
+if [[ ${_PROMPT_BUILTIN_FASTER_GIT} = true ]]; then
+	_GIT_IS_SLOW=true
+fi
 
 # Determine our kernel name
 _KERNEL_NAME=$(printf '%.5s' "$(command uname -s)")
@@ -1118,6 +1118,109 @@ fi
 
 # Alias to show the help file
 alias hlp='command less -f -r -n -S "$_BASHRC_HELP"'
+
+# Exports a new config file for bashrc with environment variable settings
+function bashrcnewconfig() {
+	# Help message remains the same
+	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+		echo "Usage: bashrcnewconfig [--test|-t|--testing]"
+		echo "Exports a new config file for bashrc with environment variable settings"
+		echo ""
+		echo "Options:"
+		echo "  --test, -t, --testing    Output config to stdout instead of file"
+		echo "  --help, -h               Show this help message"
+		return 0
+	fi
+
+	# Determine if we're testing (outputting to stdout) or writing to file
+	local OUTPUT_TO_FILE=true
+	if [[ "$1" == "--test" ]] || [[ "$1" == "-t" ]] || [[ "$1" == "--testing" ]]; then
+		OUTPUT_TO_FILE=false
+	fi
+
+	# Determine config path (only needed if writing to file)
+	local CONFIG_PATH
+	if $OUTPUT_TO_FILE; then
+		if [[ -f "${HOME}/.envrc" ]]; then
+			CONFIG_PATH="${HOME}/.envrc"
+		elif [[ -f "${HOME}/.env" ]]; then
+			CONFIG_PATH="${HOME}/.env"
+		else
+			mkdir -p "${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc"
+			CONFIG_PATH="${XDG_CONFIG_HOME:-${HOME}/.config}/bashrc/config"
+		fi
+
+		# Check if file exists and prompt for overwrite
+		if [[ -f "${CONFIG_PATH}" ]]; then
+			if ! ask "File ${CONFIG_PATH} already exists. Overwrite?" "N"; then
+				echo "Operation cancelled."
+				return 1
+			fi
+		fi
+	fi
+
+	# Function to write content (either to file or stdout)
+	write_content() {
+		if $OUTPUT_TO_FILE; then
+			cat > "${CONFIG_PATH}"
+		else
+			cat
+		fi
+	}
+
+	# Generate the content
+	{
+		cat << 'EOL'
+#!/usr/bin/env bash
+#######################################################
+# Extreme Ultimate .bashrc Environment Variables
+# ~/.env
+# ~/.envrc
+# ~/.config/bashrc/config
+# NOTE: Type env to see a list of set variables
+#######################################################
+
+# Alias to edit this file
+alias ebe="edit ${BASH_SOURCE}"
+
+#######################################################
+# Set/override the default editor
+# Examples: vim, nvim, emacs, nano, micro, helix, pico
+# or gui apps like kate, geany, gedit, notepadqq, or vscodium
+# NOTE: In Git Bash, you can use something like "/c/Program\ Files/Notepad++/notepad++.exe"
+#######################################################
+EOL
+
+		# Extract and modify editor config section
+		sed -n '251,275p' "${BASH_SOURCE}" | sed 's/^[[:space:]]*//' | while IFS= read -r line; do
+			if [[ "$line" == *"export EDITOR"* ]] && [[ "$line" != *"="* ]]; then
+				echo '# export EDITOR="nano"'
+			elif [[ "$line" == *"export"* ]]; then
+				echo "# ${line}"
+			else
+				echo "${line}"
+			fi
+		done
+
+		# Add separator
+		echo "#######################################################"
+		echo "# Extreme Ultimate .bashrc Configuration"
+		echo "#######################################################"
+
+		# Extract and modify the final section
+		sed -n '729,926p' "${BASH_SOURCE}" | while IFS= read -r line; do
+			if [[ "$line" == "_BDAY_FILE="* ]]; then
+				echo "# _BDAY_FILE="
+			else
+				echo "${line}"
+			fi
+		done
+	} | write_content
+
+	if $OUTPUT_TO_FILE; then
+		echo "Configuration exported successfully to: ${CONFIG_PATH}"
+	fi
+}
 
 #######################################################
 # Use these commands to keep the .bashrc immutable and write protected
@@ -8256,6 +8359,19 @@ function formattext() {
 
 	echo "$text"
 }
+
+# Convenience aliases for common text formatting operations
+# These support both direct input: lowercase "HELLO"
+# and piped input: echo "HELLO" | lowercase
+# NOTE: Aliases only work in interactive shells, not in scripts
+alias trim='formattext --trim'
+alias fixspaces='formattext --tabs-to-spaces --underscores-to-spaces --remove-duplicate-spaces'
+alias lowercase='formattext --lowercase'
+alias uppercase='formattext --uppercase'
+alias capitalize='formattext --capitalize'
+alias titlecase='formattext --titlecase'
+alias smartquotes='formattext --smart-quotes'
+alias unsmartquotes='formattext --unsmart-quotes'
 
 # Trim leading and trailing spaces
 function trim() {
