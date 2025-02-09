@@ -16,8 +16,8 @@ if command -v cbonsai &>/dev/null; then
 fi
 
 # Check if exists and add it to the list
-if command -v asciiaquarium &>/dev/null; then
-    screensavers+=("asciiaquarium")
+if command -v asciiquarium &>/dev/null; then
+    screensavers+=("asciiquarium")
 fi
 
 # Check if exists and add it to the list
