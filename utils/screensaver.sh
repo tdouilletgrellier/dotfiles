@@ -12,7 +12,7 @@ fi
 
 # Check if exists and add it to the list
 if command -v cbonsai &>/dev/null; then
-    screensavers+=("cbonsai -S")
+    screensavers+=("cbonsai -S -M 20 -L 200")
 fi
 
 # Check if exists and add it to the list
