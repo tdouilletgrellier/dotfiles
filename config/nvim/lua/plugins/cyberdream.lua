@@ -1,4 +1,4 @@
-return{
+return {
 
   {
     "scottmckendry/cyberdream.nvim",
@@ -6,8 +6,8 @@ return{
     priority = 1000,
     config = function()
       -- Load the chosen palette
-      local palette = require("colors.palette_custom")  -- Change this line to load different palettes  
-    
+      local palette = require("colors.palette_custom") -- Change this line to load different palettes
+
       require("cyberdream").setup({
         -- Enable transparent background
         transparent = true,
@@ -19,28 +19,15 @@ return{
         hide_fillchars = true,
 
         -- Modern borderless telescope theme
-        borderless_telescope = false,
+        borderless_pickers = false,
 
         -- Set terminal colors used in `:terminal`
         terminal_colors = true,
 
-        theme = {
-          variant = "default", -- use "light" for the light variant
-          highlights = {
-            -- Highlight groups to override, adding new groups is also possible
-            -- See `:h highlight-groups` for a list of highlight groups or run `:hi` to see all groups and their current values
+        variant = "default", -- use "light" for the light variant
 
-            -- Example:
-            -- Comment = { fg = "#696969", bg = "NONE", italic = true },
-
-            -- Complete list can be found in `lua/cyberdream/theme.lua`
-          },
-
-          -- Override a color entirely
-          colors = palette,
-        },
+        colors = palette,
       })
     end,
   },
-
 }
