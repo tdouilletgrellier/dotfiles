@@ -735,7 +735,7 @@ function findall() {
         if [ -s "$temp_file" ]; then
             while IFS= read -r file; do
             	if [[ $show_match -eq 0 ]]; then
-                echo -e "${MAGENTA}./$file${RESET}"
+                echo -e "${MAGENTA}$file${RESET}"
                 elif [[ $show_match -eq 1 ]]; then
                 echo -e "${BRIGHT_WHITE}File: $file${RESET}"
                 for pattern in "${search_patterns[@]}"; do
