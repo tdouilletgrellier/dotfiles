@@ -559,198 +559,212 @@ function finddirs() {
 #-------------------------------------------------------------
 # Find pattern recursively in glob-selected files
 function findstr() {
-    local -r LINE_LENGTH_CUTOFF=1000
-    local SUDO_PREFIX=""
-    local case_sensitive=0
-    local hidden_files=1
-    local pattern=""
-    local search_text=""
-    
-    # Parse options
-    while [[ "$1" == --* ]]; do
-        case "$1" in
-            --sudo) SUDO_PREFIX="sudo ";;
-            --case-sensitive) case_sensitive=1;;
-            --no-hidden) hidden_files=0;;
-            *) echo -e "Unknown option: $1"; return 1;;
-        esac
-        shift
-    done
-    
-    pattern="$1"
-    search_text="$2"
-    
-    if [ -z "$pattern" ] || [ -z "$search_text" ]; then
-        echo -e "${BRIGHT_WHITE}findstr:${RESET} Searches for text in specified file types recursively"
-        echo -e "You can use both ${BRIGHT_YELLOW}plain text${RESET} and ${BRIGHT_YELLOW}regular expressions${RESET} for searching"
-        echo -e "To use elevated permissions include the ${BRIGHT_YELLOW}--sudo${RESET} option"
-        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <search_text>${RESET}"
-        echo -e "${BRIGHT_WHITE}Options:${RESET}"
-        echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
-        echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
-        echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
-        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}'*.epx' 'PASF'${RESET}"
-        echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.epx' 'todo'${RESET}"
-        return 1
-    fi
-    
-    if hascommand --strict rg; then
-        echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}ripgrep (rg)${BRIGHT_CYAN}:${RESET}"
-        local rg_options=("--no-ignore" "--hidden" "--pretty" "--glob" "$pattern" "$search_text" ".")
-        [[ $case_sensitive -eq 1 ]] && rg_options[0]="--case-sensitive"
-        [[ $hidden_files -eq 0 ]] && rg_options=("${rg_options[@]/--hidden/}")
-        ${SUDO_PREFIX}rg "${rg_options[@]}" | awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }' || echo "No matches found."
-    else
-        echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}grep${BRIGHT_CYAN}:${RESET}"
-        local grep_options=("-Inr" "--include=$pattern" "$search_text" ".")
-        [[ $case_sensitive -eq 1 ]] && grep_options[0]="-Inr --binary-files=without-match"
-        [[ $hidden_files -eq 0 ]] && grep_options=("--exclude-dir=.*" "${grep_options[@]}")
-        ${SUDO_PREFIX}grep "${grep_options[@]}" | awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }' || echo "No matches found."
-    fi
+	local -r LINE_LENGTH_CUTOFF=1000
+	local SUDO_PREFIX=""
+	local case_sensitive=0
+	local hidden_files=1
+	local pattern=""
+	local search_text=""
+
+	# Parse options
+	while [[ "$1" == --* ]]; do
+		case "$1" in
+		--sudo) SUDO_PREFIX="sudo " ;;
+		--case-sensitive) case_sensitive=1 ;;
+		--no-hidden) hidden_files=0 ;;
+		*)
+			echo -e "Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	pattern="$1"
+	search_text="$2"
+
+	if [ -z "$pattern" ] || [ -z "$search_text" ]; then
+		echo -e "${BRIGHT_WHITE}findstr:${RESET} Searches for text in specified file types recursively"
+		echo -e "You can use both ${BRIGHT_YELLOW}plain text${RESET} and ${BRIGHT_YELLOW}regular expressions${RESET} for searching"
+		echo -e "To use elevated permissions include the ${BRIGHT_YELLOW}--sudo${RESET} option"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <search_text>${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
+		echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
+		echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}'*.epx' 'PASF'${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.epx' 'todo'${RESET}"
+		return 1
+	fi
+
+	if hascommand --strict rg; then
+		echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}ripgrep (rg)${BRIGHT_CYAN}:${RESET}"
+		local rg_options=("--no-ignore" "--hidden" "--pretty" "--glob" "$pattern" "$search_text" ".")
+		[[ $case_sensitive -eq 1 ]] && rg_options[0]="--case-sensitive"
+		[[ $hidden_files -eq 0 ]] && rg_options=("${rg_options[@]/--hidden/}")
+		${SUDO_PREFIX}rg "${rg_options[@]}" | awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }' || echo "No matches found."
+	else
+		echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}grep${BRIGHT_CYAN}:${RESET}"
+		local grep_options=("-Inr" "--include=$pattern" "$search_text" ".")
+		[[ $case_sensitive -eq 1 ]] && grep_options[0]="-Inr --binary-files=without-match"
+		[[ $hidden_files -eq 0 ]] && grep_options=("--exclude-dir=.*" "${grep_options[@]}")
+		${SUDO_PREFIX}grep "${grep_options[@]}" | awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }' || echo "No matches found."
+	fi
 }
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # Find multiple patterns recursively in glob-selected files
 function findall() {
-    local -r LINE_LENGTH_CUTOFF=1000
-    local SUDO_PREFIX=""
-    local case_sensitive=0
-    local hidden_files=1
-    local show_match=0 
-    local file_pattern=""
-    local -a search_patterns=()
-    
-    # Parse options
-    while [[ "$1" == --* ]]; do
-        case "$1" in
-            --sudo) SUDO_PREFIX="sudo ";;
-            --case-sensitive) case_sensitive=1;;
-            --no-hidden) hidden_files=0;;
-			--show-match) show_match=1;;
-            *) echo -e "Unknown option: $1"; return 1;;
-        esac
-        shift
-    done
-    
-    # Get file pattern and search patterns
-    file_pattern="$1"
-    shift
-    
-    # Store all remaining arguments as search patterns
-    while [ "$#" -gt 0 ]; do
-        search_patterns+=("$1")
-        shift
-    done
-    
-    if [ -z "$file_pattern" ] || [ ${#search_patterns[@]} -eq 0 ]; then
-        echo -e "${BRIGHT_WHITE}findall:${RESET} Searches for multiple patterns in specified file types recursively"
-        echo -e "Files must contain ${BRIGHT_YELLOW}ALL${RESET} specified search patterns"
-        echo -e "You can use both ${BRIGHT_YELLOW}plain text${RESET} and ${BRIGHT_YELLOW}regular expressions${RESET} for searching"
-        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <pattern1> [pattern2] [pattern3...]${RESET}"
-        echo -e "${BRIGHT_WHITE}Options:${RESET}"
-        echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
-        echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
-        echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
-        echo -e "  ${BRIGHT_GREEN}--show-match${RESET}      Show all pattern matches"
-        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_YELLOW}'*.txt' 'error' 'critical' 'failed'${RESET}"
-        echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.log' 'WARNING' 'memory'${RESET}"
-        return 1
-    fi
-    
-    if hascommand --strict rg; then
-        echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}ripgrep (rg)${BRIGHT_CYAN}:${RESET}"
-        local temp_file
-        temp_file=$(mktemp)
-        
-        # First find all matching files
-        local rg_base_options=()
-        [[ $case_sensitive -eq 1 ]] && rg_base_options+=("--case-sensitive")
-        [[ $hidden_files -eq 1 ]] && rg_base_options+=("--hidden")
-        
-        ${SUDO_PREFIX}rg "${rg_base_options[@]}" \
-            --files \
-            --glob "$file_pattern" \
-            2>/dev/null | while read -r file; do
-            # Check if file contains all patterns
-            all_found=1
-            for pattern in "${search_patterns[@]}"; do
-                if ! ${SUDO_PREFIX}rg -q "${rg_base_options[@]}" "$pattern" "$file" 2>/dev/null; then
-                    all_found=0
-                    break
-                fi
-            done
-            # If all patterns found, save the file
-            if [ $all_found -eq 1 ]; then
-                echo "$file" >> "$temp_file"
-            fi
-        done
+	local -r LINE_LENGTH_CUTOFF=1000
+	local SUDO_PREFIX=""
+	local case_sensitive=0
+	local hidden_files=1
+	local show_match=0
+	local file_pattern=""
+	local -a search_patterns=()
 
-        # Display results for matching files
-        if [ -s "$temp_file" ]; then
-            while IFS= read -r file; do
-            	if [[ $show_match -eq 0 ]]; then
-                echo -e "${MAGENTA}./$file${RESET}"
-                elif [[ $show_match -eq 1 ]]; then
-				echo -e "${BRIGHT_WHITE}File: $file${RESET}"               	
-                for pattern in "${search_patterns[@]}"; do
-                    echo -e "${BRIGHT_YELLOW}Pattern: $pattern${RESET}"
-                    ${SUDO_PREFIX}rg "${rg_base_options[@]}" --pretty "$pattern" "$file" 2>/dev/null | 
-                        awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }'
-                    echo
-                done
-            	fi
-            done < "$temp_file"
-        else
-            echo "No files found containing all patterns."
-        fi
-        
-        rm -f "$temp_file"
-    else
-        echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}grep${BRIGHT_CYAN}:${RESET}"
-        local temp_file
-        temp_file=$(mktemp)
-        
-        # Find all matching files first
-        ${SUDO_PREFIX}find . -type f -name "$file_pattern" 2>/dev/null | while read -r file; do
-            # Check if file contains all patterns
-            all_found=1
-            for pattern in "${search_patterns[@]}"; do
-                if ! ${SUDO_PREFIX}grep -q ${case_sensitive:+-i} "$pattern" "$file" 2>/dev/null; then
-                    all_found=0
-                    break
-                fi
-            done
-            # If all patterns found, save the file
-            if [ $all_found -eq 1 ]; then
-                echo "$file" >> "$temp_file"
-            fi
-        done
-        
-        # Display results for matching files
-        if [ -s "$temp_file" ]; then
-            while IFS= read -r file; do
-            	if [[ $show_match -eq 0 ]]; then
-                echo -e "${MAGENTA}$file${RESET}"
-                elif [[ $show_match -eq 1 ]]; then
-                echo -e "${BRIGHT_WHITE}File: $file${RESET}"
-                for pattern in "${search_patterns[@]}"; do
-                    echo -e "${BRIGHT_YELLOW}Pattern: $pattern${RESET}"
-                    ${SUDO_PREFIX}grep ${case_sensitive:+-i} --color=always -n "$pattern" "$file" 2>/dev/null | 
-                        awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }'
-                    echo
-                done
-            	fi
-            done < "$temp_file"
-        else
-            echo "No files found containing all patterns."
-        fi
-        
-        rm -f "$temp_file"
-    fi
+	# Parse options
+	while [[ "$1" == --* ]]; do
+		case "$1" in
+		--sudo) SUDO_PREFIX="sudo " ;;
+		--case-sensitive) case_sensitive=1 ;;
+		--no-hidden) hidden_files=0 ;;
+		--show-match) show_match=1 ;;
+		*)
+			echo -e "Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Get file pattern and search patterns
+	file_pattern="$1"
+	shift
+
+	# Store all remaining arguments as search patterns
+	while [ "$#" -gt 0 ]; do
+		search_patterns+=("$1")
+		shift
+	done
+
+	if [ -z "$file_pattern" ] || [ ${#search_patterns[@]} -eq 0 ]; then
+		echo -e "${BRIGHT_WHITE}findall:${RESET} Searches for multiple patterns in specified file types recursively"
+		echo -e "Files must contain ${BRIGHT_YELLOW}ALL${RESET} specified search patterns"
+		echo -e "You can use both ${BRIGHT_YELLOW}plain text${RESET} and ${BRIGHT_YELLOW}regular expressions${RESET} for searching"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <pattern1> [pattern2] [pattern3...]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
+		echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
+		echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
+		echo -e "  ${BRIGHT_GREEN}--show-match${RESET}      Show all pattern matches"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_YELLOW}'*.txt' 'error' 'critical' 'failed'${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.log' 'WARNING' 'memory'${RESET}"
+		return 1
+	fi
+
+	if hascommand --strict rg; then
+		echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}ripgrep (rg)${BRIGHT_CYAN}:${RESET}"
+		local temp_file
+		temp_file=$(mktemp)
+
+		# First find all matching files
+		local rg_base_options=()
+		[[ $case_sensitive -eq 1 ]] && rg_base_options+=("--case-sensitive")
+		[[ $hidden_files -eq 1 ]] && rg_base_options+=("--hidden")
+
+		${SUDO_PREFIX}rg "${rg_base_options[@]}" \
+			--files \
+			--glob "$file_pattern" \
+			2>/dev/null | while read -r file; do
+			# Check if file contains all patterns
+			all_found=1
+			for pattern in "${search_patterns[@]}"; do
+				if ! ${SUDO_PREFIX}rg -q "${rg_base_options[@]}" "$pattern" "$file" 2>/dev/null; then
+					all_found=0
+					break
+				fi
+			done
+			# If all patterns found, save the file
+			if [ $all_found -eq 1 ]; then
+				echo "$file" >>"$temp_file"
+			fi
+		done
+
+		# Display results for matching files
+		if [ -s "$temp_file" ]; then
+			while IFS= read -r file; do
+				if [[ $show_match -eq 0 ]]; then
+					echo -e "${MAGENTA}$file${RESET}"
+				elif [[ $show_match -eq 1 ]]; then
+					echo -e "${BRIGHT_WHITE}File: $file${RESET}"
+					for pattern in "${search_patterns[@]}"; do
+						echo -e "${BRIGHT_YELLOW}Pattern: $pattern${RESET}"
+						${SUDO_PREFIX}rg "${rg_base_options[@]}" --pretty "$pattern" "$file" 2>/dev/null |
+							awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }'
+						echo
+					done
+				fi
+			done <"$temp_file"
+		else
+			echo "No files found containing all patterns."
+		fi
+
+		rm -f "$temp_file"
+	else
+		echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}grep${BRIGHT_CYAN}:${RESET}"
+		local temp_file
+		temp_file=$(mktemp)
+
+		# Find all matching files first
+		if hascommand --strict fdfind; then
+			FIND_CMD="${SUDO_PREFIX}fdfind -t f -g \"$file_pattern\""
+		elif hascommand --strict fd; then
+			FIND_CMD="${SUDO_PREFIX}fd -t f -g \"$file_pattern\""
+		else
+			FIND_CMD="${SUDO_PREFIX}find . -type f -name \"$file_pattern\""
+		fi
+		eval "$FIND_CMD" 2>/dev/null | while read -r file; do
+
+			# Check if file contains all patterns
+			all_found=1
+			for pattern in "${search_patterns[@]}"; do
+				if ! ${SUDO_PREFIX}grep -q ${case_sensitive:+-i} "$pattern" "$file" 2>/dev/null; then
+					all_found=0
+					break
+				fi
+			done
+			# If all patterns found, save the file
+			if [ $all_found -eq 1 ]; then
+				echo "$file" >>"$temp_file"
+			fi
+		done
+
+		# Display results for matching files
+		if [ -s "$temp_file" ]; then
+			while IFS= read -r file; do
+				if [[ $show_match -eq 0 ]]; then
+					echo -e "${MAGENTA}$file${RESET}"
+				elif [[ $show_match -eq 1 ]]; then
+					echo -e "${BRIGHT_WHITE}File: $file${RESET}"
+					for pattern in "${search_patterns[@]}"; do
+						echo -e "${BRIGHT_YELLOW}Pattern: $pattern${RESET}"
+						${SUDO_PREFIX}grep ${case_sensitive:+-i} --color=always -n "$pattern" "$file" 2>/dev/null |
+							awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }'
+						echo
+					done
+				fi
+			done <"$temp_file"
+		else
+			echo "No files found containing all patterns."
+		fi
+
+		rm -f "$temp_file"
+	fi
 }
 #-------------------------------------------------------------
