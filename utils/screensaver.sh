@@ -7,39 +7,39 @@ screensavers=()
 
 # Check if exists and add it to the list
 if command -v cacafire &>/dev/null; then
-    screensavers+=("cacafire")
+	screensavers+=("cacafire")
 fi
 
 # Check if exists and add it to the list
 if command -v cbonsai &>/dev/null; then
-    screensavers+=("cbonsai -S -M 20 -L 200")
+	screensavers+=("cbonsai -S -M 20 -L 200")
 fi
 
 # Check if exists and add it to the list
 if command -v asciiquarium &>/dev/null; then
-    screensavers+=("asciiquarium")
+	screensavers+=("asciiquarium")
 fi
 
 # Check if exists and add it to the list
 if command -v neo.sh &>/dev/null; then
-    screensavers+=("neo.sh")
+	screensavers+=("neo.sh")
 fi
 
 # Check if exists and add it to the list
 if command -v cmatrix &>/dev/null; then
-    screensavers+=("cmatrix -s")
+	screensavers+=("cmatrix -s")
 elif command -v matrix.sh &>/dev/null; then
-    screensavers+=("matrix.sh")
+	screensavers+=("matrix.sh")
 fi
 
 # Check if exists and add it to the list
 if command -v pipes.sh &>/dev/null; then
-      screensavers+=("pipes.sh")
+	screensavers+=("pipes.sh  -f50 -r0 -s10 -p6 -t0 -t1 -t2 -t3 -t4 -t9")
 fi
 
 # If at least one screensaver is available, pick one randomly
 if [ ${#screensavers[@]} -gt 0 ]; then
-    random_index=$((RANDOM % ${#screensavers[@]}))
-    selected_screensaver="${screensavers[$random_index]}"
-    exec $selected_screensaver
+	random_index=$((RANDOM % ${#screensavers[@]}))
+	selected_screensaver="${screensavers[$random_index]}"
+	exec $selected_screensaver
 fi

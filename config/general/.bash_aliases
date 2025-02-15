@@ -559,59 +559,55 @@ function finddirs() {
 #-------------------------------------------------------------
 # Find pattern recursively in glob-selected files
 function findstr() {
-	local -r LINE_LENGTH_CUTOFF=1000
-	local SUDO_PREFIX=""
-	local case_sensitive=0
-	local hidden_files=1
-
-	if [[ "$1" == "--sudo" ]]; then
-		SUDO_PREFIX="sudo "
-		shift
-	fi
-
-	if [[ "$1" == "--case-sensitive" ]]; then
-		case_sensitive=1
-		shift
-	fi
-
-	if [[ "$1" == "--no-hidden" ]]; then
-		hidden_files=0
-		shift
-	fi
-
-	local pattern="$1"
-	local search_text="$2"
-
-	if [ -z "$pattern" ] || [ -z "$search_text" ]; then
-		echo -e "${BRIGHT_WHITE}findstr:${RESET} Searches for text in specified file types recursively"
-		echo -e "You can use both ${BRIGHT_YELLOW}plain text${RESET} and ${BRIGHT_YELLOW}regular expressions${RESET} for searching"
-		echo -e "To use elevated permissions include the ${BRIGHT_YELLOW}--sudo${RESET} option"
-		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <search_text>${RESET}"
-		echo -e "${BRIGHT_WHITE}Options:${RESET}"
-		echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
-		echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
-		echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
-		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}'*.epx' 'PASF'${RESET}"
-		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.epx' 'todo'${RESET}"
-		return 1
-	fi
-
-	if command -v rg &>/dev/null; then
-		echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}ripgrep (rg)${BRIGHT_CYAN}:${RESET}"
-		rg_options="--smart-case --no-ignore --hidden --pretty --glob \"$pattern\" \"$search_text\" ."
-		[[ $case_sensitive -eq 1 ]] && rg_options="--case-sensitive --no-ignore --hidden --pretty --glob \"$pattern\" \"$search_text\" ."
-		[[ $hidden_files -eq 0 ]] && rg_options="${rg_options/--hidden/}"
-
-		eval ${SUDO_PREFIX}rg $rg_options | awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }' || echo "No matches found."
-	else
-		echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}grep${BRIGHT_CYAN}:${RESET}"
-		grep_options="-Inr --include=\"$pattern\" \"$search_text\" ."
-		[[ $case_sensitive -eq 1 ]] && grep_options="-Inr --include=\"$pattern\" --binary-files=without-match \"$search_text\" ."
-		[[ $hidden_files -eq 0 ]] && grep_options="--exclude-dir=.* $grep_options"
-
-		eval ${SUDO_PREFIX}grep $grep_options | awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }' || echo "No matches found."
-	fi
-}
+    local -r LINE_LENGTH_CUTOFF=1000
+    local SUDO_PREFIX=""
+    local case_sensitive=0
+    local hidden_files=1
+    local pattern=""
+    local search_text=""
+    
+    # Parse options
+    while [[ "$1" == --* ]]; do
+        case "$1" in
+            --sudo) SUDO_PREFIX="sudo ";;
+            --case-sensitive) case_sensitive=1;;
+            --no-hidden) hidden_files=0;;
+            *) echo -e "Unknown option: $1"; return 1;;
+        esac
+        shift
+    done
+    
+    pattern="$1"
+    search_text="$2"
+    
+    if [ -z "$pattern" ] || [ -z "$search_text" ]; then
+        echo -e "${BRIGHT_WHITE}findstr:${RESET} Searches for text in specified file types recursively"
+        echo -e "You can use both ${BRIGHT_YELLOW}plain text${RESET} and ${BRIGHT_YELLOW}regular expressions${RESET} for searching"
+        echo -e "To use elevated permissions include the ${BRIGHT_YELLOW}--sudo${RESET} option"
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <search_text>${RESET}"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
+        echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
+        echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
+        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}'*.epx' 'PASF'${RESET}"
+        echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.epx' 'todo'${RESET}"
+        return 1
+    fi
+    
+    if hascommand --strict rg; then
+        echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}ripgrep (rg)${BRIGHT_CYAN}:${RESET}"
+        local rg_options=("--no-ignore" "--hidden" "--pretty" "--glob" "$pattern" "$search_text" ".")
+        [[ $case_sensitive -eq 1 ]] && rg_options[0]="--case-sensitive"
+        [[ $hidden_files -eq 0 ]] && rg_options=("${rg_options[@]/--hidden/}")
+        ${SUDO_PREFIX}rg "${rg_options[@]}" | awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }' || echo "No matches found."
+    else
+        echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}grep${BRIGHT_CYAN}:${RESET}"
+        local grep_options=("-Inr" "--include=$pattern" "$search_text" ".")
+        [[ $case_sensitive -eq 1 ]] && grep_options[0]="-Inr --binary-files=without-match"
+        [[ $hidden_files -eq 0 ]] && grep_options=("--exclude-dir=.*" "${grep_options[@]}")
+        ${SUDO_PREFIX}grep "${grep_options[@]}" | awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }' || echo "No matches found."
+    fi
+# }
 #-------------------------------------------------------------
