@@ -611,3 +611,146 @@ function findstr() {
     fi
 }
 #-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Find multiple patterns recursively in glob-selected files
+function findall() {
+    local -r LINE_LENGTH_CUTOFF=1000
+    local SUDO_PREFIX=""
+    local case_sensitive=0
+    local hidden_files=1
+    local show_match=0 
+    local file_pattern=""
+    local -a search_patterns=()
+    
+    # Parse options
+    while [[ "$1" == --* ]]; do
+        case "$1" in
+            --sudo) SUDO_PREFIX="sudo ";;
+            --case-sensitive) case_sensitive=1;;
+            --no-hidden) hidden_files=0;;
+			--show-match) show_match=1;;
+            *) echo -e "Unknown option: $1"; return 1;;
+        esac
+        shift
+    done
+    
+    # Get file pattern and search patterns
+    file_pattern="$1"
+    shift
+    
+    # Store all remaining arguments as search patterns
+    while [ "$#" -gt 0 ]; do
+        search_patterns+=("$1")
+        shift
+    done
+    
+    if [ -z "$file_pattern" ] || [ ${#search_patterns[@]} -eq 0 ]; then
+        echo -e "${BRIGHT_WHITE}findall:${RESET} Searches for multiple patterns in specified file types recursively"
+        echo -e "Files must contain ${BRIGHT_YELLOW}ALL${RESET} specified search patterns"
+        echo -e "You can use both ${BRIGHT_YELLOW}plain text${RESET} and ${BRIGHT_YELLOW}regular expressions${RESET} for searching"
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <pattern1> [pattern2] [pattern3...]${RESET}"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
+        echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
+        echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
+        echo -e "  ${BRIGHT_GREEN}--show-match${RESET}      Show all pattern matches"
+        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_YELLOW}'*.txt' 'error' 'critical' 'failed'${RESET}"
+        echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.log' 'WARNING' 'memory'${RESET}"
+        return 1
+    fi
+    
+    if hascommand --strict rg; then
+        echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}ripgrep (rg)${BRIGHT_CYAN}:${RESET}"
+        local temp_file
+        temp_file=$(mktemp)
+        
+        # First find all matching files
+        local rg_base_options=()
+        [[ $case_sensitive -eq 1 ]] && rg_base_options+=("--case-sensitive")
+        [[ $hidden_files -eq 1 ]] && rg_base_options+=("--hidden")
+        
+        ${SUDO_PREFIX}rg "${rg_base_options[@]}" \
+            --files \
+            --glob "$file_pattern" \
+            2>/dev/null | while read -r file; do
+            # Check if file contains all patterns
+            all_found=1
+            for pattern in "${search_patterns[@]}"; do
+                if ! ${SUDO_PREFIX}rg -q "${rg_base_options[@]}" "$pattern" "$file" 2>/dev/null; then
+                    all_found=0
+                    break
+                fi
+            done
+            # If all patterns found, save the file
+            if [ $all_found -eq 1 ]; then
+                echo "$file" >> "$temp_file"
+            fi
+        done
+
+        # Display results for matching files
+        if [ -s "$temp_file" ]; then
+            while IFS= read -r file; do
+            	if [[ $show_match -eq 0 ]]; then
+                echo -e "${MAGENTA}./$file${RESET}"
+                elif [[ $show_match -eq 1 ]]; then
+				echo -e "${BRIGHT_WHITE}File: $file${RESET}"               	
+                for pattern in "${search_patterns[@]}"; do
+                    echo -e "${BRIGHT_YELLOW}Pattern: $pattern${RESET}"
+                    ${SUDO_PREFIX}rg "${rg_base_options[@]}" --pretty "$pattern" "$file" 2>/dev/null | 
+                        awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }'
+                    echo
+                done
+            	fi
+            done < "$temp_file"
+        else
+            echo "No files found containing all patterns."
+        fi
+        
+        rm -f "$temp_file"
+    else
+        echo -e "${BRIGHT_CYAN}Searching with ${BRIGHT_YELLOW}grep${BRIGHT_CYAN}:${RESET}"
+        local temp_file
+        temp_file=$(mktemp)
+        
+        # Find all matching files first
+        ${SUDO_PREFIX}find . -type f -name "$file_pattern" 2>/dev/null | while read -r file; do
+            # Check if file contains all patterns
+            all_found=1
+            for pattern in "${search_patterns[@]}"; do
+                if ! ${SUDO_PREFIX}grep -q ${case_sensitive:+-i} "$pattern" "$file" 2>/dev/null; then
+                    all_found=0
+                    break
+                fi
+            done
+            # If all patterns found, save the file
+            if [ $all_found -eq 1 ]; then
+                echo "$file" >> "$temp_file"
+            fi
+        done
+        
+        # Display results for matching files
+        if [ -s "$temp_file" ]; then
+            while IFS= read -r file; do
+            	if [[ $show_match -eq 0 ]]; then
+                echo -e "${MAGENTA}./$file${RESET}"
+                elif [[ $show_match -eq 1 ]]; then
+                echo -e "${BRIGHT_WHITE}File: $file${RESET}"
+                for pattern in "${search_patterns[@]}"; do
+                    echo -e "${BRIGHT_YELLOW}Pattern: $pattern${RESET}"
+                    ${SUDO_PREFIX}grep ${case_sensitive:+-i} --color=always -n "$pattern" "$file" 2>/dev/null | 
+                        awk -v len=$LINE_LENGTH_CUTOFF '{ $0=substr($0, 1, len); print $0 }'
+                    echo
+                done
+            	fi
+            done < "$temp_file"
+        else
+            echo "No files found containing all patterns."
+        fi
+        
+        rm -f "$temp_file"
+    fi
+}
+#-------------------------------------------------------------
