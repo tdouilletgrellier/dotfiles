@@ -80,7 +80,7 @@ matrix () {
   clear
 
   while :; do
-    echo $lines $cols $(( $RANDOM % $cols)) $(( $RANDOM % 117 ))
+    echo $lines $cols $(( $RANDOM % $cols)) $(( $RANDOM % 117 )) # 117 is the length of letters +1
     sleep 0.05
   done | awk "$awkscript"
 }

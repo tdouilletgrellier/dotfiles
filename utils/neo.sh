@@ -6,6 +6,9 @@
 #
 # A morning project. Could have been better, but I'm learning when to stop.
 
+# Clear terminal when CTRL+C
+trap '{ clear; exit 1; }' INT
+
 ### Customization:
 blue="\033[0;34m"
 brightblue="\033[1;34m"
