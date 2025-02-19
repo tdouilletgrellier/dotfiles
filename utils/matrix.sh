@@ -44,22 +44,20 @@ matrix () {
         line = cols[col];
         tail = line - drops[col];
 
-        # Print current character in white
-        if (line < lines) {
-          printf "\033[%s;%sH\033[1;37m%s", line, col, letter;
-          
-          # Print trailing character in green
-          if (line > 0) {
-            printf "\033[%s;%sH\033[2;32m%s", line-1, col, letter;
-          }
-        } else {
-          printf "\033[%s;%sH\033[2;32m%s", line-1, col, letter;
-        }
-
-        # Clear character at tail and beyond
-        if (tail >= 0) {
-          printf "\033[%s;%sH ", tail, col;
-        }
+ # Print current character in white (including last line)
+            if (line <= lines) {
+                printf "\033[%s;%sH\033[1;37m%s", line, col, letter;
+                
+                # Print trailing character in green
+                if (line > 0) {
+                    printf "\033[%s;%sH\033[2;32m%s", line-1, col, letter;
+                }
+            }
+            
+            # Clear character at tail and beyond
+            if (tail >= 0) {
+                printf "\033[%s;%sH ", tail, col;
+            }
 
         cols[col] = cols[col] + 1;
 
