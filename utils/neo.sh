@@ -3,44 +3,52 @@
 # Trap: When the user presses CTRL+C, clear the terminal and restore the cursor to its normal state
 trap '{ tput cnorm; clear; exit 1; }' INT
 
-# Parse command-line arguments
-for arg in "$@"; do
-    case $arg in
-        -h|--help)  # Display help if -h or --help is passed
-            echo "Matrix (Terminal Display Effect)"
-            echo ""
-            echo "A terminal-based visual effect mimicking the Matrix code screen."
-            echo "Random characters and colors are displayed in columns that scroll vertically."
-            echo ""
-            echo "Usage: matrix [OPTIONS]"
-            echo ""
-            echo "Options:"
-            echo "  -h, --help           Show this help message"
-            echo "  --spacing, -s        Set the spacing (likelihood) of characters appearing (default: 100)"
-            echo "  --scroll, -sc        Set scroll speed (default: 0 for static, positive integer for speed)"
-            echo "  --random-colors, -rc Toggle between two color modes: the default colors or a full list of colors (default: false)"
-            echo ""
-            echo "Example 1: matrix --spacing 50 --scroll 2"
-            echo "Example 2: matrix -s 200 -sc 1 -rc"
-            exit 0
-            ;;
-        --spacing|-s)  # Parse the --spacing or -s option and set its value
-            spacing=$2
-            shift 2  # Move past the current argument and its value
-            ;;
-        --scroll|-sc)  # Parse the --scroll or -sc option and set its value
-            scroll=$2
-            shift 2  # Move past the current argument and its value
-            ;;
-        --random-colors|-rc)  # Parse the --random-colors or -rc option and enable random color mode
-            random_colors=true
-            shift  # Move past this argument
-            ;;
-        *)
-            echo "Invalid option: $arg"  # Invalid option handling
-            exit 1
-            ;;
-    esac
+# Function to display help message
+show_help() {
+  cat << EOF
+Usage: matrix [OPTIONS]
+
+Matrix-style terminal screensaver with configurable speed, colors, and effect parameters.
+
+Options:
+  -s, --spacing=<value>        Set the spacing (likelihood) of characters appearing (default: 100).
+                               Example: -s 50 for denser characters.
+
+  -sc, --scroll=<value>        Set the scroll speed (default: 0 for static, positive integer for speed).
+                               Example: -sc 2 for faster scrolling.
+
+  -rc, --random-colors         Enable random colors for characters (default: disabled).
+                               Without this flag, characters are only green/white.
+
+  -h, --help                   Show this help message and exit.
+
+Examples:
+  matrix -s 50 -sc 2 -rc
+  matrix --spacing 100 --scroll 0 --random-colors
+EOF
+  exit 0
+}
+
+# Default values
+spacing=100
+scroll=0
+random_colors=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help) show_help ;;
+    -s|--spacing) spacing="$2"; shift ;;
+    --spacing=*) spacing="${1#*=}" ;;
+    -sc|--scroll) scroll="$2"; shift ;;
+    --scroll=*) scroll="${1#*=}" ;;
+    -rc|--random-colors) random_colors=true ;;
+    *) 
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
 done
 
 ### Colors definitions (ANSI escape codes for terminal colors)
@@ -106,23 +114,25 @@ else
     colors=($green $brightgreen $dimgreen $dimwhite)
 fi
 
-# Assign default values for spacing and scroll based on user input
-spacing=${1:-100}   # The likelihood of a character being left in place (lower = denser)
-scroll=${2:-0}      # 0 for static display, higher values control scroll speed
+# Set up terminal properties
 screenlines=$(( $(tput lines) - 1 + $scroll))  # Calculate screen height, considering scroll speed
 screencols=$(( $(tput cols) / 2 - 1 ))         # Calculate screen width, adjusted for scrolling effect
+
+# Adjust speed based on scroll value
+scale=3  # Precision for sleep time calculation
+if [[ $scroll -eq 0 ]]; then
+    base_delay=0  # No movement if scroll is zero
+    increment=0  # No increment needed for static mode
+else
+    base_delay=$(echo "scale=$scale; 0.1 / (1 + $scroll * 0.05)" | bc)  # Adjust delay, inversely proportional to scroll
+    increment=0.005  # Fine-tune increment for additional speed control
+fi
+
+sleep_time=$(echo "scale=$scale; $base_delay + $scroll * $increment" | bc)
 
 # Get the number of available characters and colors
 count=${#chars[@]}
 colorcount=${#colors[@]}
-
-# Show help if -h is passed
-if [[ $1 =~ '-h' ]]; then
-    echo "Display a Matrix(ish) screen in the terminal"
-    echo "Usage: matrix [SPACING [SCROLL]]"
-    echo "Example: matrix 100 0"
-    exit 0
-fi
 
 # Clear screen and hide cursor to create the "Matrix" effect
 clear
@@ -152,4 +162,9 @@ while :; do
         printf "\n"
     done
     tput cup 0 0  # Reset cursor position to the top-left corner for next frame
+
+    # Only sleep if scroll is greater than 0, i.e., if it's not static
+    if [[ $scroll -gt 0 ]]; then
+        sleep $sleep_time  # Adjust speed of refresh
+    fi
 done
