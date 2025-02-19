@@ -75,6 +75,8 @@ matrix () {
   # Define characters once
   # Japanese Katakana
   katakana="ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"
+  hiragana="あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん"
+  kanji="日月火水木金土山川田人名前東京日本語雨風雷電時光影龍虎神"
   # Latin Alphabet (Uppercase & Lowercase) + Numbers
   latin="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   # Symbols
@@ -86,9 +88,39 @@ matrix () {
   # Hebrew
   hebrew="אביגדהווחטךכעפצקרש"
   # Arabic 
-  arabic="اأإآءؤئبتثجحخدذرزسشصضطظعغفقكلمنهوىي"  
-  # Final combined array
-  letters="$katakana$latin$symbols$cyrillic$greek$hebrew$arabic"
+  arabic="اأإآءؤئبتثجحخدذرزسشصضطظعغفقكلمنهوىي"
+  # Chinese
+  chinese="你好世界风雨雷电火水山川天地人日月星龙虎"
+  # Indian
+  devanagari="अआइईउऊएऐओऔकखगघचछजझटठडढणतथदधनपफबभमयरलवशषसह"
+  # Korean
+  korean="가각간갇갈감갑값갓강개객거건걸검겁것경계고곡곤골공과광교구국군굴궁권그극근글금급기긴길김깊까깨꺼꼬꽃"  
+  # Thai
+  thai="กขคฆงจฉชซญฎฏฐฑฒณดตถทธนบปผพภมยรลวศษสหฬอ"
+  # Tibetan
+  tibetan="ཀཁགངཅཆཇཉཏཐདནཔཕབམཙཚཛཞཟའཡརལཤསཧཨ"
+  # Braille
+  braille="⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠭⠽"
+  # Final Combination: Just Uncomment What You Want!
+  letters=(
+    "$latin"
+    "$symbols"
+    "$katakana"
+    # "$hiragana"
+    # "$kanji"
+    "$cyrillic"
+    "$greek"
+    "$hebrew"
+    "$arabic"
+    # "$chinese"
+    "$devanagari"
+    # "$korean"
+    "$thai"
+    "$tibetan"
+    "$braille"
+  )
+  # Join all enabled character sets into one string
+  letters="${letters[*]}"
   # Compute length
   local letters_length=$(echo -n "$letters" | wc -m)
   # AWK Script
