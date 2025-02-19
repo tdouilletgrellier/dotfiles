@@ -73,7 +73,7 @@ matrix () {
   local cols=$(tput cols)
 
   # Define characters once
-  # Japanese Katakana
+  # Japanese
   katakana="ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"
   hiragana="あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん"
   kanji="日月火水木金土山川田人名前東京日本語雨風雷電時光影龍虎神"
