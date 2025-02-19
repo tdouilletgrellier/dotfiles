@@ -1,47 +1,161 @@
 # Matrix-style screensaver for your terminal
-# Either run execute the script directly,
-# Or source it in .zshrc, and start with $ matrix
+# Execute directly or source it then run $ matrix
 
 # Clear terminal when CTRL+C
-trap '{ clear; exit 1; }' INT
+trap '{ tput cnorm; clear; exit 1; }' INT
+
+# Function to display help message
+show_help() {
+  cat << EOF
+Usage: matrix [OPTIONS]
+
+Matrix-style terminal screensaver with configurable speed, colors, and effect parameters.
+
+Options:
+  -s, --speed=<value>         Set the refresh speed in seconds (default: 0.05).
+                               Example: -s 0.03 for faster animation.
+
+  -r, --random-colors         Enable random colors for characters (default: disabled).
+                               Without this flag, characters are only green/white.
+
+  -p, --start_prob=<value>    Probability (0.0 to 1.0) for a new drop to start (default: 1.0).
+                               Lower values reduce the number of falling streams.
+
+  -l, --length_factor=<value> Adjust the maximum length of each drop relative to screen height.
+                               Example: 0.9 means max drop length = 90% of terminal lines (default: 0.95).
+
+  -m, --min_length=<value>    Set the minimum length of each falling drop (default: 5).
+                               Longer values make drops more continuous.
+
+  -h, --help                  Show this help message and exit.
+
+Examples:
+  matrix -s 0.1 -r -p 0.8
+  ./matrixsh --length_factor=0.8 --min_length=10
+
+EOF
+  exit 0
+}
+
+# Default values
+speed=0.05
+random_colors=0
+start_prob=1.0
+length_factor=0.95
+min_length=5
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help) show_help ;;
+    -r|--random-colors) random_colors=1 ;;
+    -s|--speed) speed="$2"; shift ;;
+    --speed=*) speed="${1#*=}" ;;
+    -p|--start_prob) start_prob="$2"; shift ;;
+    --start_prob=*) start_prob="${1#*=}" ;;
+    -l|--length_factor) length_factor="$2"; shift ;;
+    --length_factor=*) length_factor="${1#*=}" ;;
+    -m|--min_length) min_length="$2"; shift ;;
+    --min_length=*) min_length="${1#*=}" ;;
+    *) 
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
 
 matrix () {
+
+  # Get terminal dimensions
   local lines=$(tput lines)
   local cols=$(tput cols)
-  local start_prob=${1:-1.0}  # Default start probability is 0.8
-  local min_length=${2:-5}   # Default min length is 50
-  local length_factor=${3:-0.95}  # Default max_length = 0.9 * lines
 
-  # letters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"
-  # letters="ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"
-  # letters="ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"
-  # letters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"
-
+  # Define characters once
+  # Japanese Katakana
+  katakana="ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"
+  # Latin Alphabet (Uppercase & Lowercase) + Numbers
+  latin="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  # Symbols
+  symbols="@#$%^&*()=+{}~[]<>/!?;:.,_-±×÷√∞≈≠≡≤≥«»©®™¢£¥€₽₿"
+  # Cyrillic (Uppercase & Lowercase)
+  cyrillic="АБВГҐДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЭЮЯабвгдеёжзийклмнопрстуфхцчшщыэюя"
+  # Greek (Uppercase & Lowercase)
+  greek="ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω"
+  # Hebrew
+  hebrew="אביגדהווחטךכעפצקרש"
+  # Arabic 
+  arabic="اأإآءؤئبتثجحخدذرزسشصضطظعغفقكلمنهوىي"  
+  # Final combined array
+  letters="$katakana$latin$symbols$cyrillic$greek$hebrew$arabic"
+  # Compute length
+  local letters_length=$(echo -n "$letters" | wc -m)
+  # AWK Script
   awkscript='
 BEGIN {
     min_length = '$min_length';
     max_length = int('$length_factor' * '$lines'); 
     start_prob = '$start_prob';
+    random_colors = '$random_colors';
     
-    # Pre-define ANSI escape codes for efficiency
-    WHITE = "\033[1;37m"
-    GREEN = "\033[2;32m"
+     # ANSI escape codes
+    NORMAL_WHITE = "\033[0;37m"
+    NORMAL_GREEN = "\033[0;32m" 
+    BRIGHT_WHITE = "\033[1;37m"
+    BRIGHT_GREEN = "\033[1;32m"
+    DIM_WHITE = "\033[2;37m"
+    DIM_GREEN = "\033[2;32m"
+
+    WHITE = BRIGHT_WHITE
+    WHITE_RAND[0] = NORMAL_WHITE
+    WHITE_RAND[1] = BRIGHT_WHITE
+    WHITE_RAND[2] = DIM_WHITE
+    GREEN = NORMAL_GREEN
+    GREEN_RAND[0] = NORMAL_GREEN
+    GREEN_RAND[1] = BRIGHT_GREEN
+    GREEN_RAND[2] = DIM_GREEN    
+
+
+    # Random colors array
+    # Bright colors
+    colors[0] = "\033[1;31m"  # Bright Red
+    colors[1] = "\033[1;32m"  # Bright Green
+    colors[2] = "\033[1;33m"  # Bright Yellow
+    colors[3] = "\033[1;34m"  # Bright Blue
+    colors[4] = "\033[1;35m"  # Bright Magenta
+    colors[5] = "\033[1;36m"  # Bright Cyan
+    # Normal colors
+    colors[6] = "\033[0;31m"  # Red
+    colors[7] = "\033[0;32m"  # Green
+    colors[8] = "\033[0;33m"  # Yellow
+    colors[9] = "\033[0;34m" # Blue
+    colors[10] = "\033[0;35m" # Magenta
+    colors[11] = "\033[0;36m" # Cyan
     
     # Initialize random seed
     srand()
 }
 {
-    letters="ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"
     lines=$1
     random_col=$3
     c=$4
-    letter=substr(letters,c,1)
+    letter=substr(letters, c, 1)
+
+    # Choose color: random if enabled, otherwise standard green/white
+    GREEN = GREEN_RAND[int(rand() * length(GREEN_RAND))]   
+    WHITE = WHITE_RAND[int(rand() * length(WHITE_RAND))]   
+    if (random_colors) {
+        color = colors[int(rand() * length(colors))]
+    } else {
+        color = GREEN
+    }
+
+    # Different trailing character
+    c2 = int(rand() * letters_length) + 1
+    trail_letter=substr(letters, c2, 1)
     
-    # Get a different random character for trailing position
-    c2 = int(rand() * length(letters)) + 1
-    trail_letter=substr(letters,c2,1)
-    
-    # Initialize new column with random drop length
+     # Initialize column if empty
     if (cols[random_col] == "") {
         if (rand() < start_prob) {
             cols[random_col] = 0
@@ -66,18 +180,19 @@ BEGIN {
                 
                 # Print trailing character in green (using different character)
                 if (line > 0) {
-                    printf "\033[%s;%sH%s%s", line-1, col, GREEN, trail_letter
+                    printf "\033[%s;%sH%s%s", line-1, col, color, trail_letter
                 }
             }
             
-            # Clear character at tail and beyond
+             # Clear tail
             if (tail >= 0) {
                 printf "\033[%s;%sH ", tail, col
             }
             
+            # Move drop down
             cols[col] = cols[col] + 1
             
-            # Remove column when entire drop has passed bottom
+            # Remove finished columns
             if (tail >= lines) {
                 delete cols[col]
                 delete drops[col]
@@ -89,24 +204,18 @@ BEGIN {
 }
   '
 
-  echo -e "\e[1;40m"
+  echo -e "\e[1;40m"  # Set background
   clear
 
   while :; do
-    echo $lines $cols $(( $RANDOM % $cols)) $(( $RANDOM % 117 )) # 117 is the length of letters +1
-    sleep 0.05
-  done | awk "$awkscript"
+    printf "%d %d %d %d\n" "$lines" "$cols" "$((RANDOM % cols))" "$((RANDOM % letters_length))"
+    sleep "$speed"
+  done | awk -v letters="$letters" -v letters_length="$letters_length" "$awkscript"
 }
 
-
-
-# Determine if file is being run directly or sourced
-([[ -n $ZSH_EVAL_CONTEXT && $ZSH_EVAL_CONTEXT =~ :file$ ]] || 
- [[ -n $KSH_VERSION && $(cd "$(dirname -- "$0")" &&
-    printf '%s' "${PWD%/}/")$(basename -- "$0") != "${.sh.file}" ]] || 
- [[ -n $BASH_VERSION ]] && (return 0 2>/dev/null)) && sourced=1 || sourced=0
-
 # If script being called directly, start matrix
-if [ $sourced -eq 0 ]; then
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  tput civis  # Hide cursor
   matrix
+  tput cnorm  # Show cursor when exiting
 fi
