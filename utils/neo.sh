@@ -119,13 +119,13 @@ screenlines=$(( $(tput lines) - 1 + $scroll))  # Calculate screen height, consid
 screencols=$(( $(tput cols) / 2 - 1 ))         # Calculate screen width, adjusted for scrolling effect
 
 # Adjust speed based on scroll value
-scale=3  # Precision for sleep time calculation
+scale=4  # Increased precision for smoother calculations
 if [[ $scroll -eq 0 ]]; then
     base_delay=0  # No movement if scroll is zero
     increment=0  # No increment needed for static mode
 else
-    base_delay=$(echo "scale=$scale; 0.1 / (1 + $scroll * 0.05)" | bc)  # Adjust delay, inversely proportional to scroll
-    increment=0.005  # Fine-tune increment for additional speed control
+    base_delay=0.07   # Set a slightly higher base delay for ultra-smooth scrolling
+    increment=0.003   # Even smaller increment for ultra-smooth transition
 fi
 
 sleep_time=$(echo "scale=$scale; $base_delay + $scroll * $increment" | bc)
