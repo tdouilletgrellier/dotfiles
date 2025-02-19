@@ -18,60 +18,75 @@ matrix () {
   # letters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"
 
   awkscript='
-  BEGIN {
+BEGIN {
     min_length = '$min_length';
     max_length = int('$length_factor' * '$lines'); 
     start_prob = '$start_prob';
-  }
-
-  {
+    
+    # Pre-define ANSI escape codes for efficiency
+    WHITE = "\033[1;37m"
+    GREEN = "\033[2;32m"
+    
+    # Initialize random seed
+    srand()
+}
+{
     letters="ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"
     lines=$1
     random_col=$3
     c=$4
     letter=substr(letters,c,1)
-
+    
+    # Get a different random character for trailing position
+    c2 = int(rand() * length(letters)) + 1
+    trail_letter=substr(letters,c2,1)
+    
     # Initialize new column with random drop length
     if (cols[random_col] == "") {
-      if (rand() < start_prob) {  # Controlled probability for starting a new column
-        cols[random_col] = 0;
-        drops[random_col] = min_length + int(rand() * (max_length - min_length));  # Random drop length
-      }
+        if (rand() < start_prob) {
+            cols[random_col] = 0
+            drops[random_col] = min_length + int(rand() * (max_length - min_length))
+        }
     }
-
+    
     for (col in cols) {
-      if (cols[col] != "") {
-        line = cols[col];
-        tail = line - drops[col];
-
- # Print current character in white (including last line)
+        if (cols[col] != "") {
+            line = cols[col]
+            tail = line - drops[col]
+            
             if (line <= lines) {
-                printf "\033[%s;%sH\033[1;37m%s", line, col, letter;
+                # Choose color based on position
+                if (line == lines) {
+                    # Last line - print in green
+                    printf "\033[%s;%sH%s%s", line, col, GREEN, letter
+                } else {
+                    # Not last line - print in white
+                    printf "\033[%s;%sH%s%s", line, col, WHITE, letter
+                }
                 
-                # Print trailing character in green
+                # Print trailing character in green (using different character)
                 if (line > 0) {
-                    printf "\033[%s;%sH\033[2;32m%s", line-1, col, letter;
+                    printf "\033[%s;%sH%s%s", line-1, col, GREEN, trail_letter
                 }
             }
             
             # Clear character at tail and beyond
             if (tail >= 0) {
-                printf "\033[%s;%sH ", tail, col;
+                printf "\033[%s;%sH ", tail, col
             }
-
-        cols[col] = cols[col] + 1;
-
-        # Remove column when entire drop has passed bottom
-        if (tail >= lines) {
-          delete cols[col];
-          delete drops[col];
+            
+            cols[col] = cols[col] + 1
+            
+            # Remove column when entire drop has passed bottom
+            if (tail >= lines) {
+                delete cols[col]
+                delete drops[col]
+            }
         }
-      }
     }
-
     # Reset cursor position
     printf "\033[0;0H"
-  }
+}
   '
 
   echo -e "\e[1;40m"
