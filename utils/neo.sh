@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]]; do
     -sc|--scroll) scroll="$2"; shift ;;
     --scroll=*) scroll="${1#*=}" ;;
     -rc|--random-colors) random_colors=true ;;
-    *) 
+    *)
       echo "Unknown option: $1" >&2
       exit 1
       ;;
