@@ -768,3 +768,33 @@ function findall() {
 	fi
 }
 #-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Overrides existing tm function in bashrc to prevent exiting
+# ssh when leaving tmux
+function tm() {
+
+	# Get the passed in or default session name
+	if [[ -n "${@}" ]]; then
+		local SESSION_NAME="${@}"
+	elif [[ -n "${_TMUX_LOAD_SESSION_NAME}" ]]; then
+		local SESSION_NAME="${_TMUX_LOAD_SESSION_NAME}"
+	elif [[ "$(tmux list-sessions 2> /dev/null | wc -l)" -gt 0 ]]; then
+		local SESSION_NAME="$(tmux ls -F "#{session_name}" | createmenu)"
+	else
+		local SESSION_NAME="$(whoami)"
+	fi
+
+	# Create the session if it doesn't exist
+	TMUX='' tmux -u new-session -d -s "${SESSION_NAME}" 2> /dev/null
+
+	# Attach if outside of TMUX
+	if [[ -z "$TMUX" ]]; then
+		tmux -u attach -t "${SESSION_NAME}" 2> /dev/null
+
+	# Switch if we are already inside of TMUX
+	else
+		tmux -u switch-client -t "${SESSION_NAME}" 2> /dev/null
+	fi
+}
+#-------------------------------------------------------------	
