@@ -4223,7 +4223,7 @@ if hascommand --strict pacman && [[ -d /etc/pacman.d/ ]]; then
 	}
 
 	# Clean the pacman and helper package caches
-	alias pacman-clean-cache='yes | sudo pacman -Scc && command -v yay &> /dev/null && yes | yay -Sc || true && command -v paru &> /dev/null && yes | paru -Sc || true && echo'
+	alias pacman-clean-cache='sudo echo -ne "${BRIGHT_YELLOW}Before:${RESET} "; sudo du -sh /var/cache/pacman/pkg/ 2>/dev/null; yes | sudo pacman -Scc && command -v yay &> /dev/null && yes | yay -Sc || true && command -v paru &> /dev/null && yes | paru -Sc || true; echo -ne "\n${BRIGHT_GREEN}After:${RESET} "; sudo du -sh /var/cache/pacman/pkg/ 2>/dev/null'
 
 	# To mark a package as explicitly installed or only a dependency
 	alias pkgmarkasexplicit='sudo pacman -D --asexplicit'

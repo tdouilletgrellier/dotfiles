@@ -91,7 +91,7 @@ function welcome_greeting() {
 	if [[ $BORING = true ]]; then
 		echo -e "$COLOR_P${WELCOME_MSG}${RESET}\n"
 	else
-		if hash lolcat 2>/dev/null && hash figlet 2>/dev/null; then
+		if hascommand --strict lolcat && hascommand --strict figlet; then
 			echo "${WELCOME_MSG}" | figlet | lolcat
 		else
 			echo -e "$COLOR_P${WELCOME_MSG}${RESET}\n"
@@ -101,7 +101,7 @@ function welcome_greeting() {
 
 # Print system information with neofetch, if it's installed
 function welcome_sysinfo() {
-	if hash neofetch 2>/dev/null; then
+	if hascommand --strict neofetch; then
 		neofetch --shell_version off \
 			--disable kernel distro shell resolution de wm wm_theme theme icons term packages gpu \
 			--backend off \
@@ -133,7 +133,7 @@ function welcome_today() {
 	echo -e "${RESET}"
 
 	# Print IP address (quite slow so commented)
-	# if hash ip 2>/dev/null; then
+	# if hascommand --strict  ip; then
 	#   ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
 	#   ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
 	#   echo -e "${COLOR_S}🜨  $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
@@ -397,9 +397,9 @@ export SELECTED_EDITOR=$EDITOR
 # Fzf config
 if hascommand --strict fzf; then
 	if hascommand --strict fdfind; then
-		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude '.git'"
+		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude '.git' --exclude 'node_modules' --exclude '.cache' --exclude '.local' --exclude 'target'"
 	elif hascommand --strict fd; then
-		export FZF_DEFAULT_COMMAND="fd --hidden --exclude '.git'"
+		export FZF_DEFAULT_COMMAND="fd --hidden --exclude '.git' --exclude 'node_modules' --exclude '.cache' --exclude '.local' --exclude 'target'"
 	fi
 	if hascommand --strict bat; then
 		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
@@ -420,6 +420,22 @@ if hascommand --strict fzf; then
 		export FZF_PREVIEW_COMMAND_IMG='echo image: {}'
 		export FZF_PREVIEW_COMMAND_IMG_CLEAR=""
 	fi
+	if hascommand --strict pbcopy; then
+		CLIP_COMMAND="pbcopy"
+	elif hascommand --strict xclip; then
+		CLIP_COMMAND="xclip -selection clipboard"
+	elif hascommand --strict xsel; then
+		CLIP_COMMAND="xsel --clipboard"
+	else
+		CLIP_COMMAND=${FZF_PREVIEW_COMMAND_FILE}
+	fi
+	if hascommand --strict xdg-open; then
+		OPEN_COMMAND="xdg-open"
+	elif hascommand --strict open; then
+		OPEN_COMMAND="open"
+	else
+		OPEN_COMMAND="echo Opening not supported" # Fallback
+	fi
 	export FZF_PREVIEW_COMMAND_DEFAULT='echo {}'
 	export FZF_PREVIEW_COMMAND_FILE=''${FZF_PREVIEW_COMMAND_IMG_CLEAR}' [[ $(file --mime {}) =~ image ]] && '${FZF_PREVIEW_COMMAND_IMG}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
 	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
@@ -433,7 +449,9 @@ if hascommand --strict fzf; then
   	--bind 'ctrl-u:preview-half-page-up'
   	--bind 'ctrl-d:preview-half-page-down'
   	--bind 'ctrl-x:reload("$FZF_CTRL_T_COMMAND")'
-  	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'"
+  	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'
+  	--bind 'ctrl-y:execute-silent(echo -n {} | $CLIP_COMMAND)+abort'
+  	--header 'C-x:reload │ C-w:depth=1 │ C-/:preview │ C-y:copy │ C-u/d:scroll preview'"
 	export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
 	export FZF_ALT_C_OPTS="
   	--walker-skip .git,node_modules,target
@@ -443,11 +461,19 @@ if hascommand --strict fzf; then
   	--bind 'ctrl-u:preview-half-page-up'
   	--bind 'ctrl-d:preview-half-page-down'
   	--bind 'ctrl-x:reload("$FZF_ALT_C_COMMAND")'
-  	--bind 'ctrl-w:reload("$FZF_ALT_C_COMMAND" --max-depth 1)'"
+  	--bind 'ctrl-w:reload("$FZF_ALT_C_COMMAND" --max-depth 1)'
+  	--bind 'ctrl-o:execute($OPEN_COMMAND {})'
+    --header 'C-x:reload │ C-w:depth=1 │ C-/:preview │ C-y:copy │ C-u/d:scroll preview │ C-o:open'"
 	export FZF_CTRL_R_OPTS="
-	--preview 'echo {}' --preview-window down:3:hidden:wrap
-	--bind 'ctrl-/:toggle-preview'"
-	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up --cycle"
+    --preview 'echo {}'
+    --preview-window down:3:hidden:wrap
+    --bind 'ctrl-/:toggle-preview'
+    --bind 'ctrl-y:execute-silent(echo -n {2..} | $CLIP_COMMAND)+abort'
+    --header 'C-/:preview │ C-y:copy'"
+	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up --cycle
+	--history='${HOME}/.fzf_history'
+    --history-size=100000
+    --no-mouse"
 	# --- setup fzf theme ---
 	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
  	--color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#2a2a2a
@@ -779,22 +805,22 @@ function tm() {
 		local SESSION_NAME="${@}"
 	elif [[ -n "${_TMUX_LOAD_SESSION_NAME}" ]]; then
 		local SESSION_NAME="${_TMUX_LOAD_SESSION_NAME}"
-	elif [[ "$(tmux list-sessions 2> /dev/null | wc -l)" -gt 0 ]]; then
+	elif [[ "$(tmux list-sessions 2>/dev/null | wc -l)" -gt 0 ]]; then
 		local SESSION_NAME="$(tmux ls -F "#{session_name}" | createmenu)"
 	else
 		local SESSION_NAME="$(whoami)"
 	fi
 
 	# Create the session if it doesn't exist
-	TMUX='' tmux -u new-session -d -s "${SESSION_NAME}" 2> /dev/null
+	TMUX='' tmux -u new-session -d -s "${SESSION_NAME}" 2>/dev/null
 
 	# Attach if outside of TMUX
 	if [[ -z "$TMUX" ]]; then
-		tmux -u attach -t "${SESSION_NAME}" 2> /dev/null
+		tmux -u attach -t "${SESSION_NAME}" 2>/dev/null
 
 	# Switch if we are already inside of TMUX
 	else
-		tmux -u switch-client -t "${SESSION_NAME}" 2> /dev/null
+		tmux -u switch-client -t "${SESSION_NAME}" 2>/dev/null
 	fi
 }
-#-------------------------------------------------------------	
+#-------------------------------------------------------------
