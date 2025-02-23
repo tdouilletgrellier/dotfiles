@@ -537,7 +537,98 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 
 #-------------------------------------------------------------
 # Reduce pdf size with gs
-# gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/prepress -dNOPAUSE -dQUIET -dBATCH -sOutputFile=output.pdf input.pdf
+function compresspdf() {
+    if ! hascommand --strict  gs; then
+        echo -e "${BRIGHT_RED}Error:${RESET} Ghostscript (gs) is not installed or not in the PATH."
+        return 1
+    fi
+
+    if [ -z "$1" ]; then
+        echo -e "${BRIGHT_WHITE}compress_pdf:${RESET} Compresses a PDF while preserving hyperlinks"
+        echo -e "Uses ${BRIGHT_CYAN}Ghostscript${RESET} to optimize the file size with high-quality settings."
+        echo -e "Hyperlinks are ${BRIGHT_YELLOW}preserved${RESET} by default."
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}compress_pdf${RESET} ${BRIGHT_YELLOW}[input.pdf]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_YELLOW}-o, --output${RESET}     Output PDF file (default: output.pdf)"
+        echo -e "  ${BRIGHT_YELLOW}-c, --compat${RESET}     PDF compatibility level (default: 1.4)"
+        echo -e "  ${BRIGHT_YELLOW}                        Possible values:${RESET}"
+        echo -e "                          ${BRIGHT_CYAN}1.2${RESET}  (Acrobat 3.0, old format)"
+        echo -e "                          ${BRIGHT_CYAN}1.3${RESET}  (Acrobat 4.0, no transparency)"
+        echo -e "                          ${BRIGHT_CYAN}1.4${RESET}  (Acrobat 5.0, supports transparency)"
+        echo -e "                          ${BRIGHT_CYAN}1.5${RESET}  (Acrobat 6.0, object streams)"
+        echo -e "                          ${BRIGHT_CYAN}1.6${RESET}  (Acrobat 7.0, JBIG2 compression)"
+        echo -e "                          ${BRIGHT_CYAN}1.7${RESET}  (Acrobat 8.0+, latest standard)"
+        echo -e "  ${BRIGHT_YELLOW}-s, --settings${RESET}   Compression level (default: prepress)"
+        echo -e "  ${BRIGHT_YELLOW}                        Possible values:${RESET}"
+        echo -e "                          ${BRIGHT_CYAN}screen${RESET}    (Lowest quality, smallest file size)"
+        echo -e "                          ${BRIGHT_CYAN}ebook${RESET}     (Medium quality, smaller file size)"
+        echo -e "                          ${BRIGHT_CYAN}printer${RESET}   (High quality, larger file size)"
+        echo -e "                          ${BRIGHT_CYAN}prepress${RESET}  (Best quality, preserves color accuracy)"
+        echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}       Show this help message"
+        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}compress_pdf${RESET} ${BRIGHT_YELLOW}input.pdf${RESET}"
+        echo -e "  ${BRIGHT_CYAN}compress_pdf${RESET} ${BRIGHT_YELLOW}input.pdf -o compressed.pdf -s printer -c 1.5${RESET}"
+        return 1
+    fi
+
+    local input_file="$1"
+    shift # remove the first argument (input file)
+    local output_file="output.pdf"
+    local compatibility="1.4"
+    local pdf_settings="prepress"
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -o|--output)
+                output_file="$2"
+                shift 2
+                ;;
+            -c|--compat)
+                compatibility="$2"
+                shift 2
+                ;;
+            -s|--settings)
+                pdf_settings="$2"
+                shift 2
+                ;;
+            -h|--help)
+                compress_pdf
+                return 0
+                ;;
+            *)
+                echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+                return 1
+                ;;
+        esac
+    done
+
+    # Ensure the correct formatting for pdf_settings
+    pdf_settings="/$pdf_settings"
+
+    # Print the full gs command with nice syntax highlighting
+    echo -e "${BRIGHT_WHITE}Ghostscript Command:${RESET}"
+    echo -e "  ${BRIGHT_MAGENTA}gs${RESET} \
+${BRIGHT_BLUE}-sDEVICE=${RESET}${BRIGHT_YELLOW}pdfwrite${RESET} \
+${BRIGHT_BLUE}-dCompatibilityLevel=${RESET}${BRIGHT_YELLOW}\"$compatibility\"${RESET} \
+${BRIGHT_BLUE}-dPDFSETTINGS=${RESET}${BRIGHT_YELLOW}\"$pdf_settings\"${RESET} \
+${BRIGHT_BLUE}-dNOPAUSE${RESET} ${BRIGHT_BLUE}-dQUIET${RESET} ${BRIGHT_BLUE}-dBATCH${RESET} \
+${BRIGHT_BLUE}-dPreserveAnnots=true${RESET} \
+${BRIGHT_BLUE}-sOutputFile=${RESET}${BRIGHT_YELLOW}\"$output_file\"${RESET} \
+${BRIGHT_YELLOW}\"$input_file\"${RESET}"
+
+    # Compress the PDF using Ghostscript
+    gs -sDEVICE=pdfwrite -dCompatibilityLevel="$compatibility" -dPDFSETTINGS="$pdf_settings" \
+       -dNOPAUSE -dQUIET -dBATCH -dPreserveAnnots=true -sOutputFile="$output_file" "$input_file"
+
+    # Check if gs command was successful
+    if [ $? -ne 0 ]; then
+        echo -e "${BRIGHT_RED}Error:${RESET} Ghostscript failed to compress the PDF."
+        return 1
+    fi
+
+    echo -e "${BRIGHT_GREEN}Compressed PDF saved as:${RESET} $output_file"
+}
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
