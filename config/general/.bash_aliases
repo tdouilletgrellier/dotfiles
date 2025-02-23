@@ -468,7 +468,7 @@ if hascommand --strict fzf; then
     --header 'C-x:reload│C-w:depth│C-/:preview│C-y:copy│C-u/d:scroll│C-space:sel│C-o:open'"
 	export FZF_CTRL_R_OPTS="
     --preview 'echo {}'
-    --border-label='╢ Ctrl-R:Hist ╟'
+    --border-label='╢ Ctrl-R:History ╟'
     --preview-window down:3:hidden:wrap
     --bind 'ctrl-/:toggle-preview'
     --bind 'ctrl-y:execute-silent(echo -n {2..} | $CLIP_COMMAND)+abort'
@@ -480,28 +480,12 @@ if hascommand --strict fzf; then
     --bind='ctrl-space:toggle'
     --multi"
     # --- setup fzf theme ---
-	FG_COLOR="#00ff00"          # Foreground
-	FG_PLUS_COLOR="#00d900"      # Bright Green (Color 10)
-	BG_COLOR="#000000"           # Background
-	BG_PLUS_COLOR="#083905"      # Selection Background
-	HL_COLOR="#386bd7"           # Blue (Color 4)
-	HL_PLUS_COLOR="#66ccff"      # Bright Blue (Color 12)
-	INFO_COLOR="#e7bf00"         # Yellow (Color 3)
-	MARKER_COLOR="#e5e500"       # Bright Yellow (Color 11)
-	PROMPT_COLOR="#990000"       # Red (Color 1)
-	SPINNER_COLOR="#e500e5"      # Bright Magenta (Color 13)
-	POINTER_COLOR="#b200b2"      # Magenta (Color 5)
-	HEADER_COLOR="#666666"       # Dark Grey (Color 8)
-	BORDER_COLOR="#666666"       # Dark Grey (Color 8)
-	LABEL_COLOR="#bebebe"        # Light Grey (Color 7)
-	QUERY_COLOR="#00ff00"        # Bright Green (Foreground)
-	HEADER_STYLE="italic"        # Keep italic for style  
 	export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS}
-  	--color=fg:${FG_COLOR},fg+:${FG_PLUS_COLOR},bg:${BG_COLOR},bg+:${BG_PLUS_COLOR}
-  	--color=hl:${HL_COLOR},hl+:${HL_PLUS_COLOR},info:${INFO_COLOR},marker:${MARKER_COLOR}
-  	--color=prompt:${PROMPT_COLOR},spinner:${SPINNER_COLOR},pointer:${POINTER_COLOR},header:${HEADER_COLOR}
-  	--color=border:${BORDER_COLOR},label:${LABEL_COLOR},query:${QUERY_COLOR}
-  	--color=header:${HEADER_STYLE}"
+  	--color=fg:2,fg+:10,bg:0,bg+:0
+  	--color=hl:4,hl+:12,info:3,marker:11
+  	--color=prompt:1,spinner:13,pointer:5,header:8
+  	--color=border:8,label:7,query:2
+  	--color=header:italic"
 	# --- setup fzf default options ---
 	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
 	--border="rounded" --border-label=""
