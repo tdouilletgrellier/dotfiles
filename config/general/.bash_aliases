@@ -451,7 +451,7 @@ if hascommand --strict fzf; then
   	--bind 'ctrl-x:reload("$FZF_CTRL_T_COMMAND")'
   	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'
   	--bind 'ctrl-y:execute-silent(echo -n {} | $CLIP_COMMAND)+abort'
-  	--header 'C-x:reload │ C-w:depth=1 │ C-/:preview │ C-y:copy │ C-u/d:scroll preview'"
+  	--header 'C-x:reload│C-w:depth│C-/:preview│C-y:copy│C-u/d:scroll│C-space:sel'"
 	export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
 	export FZF_ALT_C_OPTS="
   	--walker-skip .git,node_modules,target
@@ -463,7 +463,7 @@ if hascommand --strict fzf; then
   	--bind 'ctrl-x:reload("$FZF_ALT_C_COMMAND")'
   	--bind 'ctrl-w:reload("$FZF_ALT_C_COMMAND" --max-depth 1)'
   	--bind 'ctrl-o:execute($OPEN_COMMAND {})'
-    --header 'C-x:reload │ C-w:depth=1 │ C-/:preview │ C-y:copy │ C-u/d:scroll preview │ C-o:open'"
+    --header 'C-x:reload│C-w:depth│C-/:preview│C-y:copy│C-u/d:scroll│C-space:sel│C-o:open'"
 	export FZF_CTRL_R_OPTS="
     --preview 'echo {}'
     --preview-window down:3:hidden:wrap
@@ -473,18 +473,36 @@ if hascommand --strict fzf; then
 	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up --cycle
 	--history='${HOME}/.fzf_history'
     --history-size=100000
-    --no-mouse"
-	# --- setup fzf theme ---
-	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
- 	--color=fg:#79ff0f,fg+:#66ff66,bg:#000000,bg+:#2a2a2a
- 	--color=hl:#386bd7,hl+:#66ccff,info:#f3d64e,marker:#e7bf00
-  	--color=prompt:#cd0000,spinner:#db67e6,pointer:#b349be,header:#87afaf
-  	--color=border:#2a2a2a,label:#666666,query:#bbbbbb
-  	--color header:italic'
+    --no-mouse
+    --bind='ctrl-space:toggle'
+    --multi"
+    # --- setup fzf theme ---
+	FG_COLOR="#00ff00"          # Foreground
+	FG_PLUS_COLOR="#00d900"      # Bright Green (Color 10)
+	BG_COLOR="#000000"           # Background
+	BG_PLUS_COLOR="#083905"      # Selection Background
+	HL_COLOR="#386bd7"           # Blue (Color 4)
+	HL_PLUS_COLOR="#66ccff"      # Bright Blue (Color 12)
+	INFO_COLOR="#e7bf00"         # Yellow (Color 3)
+	MARKER_COLOR="#e5e500"       # Bright Yellow (Color 11)
+	PROMPT_COLOR="#990000"       # Red (Color 1)
+	SPINNER_COLOR="#e500e5"      # Bright Magenta (Color 13)
+	POINTER_COLOR="#b200b2"      # Magenta (Color 5)
+	HEADER_COLOR="#666666"       # Dark Grey (Color 8)
+	BORDER_COLOR="#666666"       # Dark Grey (Color 8)
+	LABEL_COLOR="#bebebe"        # Light Grey (Color 7)
+	QUERY_COLOR="#00ff00"        # Bright Green (Foreground)
+	HEADER_STYLE="italic"        # Keep italic for style  
+	export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS}
+  	--color=fg:${FG_COLOR},fg+:${FG_PLUS_COLOR},bg:${BG_COLOR},bg+:${BG_PLUS_COLOR}
+  	--color=hl:${HL_COLOR},hl+:${HL_PLUS_COLOR},info:${INFO_COLOR},marker:${MARKER_COLOR}
+  	--color=prompt:${PROMPT_COLOR},spinner:${SPINNER_COLOR},pointer:${POINTER_COLOR},header:${HEADER_COLOR}
+  	--color=border:${BORDER_COLOR},label:${LABEL_COLOR},query:${QUERY_COLOR}
+  	--color=header:${HEADER_STYLE}"
 	# --- setup fzf default options ---
 	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
 	--border="rounded" --border-label=""
-	--prompt="❯ " --pointer="◆" --marker="✓ "'
+	--prompt="  " --pointer="" --marker=" "'
 	# --- setup fzf completions options ---
 	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
 		export FZF_TAB_COMPLETION_PROMPT='❯ '
