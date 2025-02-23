@@ -492,7 +492,7 @@ if hascommand --strict fzf; then
 	--prompt="  " --pointer="❯" --marker=" "'
 	# --- setup fzf completions options ---
 	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
-		export FZF_TAB_COMPLETION_PROMPT='❯ '
+		export FZF_TAB_COMPLETION_PROMPT='  '
 	fi
 fi
 #-------------------------------------------------------------
