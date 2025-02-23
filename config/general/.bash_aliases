@@ -443,6 +443,7 @@ if hascommand --strict fzf; then
 	export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND} --type f"
 	export FZF_CTRL_T_OPTS="
   	--walker-skip .git,node_modules,target
+  	--border-label='╢ Ctrl-T:Files ╟'
   	--preview '${FZF_PREVIEW_COMMAND_FILE}'
   	--preview-window 'right:60%:wrap'
   	--bind 'ctrl-/:change-preview-window(right|hidden|)'
@@ -457,6 +458,7 @@ if hascommand --strict fzf; then
   	--walker-skip .git,node_modules,target
   	--preview '${FZF_PREVIEW_COMMAND_DIR}'
   	--preview-window 'right:60%:wrap'
+  	--border-label='╢ Alt-C:Dirs ╟'
   	--bind 'ctrl-/:change-preview-window(right|hidden|)'
   	--bind 'ctrl-u:preview-half-page-up'
   	--bind 'ctrl-d:preview-half-page-down'
@@ -466,10 +468,11 @@ if hascommand --strict fzf; then
     --header 'C-x:reload│C-w:depth│C-/:preview│C-y:copy│C-u/d:scroll│C-space:sel│C-o:open'"
 	export FZF_CTRL_R_OPTS="
     --preview 'echo {}'
+    --border-label='╢ Ctrl-R:Hist ╟'
     --preview-window down:3:hidden:wrap
     --bind 'ctrl-/:toggle-preview'
     --bind 'ctrl-y:execute-silent(echo -n {2..} | $CLIP_COMMAND)+abort'
-    --header 'C-/:preview │ C-y:copy'"
+    --header 'C-/:preview│C-y:copy'"
 	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up --cycle
 	--history='${HOME}/.fzf_history'
     --history-size=100000
