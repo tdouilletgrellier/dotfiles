@@ -66,12 +66,7 @@ debian_apps=(
 
 #-------------------------------------------------------------
 # Welcome message
-# Formatting variables
-COLOR_P="\033[1;32m"
-COLOR_S="\033[0;32m"
-RESET="\033[0m"
 BORING=true
-
 # Print time-based personalized message, using figlet & lolcat if availible
 function welcome_greeting() {
 	h=$(date +%H)
@@ -89,12 +84,12 @@ function welcome_greeting() {
 	fi
 	WELCOME_MSG="$greeting $USER!"
 	if [[ $BORING = true ]]; then
-		echo -e "$COLOR_P${WELCOME_MSG}${RESET}\n"
+		echo -e "$BRIGHT_GREEN${WELCOME_MSG}${RESET}\n"
 	else
 		if hascommand --strict lolcat && hascommand --strict figlet; then
 			echo "${WELCOME_MSG}" | figlet | lolcat
 		else
-			echo -e "$COLOR_P${WELCOME_MSG}${RESET}\n"
+			echo -e "$BRIGHT_GREEN${WELCOME_MSG}${RESET}\n"
 		fi
 	fi
 }
@@ -118,17 +113,17 @@ function welcome_today() {
 
 	# Print last login in the format: "Last Login: Day Month Date HH:MM on tty"
 	last_login=$(last | grep "^$USER " | head -1 | awk '{print "⧗  "$4" "$6" "$5" at "$7}')
-	echo -e "${COLOR_S}${last_login}"
+	echo -e "${GREEN}${last_login}"
 
 	# Print date time
-	echo -e "$COLOR_S$(date '+⏲  %a %d %b at %H:%M')"
+	echo -e "$GREEN$(date '+⏲  %a %d %b at %H:%M')"
 
 	# Print local weather
 	if ! [ -n "$SSH_CLIENT" ]; then
-		echo -e "${COLOR_S}⌂  $(hostname)"
+		echo -e "${GREEN}⌂  $(hostname)"
 		# curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
 	else
-		echo -e "${COLOR_S}⌂  $(hostname)"
+		echo -e "${GREEN}⌂  $(hostname)"
 	fi
 	echo -e "${RESET}"
 
@@ -136,7 +131,7 @@ function welcome_today() {
 	# if hascommand --strict  ip; then
 	#   ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
 	#   ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
-	#   echo -e "${COLOR_S}🜨  $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
+	#   echo -e "${GREEN}🜨  $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
 	#   echo -e "${RESET}\n"
 	# fi
 }
@@ -316,14 +311,12 @@ fi
 
 #-------------------------------------------------------------
 # Exit message
-BRed='\e[1;31m'    # Red
-NC="\e[m"          # Normal color
 function _exit() { # Function to run upon exit of shell.
-	#echo -e "${BRed}Hasta la vista, baby${NC}"
+	#echo -e "${BRIGHT_RED}Hasta la vista, baby${RESET}"
 	echo -e '\e[m'
-	echo -e "${BRed}So long Space Cowboy...${NC}"
+	echo -e "${BRIGHT_RED}So long Space Cowboy...${RESET}"
 	echo -e '\e[m'
-	echo -e "$BRed$(sparkbars)${NC}"
+	echo -e "$BRIGHT_RED$(sparkbars)${RESET}"
 	echo -e '\e[m'
 }
 # If not running in nested shell, then show exit message :)
@@ -352,10 +345,10 @@ if [[ "${SHLVL}" -lt 2 ]]; then
 		if [[ $BORING = true ]]; then
 			if [ -x /usr/games/fortune ]; then
 				echo -e '\e[m'
-				echo -e "$COLOR_S$(/usr/games/fortune -s)${NC}"
+				echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
 			fi
 			echo -e '\e[m'
-			echo -e "$COLOR_S$(sparkbars)${NC}"
+			echo -e "$GREEN$(sparkbars)${RESET}"
 		else
 			if [ -x /usr/games/fortune ]; then
 				echo -e '\e[m'
@@ -367,7 +360,7 @@ if [[ "${SHLVL}" -lt 2 ]]; then
 	else
 		if [ -z "${TMUX}" ]; then
 			echo -e '\e[m'
-			echo -e "$COLOR_S$(sparkbars)${NC}"
+			echo -e "$GREEN$(sparkbars)${RESET}"
 		fi
 	fi
 fi
@@ -377,7 +370,7 @@ fi
 # Some formatting
 export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
 export HISTIGNORE="&:bg:fg:ll:h"
-export HISTTIMEFORMAT="$(echo -e ${BCyan})[%d/%m %H:%M:%S]$(echo -e ${NC}) "
+export HISTTIMEFORMAT="$(echo -e ${BRIGHT_CYAN})[%d/%m %H:%M:%S]$(echo -e ${RESET}) "
 export HISTCONTROL=ignoredups
 export HOSTFILE=$HOME/.hosts # Put a list of remote hosts in ~/.hosts
 #-------------------------------------------------------------
