@@ -445,46 +445,46 @@ if hascommand --strict fzf; then
   	--walker-skip .git,node_modules,target
   	--border-label='╢ Ctrl-T:Files ╟'
   	--preview '${FZF_PREVIEW_COMMAND_FILE}'
-  	--preview-window 'right:60%:wrap'
-  	--bind 'ctrl-/:change-preview-window(right|hidden|)'
+  	--preview-window 'right:50%:wrap'
+  	--bind 'ctrl-/:change-preview-window(down,50%,border-top|hidden|)'
   	--bind 'ctrl-u:preview-half-page-up'
   	--bind 'ctrl-d:preview-half-page-down'
   	--bind 'ctrl-x:reload("$FZF_CTRL_T_COMMAND")'
   	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'
   	--bind 'ctrl-y:execute-silent(echo -n {} | $CLIP_COMMAND)+abort'
-  	--header 'C-x:reload│C-w:depth│C-/:preview│C-y:copy│C-u/d:scroll│C-space:sel'"
+  	--header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel'"
 	export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
 	export FZF_ALT_C_OPTS="
   	--walker-skip .git,node_modules,target
   	--preview '${FZF_PREVIEW_COMMAND_DIR}'
-  	--preview-window 'right:60%:wrap'
+  	--preview-window 'right:50%:wrap'
   	--border-label='╢ Alt-C:Dirs ╟'
-  	--bind 'ctrl-/:change-preview-window(right|hidden|)'
+  	--bind 'ctrl-/:change-preview-window(down,50%,border-top|hidden|)'
   	--bind 'ctrl-u:preview-half-page-up'
   	--bind 'ctrl-d:preview-half-page-down'
   	--bind 'ctrl-x:reload("$FZF_ALT_C_COMMAND")'
   	--bind 'ctrl-w:reload("$FZF_ALT_C_COMMAND" --max-depth 1)'
   	--bind 'ctrl-o:execute($OPEN_COMMAND {})'
-    --header 'C-x:reload│C-w:depth│C-/:preview│C-y:copy│C-u/d:scroll│C-space:sel│C-o:open'"
+    --header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel│C-o:open'"
 	export FZF_CTRL_R_OPTS="
     --preview 'echo {}'
     --border-label='╢ Ctrl-R:History ╟'
     --preview-window down:3:hidden:wrap
     --bind 'ctrl-/:toggle-preview'
     --bind 'ctrl-y:execute-silent(echo -n {2..} | $CLIP_COMMAND)+abort'
-    --header 'C-/:preview│C-y:copy'"
+    --header 'C-/:prev│C-y:copy'"
 	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up --cycle
 	--history='${HOME}/.fzf_history'
     --history-size=100000
     --no-mouse
     --bind='ctrl-space:toggle'
     --multi"
-    # --- setup fzf theme ---
+	# --- setup fzf theme ---
 	export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS}
-  	--color=fg:2,fg+:10,bg:0,bg+:0
-  	--color=hl:4,hl+:12,info:3,marker:11
+  	--color=fg:2,fg+:3,bg:0,bg+:0
+  	--color=hl:4,hl+:12,info:6,marker:11
   	--color=prompt:1,spinner:13,pointer:5,header:8
-  	--color=border:8,label:7,query:2
+  	--color=border:8,label:7,query:10
   	--color=header:italic"
 	# --- setup fzf default options ---
 	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
