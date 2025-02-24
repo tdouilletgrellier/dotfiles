@@ -108,46 +108,95 @@ function welcome_sysinfo() {
 
 # Print todays info: Date, IP, weather, etc
 function welcome_today() {
+    echo -e "${RESET}"  # Ensure reset before printing
 
-	#echo -e "\033[1;34mToday\n------"
+    # Get last login info
+    last_login=$(last | grep "^$USER " | head -1 | awk '{print $4" "$6" "$5" at "$7}')
+    
+    # Get date and time
+    current_date=$(date '+%a %d %b at %H:%M')
+    
+    # Get hostname
+    host_info="$(hostname)"
+    
+    # Get IP address (commented out by default)
+    # if hascommand --strict ip; then
+    #     ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+    #     ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
+    #     ip_info="🜨  $(curl -s -m 0.5 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
+    # fi
 
-	# Print last login in the format: "Last Login: Day Month Date HH:MM on tty"
-	last_login=$(last | grep "^$USER " | head -1 | awk '{print "⧗  "$4" "$6" "$5" at "$7}')
-	echo -e "${GREEN}${last_login}"
+    # Boring version (using basic green colors)
+    if [[ $BORING = true ]]; then
+        echo -e "${GREEN}⧗${RESET}  ${last_login}"
+        echo -e "${GREEN}⏲${RESET}  ${current_date}"
+        echo -e "${GREEN}⌂${RESET}  ${host_info}"
+        # echo -e "${GREEN}🜨${RESET}  ${ip_info}"
+    else
+        # Colorful version: symbol/colon in one color, text in another
+        echo -e "${BRIGHT_GREEN}⧗${RESET}  ${BRIGHT_GREEN}${last_login}"
+        echo -e "${BRIGHT_YELLOW}⏲${RESET}  ${BRIGHT_YELLOW}${current_date}"
+        echo -e "${BRIGHT_RED}⌂${RESET}  ${BRIGHT_RED}${host_info}"
+        # echo -e "${BRIGHT_BLUE}🜨${RESET}  ${BRIGHT_MAGENTA}${ip_info}"
+    fi
 
-	# Print date time
-	echo -e "$GREEN$(date '+⏲  %a %d %b at %H:%M')"
-
-	# Print local weather
-	if ! [ -n "$SSH_CLIENT" ]; then
-		echo -e "${GREEN}⌂  $(hostname)"
-		# curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
-	else
-		echo -e "${GREEN}⌂  $(hostname)"
-	fi
-	echo -e "${RESET}"
-
-	# Print IP address (quite slow so commented)
-	# if hascommand --strict  ip; then
-	#   ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-	#   ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
-	#   echo -e "${GREEN}🜨  $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
-	#   echo -e "${RESET}\n"
-	# fi
+    echo -e "${RESET}"  # Reset colors at the end
 }
+
+
 
 function weather() {
 	timeout=0.5
 	curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
+	echo -e "${RESET}"
 }
 
-# Putting it all together
-function welcome() {
-	welcome_greeting
-	# welcome_sysinfo
-	welcome_today
-	# weather
+function display_fortune() {
+    echo -e "${RESET}"  # Reset colors once
+
+    if hascommand --strict lolcat; then
+        if [[ $BORING = true ]]; then
+            [ -x /usr/games/fortune ] && echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
+        else
+            [ -x /usr/games/fortune ] && /usr/games/fortune -s | lolcat
+        fi
+    fi
 }
+
+function display_sparkbars() {
+    echo -e "${RESET}"  # Reset colors once
+
+    if hascommand --strict lolcat; then
+        if [[ $BORING = true ]]; then
+            echo -e "$GREEN$(sparkbars)${RESET}"
+        else
+            sparkbars | lolcat
+        fi
+    else
+        [[ -z "${TMUX}" ]] && echo -e "$GREEN$(sparkbars)${RESET}"
+    fi
+}
+
+# Main welcome function
+function welcome() {
+    # Only run if in a login shell (SHLVL < 2)
+    if [[ "${SHLVL}" -lt 2 ]]; then
+        [[ -z "${TMUX}" || -n "$SSH_CLIENT" ]] && { clear; printf '\e[3J'; }
+
+		welcome_greeting
+		# welcome_sysinfo
+		# neofetch
+		welcome_today
+		# weather
+		display_fortune
+    	display_sparkbars
+	fi
+}
+
+# Run welcome message at login
+welcome
+
+
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -326,44 +375,44 @@ fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-# Welcome message
-# If not running in nested shell, then show welcome message :)
-if [[ "${SHLVL}" -lt 2 ]]; then
-	if [ -n "$SSH_CLIENT" ]; then
-		if [ -z "${TMUX}" ]; then
-			clear && printf '\e[3J'
-		else
-			printf '\e[3J'
-		fi
-	else
-		# echo "no ssh"
-		clear && printf '\e[3J'
-	fi
-	welcome
-	# Fortune message
-	if hascommand --strict lolcat; then
-		if [[ $BORING = true ]]; then
-			if [ -x /usr/games/fortune ]; then
-				echo -e '\e[m'
-				echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
-			fi
-			echo -e '\e[m'
-			echo -e "$GREEN$(sparkbars)${RESET}"
-		else
-			if [ -x /usr/games/fortune ]; then
-				echo -e '\e[m'
-				/usr/games/fortune -s | lolcat # Makes our day a bit more fun.... :-)
-				echo -e '\e[m'
-				sparkbars | lolcat
-			fi
-		fi
-	else
-		if [ -z "${TMUX}" ]; then
-			echo -e '\e[m'
-			echo -e "$GREEN$(sparkbars)${RESET}"
-		fi
-	fi
-fi
+# # Welcome message
+# # If not running in nested shell, then show welcome message :)
+# if [[ "${SHLVL}" -lt 2 ]]; then
+# 	if [ -n "$SSH_CLIENT" ]; then
+# 		if [ -z "${TMUX}" ]; then
+# 			clear && printf '\e[3J'
+# 		else
+# 			printf '\e[3J'
+# 		fi
+# 	else
+# 		# echo "no ssh"
+# 		clear && printf '\e[3J'
+# 	fi
+# 	welcome
+# 	# Fortune message
+# 	if hascommand --strict lolcat; then
+# 		if [[ $BORING = true ]]; then
+# 			if [ -x /usr/games/fortune ]; then
+# 				echo -e '\e[m'
+# 				echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
+# 			fi
+# 			echo -e '\e[m'
+# 			echo -e "$GREEN$(sparkbars)${RESET}"
+# 		else
+# 			if [ -x /usr/games/fortune ]; then
+# 				echo -e '\e[m'
+# 				/usr/games/fortune -s | lolcat # Makes our day a bit more fun.... :-)
+# 				echo -e '\e[m'
+# 				sparkbars | lolcat
+# 			fi
+# 		fi
+# 	else
+# 		if [ -z "${TMUX}" ]; then
+# 			echo -e '\e[m'
+# 			echo -e "$GREEN$(sparkbars)${RESET}"
+# 		fi
+# 	fi
+# fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
