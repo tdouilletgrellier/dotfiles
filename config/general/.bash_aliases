@@ -655,15 +655,6 @@ function sync2ssh() {
     fi
     echo -e "${BRIGHT_GREEN}Files synchronized successfully${RESET}"
 }
-# Copies an entire directory (Documents/) to cronos
-#rsync -ravP ~/Documents/ ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/
-#sync2ssh ~/Documents/ ${USER}@cronos.hpc.edf.fr ${HOME}/${USER}/
-# Copies a specific file (file.txt) to cronos
-#rsync -avzP ~/Documents/file.txt ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/file.txt
-#sync2ssh ~/Documents/file.txt ${USER}@cronos.hpc.edf.fr ${HOME}/${USER}/file.txt
-# Copies a remote directory (folder/) from cronos to my local machine
-#rsync -ravP ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/folder/ ~/Documents/folder/
-#rsync -rLzv --delete -e 'ssh -o ConnectTimeout=10 -p 22' ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/folder/ ~/Documents/folder/
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
