@@ -433,7 +433,9 @@ if hascommand --strict fzf; then
 	export FZF_PREVIEW_COMMAND_FILE=''${FZF_PREVIEW_COMMAND_IMG_CLEAR}' [[ $(file --mime {}) =~ image ]] && '${FZF_PREVIEW_COMMAND_IMG}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
 	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
 	export FZF_PREVIEW_COMMAND='('${FZF_PREVIEW_COMMAND_IMG}' || '${FZF_PREVIEW_COMMAND_FILE}' || '${FZF_PREVIEW_COMMAND_DIR}' || '${FZF_PREVIEW_COMMAND_DEFAULT}') 2> /dev/null'
-	export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND} --type f"
+	if hascommand --strict fdfind || hascommand --strict fd; then
+		export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND} --type f"
+	fi
 	export FZF_CTRL_T_OPTS="
   	--walker-skip .git,node_modules,target
   	--border-label='╢ Ctrl-T:Files ╟'
@@ -446,7 +448,9 @@ if hascommand --strict fzf; then
   	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'
   	--bind 'ctrl-y:execute-silent(echo -n {} | $CLIP_COMMAND)+abort'
   	--header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel'"
-	export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
+  	if hascommand --strict fdfind || hascommand --strict fd; then
+		export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
+	fi
 	export FZF_ALT_C_OPTS="
   	--walker-skip .git,node_modules,target
   	--preview '${FZF_PREVIEW_COMMAND_DIR}'
