@@ -568,7 +568,11 @@ function sync2ssh() {
     shift
 
     # Parse remaining arguments
-    [[ "${1: -1}" != "/" ]] && LOCAL_DIR="${1}/" || LOCAL_DIR="$1"
+    if [[ -d "$1" ]]; then
+    	[[ "${1: -1}" != "/" ]] && LOCAL_DIR="${1}/" || LOCAL_DIR="$1"
+	else
+    	LOCAL_DIR="$1"
+	fi
     SSH_USER_HOST_PORT="$2"
     REMOTE_DIR="$3"
     shift 3
