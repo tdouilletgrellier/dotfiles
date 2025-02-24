@@ -741,15 +741,8 @@ function compresspdf() {
 
 	# Print the full gs command with nice syntax highlighting
 	echo -e "${BRIGHT_WHITE}Ghostscript Command:${RESET}"
-	echo -e "  ${BRIGHT_MAGENTA}gs${RESET} \
-${BRIGHT_BLUE}-sDEVICE=${RESET}${BRIGHT_YELLOW}pdfwrite${RESET} \
-${BRIGHT_BLUE}-dCompatibilityLevel=${RESET}${BRIGHT_YELLOW}\"$compatibility\"${RESET} \
-${BRIGHT_BLUE}-dPDFSETTINGS=${RESET}${BRIGHT_YELLOW}\"$pdf_settings\"${RESET} \
-${BRIGHT_BLUE}-dNOPAUSE${RESET} ${BRIGHT_BLUE}-dQUIET${RESET} ${BRIGHT_BLUE}-dBATCH${RESET} \
-${BRIGHT_BLUE}-dPreserveAnnots=true${RESET} \
-${BRIGHT_BLUE}-sOutputFile=${RESET}${BRIGHT_YELLOW}\"$output_file\"${RESET} \
-${BRIGHT_YELLOW}\"$input_file\"${RESET}"
-
+	echo -e "  ${BRIGHT_MAGENTA}gs${RESET} ${BRIGHT_BLUE}-sDEVICE=${RESET}${BRIGHT_YELLOW}pdfwrite${RESET} ${BRIGHT_BLUE}-dCompatibilityLevel=${RESET}${BRIGHT_YELLOW}\"$compatibility\"${RESET} ${BRIGHT_BLUE}-dPDFSETTINGS=${RESET}${BRIGHT_YELLOW}\"$pdf_settings\"${RESET} ${BRIGHT_BLUE}-dNOPAUSE${RESET} ${BRIGHT_BLUE}-dQUIET${RESET} ${BRIGHT_BLUE}-dBATCH${RESET} ${BRIGHT_BLUE}-dPreserveAnnots=true${RESET} ${BRIGHT_BLUE}-sOutputFile=${RESET}${BRIGHT_YELLOW}\"$output_file\"${RESET} ${BRIGHT_YELLOW}\"$input_file\"${RESET}"
+	
 	# Compress the PDF using Ghostscript
 	gs -sDEVICE=pdfwrite -dCompatibilityLevel="$compatibility" -dPDFSETTINGS="$pdf_settings" \
 		-dNOPAUSE -dQUIET -dBATCH -dPreserveAnnots=true -sOutputFile="$output_file" "$input_file"
