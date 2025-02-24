@@ -448,7 +448,7 @@ if hascommand --strict fzf; then
   	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'
   	--bind 'ctrl-y:execute-silent(echo -n {} | $CLIP_COMMAND)+abort'
   	--header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel'"
-  	if hascommand --strict fdfind || hascommand --strict fd; then
+	if hascommand --strict fdfind || hascommand --strict fd; then
 		export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
 	fi
 	export FZF_ALT_C_OPTS="
@@ -520,140 +520,140 @@ function sync2ssh() {
 	if ! hascommand --strict rsync; then
 		echo -e "${BRIGHT_RED}Error:${RESET} rsync is not installed or not in the PATH."
 		return 1
-	fi	
-    
+	fi
+
 	# Show help if no arguments or first argument isn't push/pull
 	if [ $# -eq 0 ] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
-        
-        echo -e "${BRIGHT_WHITE}sync2ssh:${RESET} Synchronize files between local and remote systems using rsync"
-        echo -e "Uses ${BRIGHT_CYAN}rsync${RESET} for efficient file transfer with ${BRIGHT_YELLOW}progress tracking${RESET} and ${BRIGHT_YELLOW}resume capability${RESET}."
-        echo -e "Supports both ${BRIGHT_YELLOW}password authentication${RESET} and ${BRIGHT_YELLOW}SSH key-based${RESET} connections."
-        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
-        echo -e "${BRIGHT_WHITE}Direction:${RESET}"
-        echo -e "  ${BRIGHT_YELLOW}push${RESET}            Transfer files from local to remote system"
-        echo -e "  ${BRIGHT_YELLOW}pull${RESET}            Transfer files from remote to local system"
-        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+
+		echo -e "${BRIGHT_WHITE}sync2ssh:${RESET} Synchronize files between local and remote systems using rsync"
+		echo -e "Uses ${BRIGHT_CYAN}rsync${RESET} for efficient file transfer with ${BRIGHT_YELLOW}progress tracking${RESET} and ${BRIGHT_YELLOW}resume capability${RESET}."
+		echo -e "Supports both ${BRIGHT_YELLOW}password authentication${RESET} and ${BRIGHT_YELLOW}SSH key-based${RESET} connections."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Direction:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}push${RESET}            Transfer files from local to remote system"
+		echo -e "  ${BRIGHT_YELLOW}pull${RESET}            Transfer files from remote to local system"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
 		echo -e "  ${BRIGHT_YELLOW}-z, --compress${RESET}  Enable compression during transfer"
 		echo -e "  ${BRIGHT_YELLOW}-d, --delete${RESET}    Enable deletion of extraneous files on the destination"
-        echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}      Show this help message"
-        echo -e "${BRIGHT_WHITE}Features:${RESET}"
-        echo -e "                          ${BRIGHT_CYAN}Archive mode${RESET}     (Preserves permissions, times, links)"
-        echo -e "                          ${BRIGHT_CYAN}Verbose output${RESET}   (Shows detailed transfer information)"
-        echo -e "                          ${BRIGHT_CYAN}Progress bar${RESET}     (Displays transfer progress)"
-        echo -e "                          ${BRIGHT_CYAN}Auto-resume${RESET}      (Continues interrupted transfers)"
-        echo -e "                          ${BRIGHT_CYAN}Delta-transfer${RESET}   (Only sends changed parts of files)"
-        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/project/ \${USER}@server.fr \${HOME}/project/ -d${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}pull ~/backup/ \${USER}@10.0.0.1:2222 /var/www/data/ -z${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/local/ \${USER}@example.fr /remote/ --compress mypassword${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/ \${USER}@server.fr \${HOME}/\${USER}/${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}pull ~/Documents/file.txt \${USER}@server.fr \${HOME}/\${USER}/file.txt${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/folder/ \${USER}@server.fr \${HOME}/\${USER}/folder/${RESET}"        
-        return 1
-    fi
-
-    # Validate direction argument
-    if [[ "$1" != "push" && "$1" != "pull" ]]; then
-        echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}First argument must be either 'push' or 'pull'${RESET}"
-        echo -e "Usage: ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
-        return 1
-    fi
-
-    # Check if all required arguments are provided
-    if [[ $# -lt 4 ]]; then
-        echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}Missing required arguments${RESET}"
-        echo -e "Usage: ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
-        return 1
-    fi
-
-    # Set direction and shift arguments
-    DIRECTION="$1"
-    shift
-
-    # Parse remaining arguments
-    if [[ -d "$1" ]]; then
-    	[[ "${1: -1}" != "/" ]] && LOCAL_DIR="${1}/" || LOCAL_DIR="$1"
-	else
-    	LOCAL_DIR="$1"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}      Show this help message"
+		echo -e "${BRIGHT_WHITE}Features:${RESET}"
+		echo -e "                          ${BRIGHT_CYAN}Archive mode${RESET}     (Preserves permissions, times, links)"
+		echo -e "                          ${BRIGHT_CYAN}Verbose output${RESET}   (Shows detailed transfer information)"
+		echo -e "                          ${BRIGHT_CYAN}Progress bar${RESET}     (Displays transfer progress)"
+		echo -e "                          ${BRIGHT_CYAN}Auto-resume${RESET}      (Continues interrupted transfers)"
+		echo -e "                          ${BRIGHT_CYAN}Delta-transfer${RESET}   (Only sends changed parts of files)"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/project/ \${USER}@server.fr \${HOME}/project/ -d${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}pull ~/backup/ \${USER}@10.0.0.1:2222 /var/www/data/ -z${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/local/ \${USER}@example.fr /remote/ --compress mypassword${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/ \${USER}@server.fr \${HOME}/\${USER}/${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}pull ~/Documents/file.txt \${USER}@server.fr \${HOME}/\${USER}/file.txt${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/folder/ \${USER}@server.fr \${HOME}/\${USER}/folder/${RESET}"
+		return 1
 	fi
-    SSH_USER_HOST_PORT="$2"
-    REMOTE_DIR="$3"
-    shift 3
 
-    # Extract optional flags and password
+	# Validate direction argument
+	if [[ "$1" != "push" && "$1" != "pull" ]]; then
+		echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}First argument must be either 'push' or 'pull'${RESET}"
+		echo -e "Usage: ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
+		return 1
+	fi
+
+	# Check if all required arguments are provided
+	if [[ $# -lt 4 ]]; then
+		echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}Missing required arguments${RESET}"
+		echo -e "Usage: ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
+		return 1
+	fi
+
+	# Set direction and shift arguments
+	DIRECTION="$1"
+	shift
+
+	# Parse remaining arguments
+	if [[ -d "$1" ]]; then
+		[[ "${1: -1}" != "/" ]] && LOCAL_DIR="${1}/" || LOCAL_DIR="$1"
+	else
+		LOCAL_DIR="$1"
+	fi
+	SSH_USER_HOST_PORT="$2"
+	REMOTE_DIR="$3"
+	shift 3
+
+	# Extract optional flags and password
 	COMPRESSION=""
 	DELETE_FLAG=""
 	SSH_PASS=""
 	while [[ $# -gt 0 ]]; do
-	    case "$1" in
-	        -z|--compress)
-	            COMPRESSION="--compress"
-	            shift
-	            ;;
-	        -d|--delete)
-	            DELETE_FLAG="--delete"
-	            shift
-	            ;;
-	        *)
-	            SSH_PASS="$1"
-	            shift
-	            ;;
-	    esac
+		case "$1" in
+		-z | --compress)
+			COMPRESSION="--compress"
+			shift
+			;;
+		-d | --delete)
+			DELETE_FLAG="--delete"
+			shift
+			;;
+		*)
+			SSH_PASS="$1"
+			shift
+			;;
+		esac
 	done
 
-    # Extract the port (if present)
-    SSH_PORT=$(echo "$SSH_USER_HOST_PORT" | awk -F: '{print $NF}')
-    if [[ "$SSH_PORT" == "$SSH_USER_HOST_PORT" ]]; then
-        SSH_PORT=22  # default SSH port
-        SSH_USER_HOST=$SSH_USER_HOST_PORT
-    else
-        SSH_USER_HOST=$(echo "$SSH_USER_HOST_PORT" | awk -F: '{print $1}')
-    fi
+	# Extract the port (if present)
+	SSH_PORT=$(echo "$SSH_USER_HOST_PORT" | awk -F: '{print $NF}')
+	if [[ "$SSH_PORT" == "$SSH_USER_HOST_PORT" ]]; then
+		SSH_PORT=22 # default SSH port
+		SSH_USER_HOST=$SSH_USER_HOST_PORT
+	else
+		SSH_USER_HOST=$(echo "$SSH_USER_HOST_PORT" | awk -F: '{print $1}')
+	fi
 
-    # Base rsync options (-a implies -rlptgoD, including --links)
-    RSYNC_OPTIONS="-avP ${DELETE_FLAG} ${COMPRESSION}"
-    SSH_OPTIONS="-e 'ssh -o ConnectTimeout=10 -p ${SSH_PORT}'"
+	# Base rsync options (-a implies -rlptgoD, including --links)
+	RSYNC_OPTIONS="-avP ${DELETE_FLAG} ${COMPRESSION}"
+	SSH_OPTIONS="-e 'ssh -o ConnectTimeout=10 -p ${SSH_PORT}'"
 
-    # Prepare source and destination based on direction
-    if [[ "$DIRECTION" == "push" ]]; then
-        SOURCE="${LOCAL_DIR}"
-        DEST="${SSH_USER_HOST}:${REMOTE_DIR}"
-    else
-        SOURCE="${SSH_USER_HOST}:${REMOTE_DIR}"
-        DEST="${LOCAL_DIR}"
-    fi
+	# Prepare source and destination based on direction
+	if [[ "$DIRECTION" == "push" ]]; then
+		SOURCE="${LOCAL_DIR}"
+		DEST="${SSH_USER_HOST}:${REMOTE_DIR}"
+	else
+		SOURCE="${SSH_USER_HOST}:${REMOTE_DIR}"
+		DEST="${LOCAL_DIR}"
+	fi
 
-    # Print the command with matching syntax highlighting
-    echo -e "${BRIGHT_WHITE}Rsync Command:${RESET}"
-    if [[ -n "$SSH_PASS" ]]; then
-        echo -e "  ${BRIGHT_MAGENTA}sshpass${RESET} ${BRIGHT_BLUE}-p${RESET} ${BRIGHT_YELLOW}'${SSH_PASS}'${RESET} ${BRIGHT_MAGENTA}rsync${RESET} ${BRIGHT_BLUE}${RSYNC_OPTIONS}${RESET} ${BRIGHT_BLUE}${SSH_OPTIONS}${RESET} ${BRIGHT_YELLOW}\"${SOURCE}\"${RESET} ${BRIGHT_YELLOW}\"${DEST}\"${RESET}"
-    else
+	# Print the command with matching syntax highlighting
+	echo -e "${BRIGHT_WHITE}Rsync Command:${RESET}"
+	if [[ -n "$SSH_PASS" ]]; then
+		echo -e "  ${BRIGHT_MAGENTA}sshpass${RESET} ${BRIGHT_BLUE}-p${RESET} ${BRIGHT_YELLOW}'${SSH_PASS}'${RESET} ${BRIGHT_MAGENTA}rsync${RESET} ${BRIGHT_BLUE}${RSYNC_OPTIONS}${RESET} ${BRIGHT_BLUE}${SSH_OPTIONS}${RESET} ${BRIGHT_YELLOW}\"${SOURCE}\"${RESET} ${BRIGHT_YELLOW}\"${DEST}\"${RESET}"
+	else
 		echo -e "  ${BRIGHT_MAGENTA}rsync${RESET} ${BRIGHT_BLUE}${RSYNC_OPTIONS}${RESET} ${BRIGHT_BLUE}${SSH_OPTIONS}${RESET} ${BRIGHT_YELLOW}\"${SOURCE}\"${RESET} ${BRIGHT_YELLOW}\"${DEST}\"${RESET}"
-    fi
-    echo
+	fi
+	echo
 
-    # Construct and execute the rsync command
-    if [[ -n "$SSH_PASS" ]]; then
-        # Ensure sshpass is installed
-        if ! hascommand --strict sshpass; then
-            echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}Install sshpass or use SSH keys instead${RESET}"
-            return 1
-        fi
-        RSYNC_COMMAND="sshpass -p '${SSH_PASS}' rsync ${RSYNC_OPTIONS} ${SSH_OPTIONS}"
-    else
-        RSYNC_COMMAND="rsync ${RSYNC_OPTIONS} ${SSH_OPTIONS}"
-    fi
+	# Construct and execute the rsync command
+	if [[ -n "$SSH_PASS" ]]; then
+		# Ensure sshpass is installed
+		if ! hascommand --strict sshpass; then
+			echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}Install sshpass or use SSH keys instead${RESET}"
+			return 1
+		fi
+		RSYNC_COMMAND="sshpass -p '${SSH_PASS}' rsync ${RSYNC_OPTIONS} ${SSH_OPTIONS}"
+	else
+		RSYNC_COMMAND="rsync ${RSYNC_OPTIONS} ${SSH_OPTIONS}"
+	fi
 
-    # Execute the rsync command
-    eval "${RSYNC_COMMAND}" "${SOURCE}" "${DEST}"
+	# Execute the rsync command
+	eval "${RSYNC_COMMAND}" "${SOURCE}" "${DEST}"
 
-    # Check the result of the rsync command
-    if [[ $? -ne 0 ]]; then
-        echo -e "${BRIGHT_RED}Error:${RESET} rsync command ${BRIGHT_RED}failed${RESET} to synchronize files"
-        return 1
-    fi
-    echo -e "${BRIGHT_GREEN}Files synchronized successfully${RESET}"
+	# Check the result of the rsync command
+	if [[ $? -ne 0 ]]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} rsync command ${BRIGHT_RED}failed${RESET} to synchronize files"
+		return 1
+	fi
+	echo -e "${BRIGHT_GREEN}Files synchronized successfully${RESET}"
 }
 #-------------------------------------------------------------
 
@@ -742,7 +742,7 @@ function compresspdf() {
 	# Print the full gs command with nice syntax highlighting
 	echo -e "${BRIGHT_WHITE}Ghostscript Command:${RESET}"
 	echo -e "  ${BRIGHT_MAGENTA}gs${RESET} ${BRIGHT_BLUE}-sDEVICE=${RESET}${BRIGHT_YELLOW}pdfwrite${RESET} ${BRIGHT_BLUE}-dCompatibilityLevel=${RESET}${BRIGHT_YELLOW}\"$compatibility\"${RESET} ${BRIGHT_BLUE}-dPDFSETTINGS=${RESET}${BRIGHT_YELLOW}\"$pdf_settings\"${RESET} ${BRIGHT_BLUE}-dNOPAUSE${RESET} ${BRIGHT_BLUE}-dQUIET${RESET} ${BRIGHT_BLUE}-dBATCH${RESET} ${BRIGHT_BLUE}-dPreserveAnnots=true${RESET} ${BRIGHT_BLUE}-sOutputFile=${RESET}${BRIGHT_YELLOW}\"$output_file\"${RESET} ${BRIGHT_YELLOW}\"$input_file\"${RESET}"
-	
+
 	# Compress the PDF using Ghostscript
 	gs -sDEVICE=pdfwrite -dCompatibilityLevel="$compatibility" -dPDFSETTINGS="$pdf_settings" \
 		-dNOPAUSE -dQUIET -dBATCH -dPreserveAnnots=true -sOutputFile="$output_file" "$input_file"
@@ -1046,3 +1046,167 @@ function tm() {
 	fi
 }
 #-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Git checkout based on date/time
+function ggcd() {
+	# Show help if no argument or -h/--help is provided
+	if [ -z "$1" ] || [[ "$1" == "-h" || "$1" == "--help" ]]; then
+		echo -e "${BRIGHT_WHITE}ggcd:${RESET} Checks out a commit based on the provided date."
+		echo -e "This function allows you to find the latest commit before a specific date and checkout that commit."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}ggcd${RESET} ${BRIGHT_YELLOW}[YYYY-MM-DD or 'YYYY-MM-DD HH:MM:SS']${RESET}      # Checkout latest commit before a date"
+		echo -e "  ${BRIGHT_CYAN}ggcd${RESET} ${BRIGHT_YELLOW}-r [start-date] [end-date]${RESET}                 # Show commits in the range"
+		echo -e "  ${BRIGHT_CYAN}ggcd${RESET} ${BRIGHT_YELLOW}-n N [date]${RESET}                               # Show the N last commits before the given date"
+		echo -e "  ${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-b, --branch${RESET}   Specify a branch to search the commit on."
+		echo -e "  ${BRIGHT_YELLOW}-r, --range${RESET}     Show commits within the date range (doesn't checkout)."
+		echo -e "  ${BRIGHT_YELLOW}-n, --number${RESET}    Show the N last commits before the given date."
+		return 0
+	fi
+
+	# Initialize variables
+	local branch=""
+	local range=false
+	local number=false
+	local num_commits=""
+	local start_date=""
+	local end_date=""
+	local args=("$@") # Store all arguments in an array
+	local i=0
+	local arg_count=${#args[@]}
+
+	# Parse options with a standard index-based approach instead of shift
+	while [ $i -lt $arg_count ]; do
+		case "${args[$i]}" in
+		-b | --branch)
+			if [ $((i + 1)) -lt $arg_count ]; then
+				branch="${args[$((i + 1))]}"
+				i=$((i + 2))
+			else
+				echo -e "${BRIGHT_RED}Error:${RESET} Branch option requires a value."
+				return 1
+			fi
+			;;
+		-r | --range)
+			range=true
+			if [ $((i + 2)) -lt $arg_count ]; then
+				start_date="${args[$((i + 1))]}"
+				end_date="${args[$((i + 2))]}"
+				i=$((i + 3))
+			else
+				echo -e "${BRIGHT_RED}Error:${RESET} Range option requires start and end dates."
+				return 1
+			fi
+			;;
+		-n | --number)
+			number=true
+			if [ $((i + 1)) -lt $arg_count ]; then
+				num_commits="${args[$((i + 1))]}"
+				i=$((i + 2))
+			else
+				echo -e "${BRIGHT_RED}Error:${RESET} Number option requires a value."
+				return 1
+			fi
+			;;
+		*)
+			if [ -z "$start_date" ]; then
+				start_date="${args[$i]}"
+			fi
+			i=$((i + 1))
+			;;
+		esac
+	done
+
+	# If more than one argument is provided without -r, throw an error
+	if [ "$#" -ge 2 ] && ! $range && ! $number; then
+		echo -e "${BRIGHT_RED}Error:${RESET} Too many arguments."
+		return 1
+	fi
+
+	# If no date or option, show help
+	if [ -z "$start_date" ] && [ -z "$num_commits" ]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} Date is required."
+		return 1
+	fi
+
+	# Get the current branch name if no branch specified
+	if [ -z "$branch" ]; then
+		# Use process substitution instead of command substitution
+		if ! branch=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); then
+			branch="main" # fallback to main if no default branch is set
+		else
+			branch=${branch#origin/}
+		fi
+	fi
+
+	# Show commits within a date range without checking out
+	if $range; then
+		echo -e "${BRIGHT_WHITE}Commits in the date range:${RESET}"
+		git log --color --oneline --after="$start_date" --before="$end_date" --date=format-local:'%d/%m/%Y %Hh%Mm%Ss' --pretty=format:"%C(magenta)%h%C(reset) - %C(green)(%ad)%C(reset) %s%C(auto)%d%C(reset) %C(bold brightblue)<%an>%C(reset)" "origin/$branch"
+		return 0
+	fi
+
+	# Show the last N commits before the given date
+	if $number; then
+		echo -e "${BRIGHT_WHITE}Last $num_commits commits before $start_date:${RESET}"
+		git log --color --oneline -n "$num_commits" --before="$start_date" --date=format-local:'%d/%m/%Y %Hh%Mm%Ss' --pretty=format:"%C(magenta)%h%C(reset) - %C(green)(%ad)%C(reset) %s%C(auto)%d%C(reset) %C(bold brightblue)<%an>%C(reset)" "origin/$branch"
+		return 0
+	fi
+
+	# Get the commit hash for the given date
+	local commit_hash=""
+	commit_hash=$(git rev-list -n 1 --before="$start_date" "origin/$branch")
+	if [ -z "$commit_hash" ]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} No commit found for the given date."
+		return 1
+	fi
+
+	# Show commit info using git log for consistency
+	echo -e "${BRIGHT_WHITE}Commit Info:${RESET}"
+	git log --color --oneline -n 1 "$commit_hash" --date=format-local:'%d/%m/%Y %Hh%Mm%Ss' --pretty=format:"%C(magenta)%h%C(reset) - %C(green)(%ad)%C(reset) %s%C(auto)%d%C(reset) %C(bold brightblue)<%an>%C(reset)"
+
+	# Check for uncommitted changes before attempting checkout
+	if ! git diff-index --quiet HEAD --; then
+		echo -e "${BRIGHT_RED}Error:${RESET} You have uncommitted changes in your working directory."
+		echo -e "Please commit or stash your changes before checking out a different commit."
+		echo -e "You can use:"
+		echo -e "  ${BRIGHT_CYAN}git stash${RESET} to temporarily save your changes"
+		echo -e "  ${BRIGHT_CYAN}git commit -m \"your message\"${RESET} to commit your changes"
+		return 1
+	fi
+
+	# Try to checkout the commit
+	local checkout_output=""
+	checkout_output=$(git checkout "$commit_hash" 2>&1)
+	local checkout_status=$?
+
+	# Handle checkout errors
+	if [ $checkout_status -ne 0 ]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} Failed to checkout the commit."
+
+		# Check for specific error conditions in the output
+		if echo "$checkout_output" | grep -q "Your local changes to the following files would be overwritten"; then
+			echo -e "Your local changes would be overwritten by checkout."
+			echo -e "Please commit or stash your changes before proceeding."
+			echo -e "You can use:"
+			echo -e "  ${BRIGHT_CYAN}git stash${RESET} to temporarily save your changes"
+			echo -e "  ${BRIGHT_CYAN}git commit -m \"your message\"${RESET} to commit your changes"
+		elif echo "$checkout_output" | grep -q "conflict"; then
+			echo -e "There are conflicts preventing the checkout."
+			echo -e "Please resolve any conflicts and try again."
+			echo -e "You might want to:"
+			echo -e "  1. ${BRIGHT_CYAN}git status${RESET} to see the conflicting files"
+			echo -e "  2. Resolve the conflicts in your editor"
+			echo -e "  3. ${BRIGHT_CYAN}git add <files>${RESET} to mark conflicts as resolved"
+		else
+			# Show the actual git error message for unexpected issues
+			echo -e "Git error message: $checkout_output"
+		fi
+		return 1
+	fi
+
+	echo -e "${BRIGHT_GREEN}Checked out commit:${RESET} $commit_hash"
+}
+
+#--------------------------------------------------------
