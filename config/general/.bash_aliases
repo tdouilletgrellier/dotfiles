@@ -530,8 +530,8 @@ function sync2ssh() {
         echo -e "  ${BRIGHT_YELLOW}push${RESET}            Transfer files from local to remote system"
         echo -e "  ${BRIGHT_YELLOW}pull${RESET}            Transfer files from remote to local system"
         echo -e "${BRIGHT_WHITE}Options:${RESET}"
-        echo -e "  ${BRIGHT_YELLOW}-z${RESET}              Enable compression during transfer"
-        echo -e "  ${BRIGHT_YELLOW}-d${RESET}              Enable deletion of extraneous files on the destination"
+		echo -e "  ${BRIGHT_YELLOW}-z, --compress${RESET}  Enable compression during transfer"
+		echo -e "  ${BRIGHT_YELLOW}-d, --delete${RESET}    Enable deletion of extraneous files on the destination"
         echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}      Show this help message"
         echo -e "${BRIGHT_WHITE}Features:${RESET}"
         echo -e "                          ${BRIGHT_CYAN}Archive mode${RESET}     (Preserves permissions, times, links)"
@@ -540,9 +540,9 @@ function sync2ssh() {
         echo -e "                          ${BRIGHT_CYAN}Auto-resume${RESET}      (Continues interrupted transfers)"
         echo -e "                          ${BRIGHT_CYAN}Delta-transfer${RESET}   (Only sends changed parts of files)"
         echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/project/ \${USER}@server.fr \${HOME}/project/${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/project/ \${USER}@server.fr \${HOME}/project/ -d${RESET}"
         echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}pull ~/backup/ \${USER}@10.0.0.1:2222 /var/www/data/ -z${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/local/ \${USER}@example.fr /remote/ -z mypassword${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/local/ \${USER}@example.fr /remote/ --compress mypassword${RESET}"
         echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/ \${USER}@server.fr \${HOME}/\${USER}/${RESET}"
         echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}pull ~/Documents/file.txt \${USER}@server.fr \${HOME}/\${USER}/file.txt${RESET}"
         echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/folder/ \${USER}@server.fr \${HOME}/\${USER}/folder/${RESET}"        
@@ -579,11 +579,11 @@ function sync2ssh() {
 	SSH_PASS=""
 	while [[ $# -gt 0 ]]; do
 	    case "$1" in
-	        -z)
+	        -z|--compress)
 	            COMPRESSION="--compress"
 	            shift
 	            ;;
-	        -d)
+	        -d|--delete)
 	            DELETE_FLAG="--delete"
 	            shift
 	            ;;
