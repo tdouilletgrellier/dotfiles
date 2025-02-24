@@ -512,6 +512,141 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 
 #-------------------------------------------------------------
 # Sync with cronos to back up my data
+function sync2ssh() {
+	if ! hascommand --strict rsync; then
+		echo -e "${BRIGHT_RED}Error:${RESET} rsync is not installed or not in the PATH."
+		return 1
+	fi	
+    
+	# Show help if no arguments or first argument isn't push/pull
+	if [ $# -eq 0 ] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+        
+        echo -e "${BRIGHT_WHITE}sync2ssh:${RESET} Synchronize files between local and remote systems using rsync"
+        echo -e "Uses ${BRIGHT_CYAN}rsync${RESET} for efficient file transfer with ${BRIGHT_YELLOW}progress tracking${RESET} and ${BRIGHT_YELLOW}resume capability${RESET}."
+        echo -e "Supports both ${BRIGHT_YELLOW}password authentication${RESET} and ${BRIGHT_YELLOW}SSH key-based${RESET} connections."
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
+        echo -e "${BRIGHT_WHITE}Direction:${RESET}"
+        echo -e "  ${BRIGHT_YELLOW}push${RESET}            Transfer files from local to remote system"
+        echo -e "  ${BRIGHT_YELLOW}pull${RESET}            Transfer files from remote to local system"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_YELLOW}-z${RESET}              Enable compression during transfer"
+        echo -e "  ${BRIGHT_YELLOW}-d${RESET}              Enable deletion of extraneous files on the destination"
+        echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}      Show this help message"
+        echo -e "${BRIGHT_WHITE}Features:${RESET}"
+        echo -e "                          ${BRIGHT_CYAN}Archive mode${RESET}     (Preserves permissions, times, links)"
+        echo -e "                          ${BRIGHT_CYAN}Verbose output${RESET}   (Shows detailed transfer information)"
+        echo -e "                          ${BRIGHT_CYAN}Progress bar${RESET}     (Displays transfer progress)"
+        echo -e "                          ${BRIGHT_CYAN}Auto-resume${RESET}      (Continues interrupted transfers)"
+        echo -e "                          ${BRIGHT_CYAN}Delta-transfer${RESET}   (Only sends changed parts of files)"
+        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/project/ \${USER}@server.fr \${HOME}/project/${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}pull ~/backup/ \${USER}@10.0.0.1:2222 /var/www/data/ -z${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/local/ \${USER}@example.fr /remote/ -z mypassword${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/ \${USER}@server.fr \${HOME}/\${USER}/${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}pull ~/Documents/file.txt \${USER}@server.fr \${HOME}/\${USER}/file.txt${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}push ~/Documents/folder/ \${USER}@server.fr \${HOME}/\${USER}/folder/${RESET}"        
+        return 1
+    fi
+
+    # Validate direction argument
+    if [[ "$1" != "push" && "$1" != "pull" ]]; then
+        echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}First argument must be either 'push' or 'pull'${RESET}"
+        echo -e "Usage: ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
+        return 1
+    fi
+
+    # Check if all required arguments are provided
+    if [[ $# -lt 4 ]]; then
+        echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}Missing required arguments${RESET}"
+        echo -e "Usage: ${BRIGHT_CYAN}sync2ssh${RESET} ${BRIGHT_YELLOW}[direction] [local_dir] [user@host[:port]] [remote_dir]${RESET} ${BRIGHT_WHITE}[options]${RESET}"
+        return 1
+    fi
+
+    # Set direction and shift arguments
+    DIRECTION="$1"
+    shift
+
+    # Parse remaining arguments
+    [[ "${1: -1}" != "/" ]] && LOCAL_DIR="${1}/" || LOCAL_DIR="$1"
+    SSH_USER_HOST_PORT="$2"
+    REMOTE_DIR="$3"
+    shift 3
+
+    # Extract optional flags and password
+	COMPRESSION=""
+	DELETE_FLAG=""
+	SSH_PASS=""
+	while [[ $# -gt 0 ]]; do
+	    case "$1" in
+	        -z)
+	            COMPRESSION="--compress"
+	            shift
+	            ;;
+	        -d)
+	            DELETE_FLAG="--delete"
+	            shift
+	            ;;
+	        *)
+	            SSH_PASS="$1"
+	            shift
+	            ;;
+	    esac
+	done
+
+    # Extract the port (if present)
+    SSH_PORT=$(echo "$SSH_USER_HOST_PORT" | awk -F: '{print $NF}')
+    if [[ "$SSH_PORT" == "$SSH_USER_HOST_PORT" ]]; then
+        SSH_PORT=22  # default SSH port
+        SSH_USER_HOST=$SSH_USER_HOST_PORT
+    else
+        SSH_USER_HOST=$(echo "$SSH_USER_HOST_PORT" | awk -F: '{print $1}')
+    fi
+
+    # Base rsync options (-a implies -rlptgoD, including --links)
+    RSYNC_OPTIONS="-avP ${DELETE_FLAG} ${COMPRESSION}"
+    SSH_OPTIONS="-e 'ssh -o ConnectTimeout=10 -p ${SSH_PORT}'"
+
+    # Prepare source and destination based on direction
+    if [[ "$DIRECTION" == "push" ]]; then
+        SOURCE="${LOCAL_DIR}"
+        DEST="${SSH_USER_HOST}:${REMOTE_DIR}"
+    else
+        SOURCE="${SSH_USER_HOST}:${REMOTE_DIR}"
+        DEST="${LOCAL_DIR}"
+    fi
+
+    # Print the command with matching syntax highlighting
+    echo -e "${BRIGHT_WHITE}Rsync Command:${RESET}"
+    if [[ -n "$SSH_PASS" ]]; then
+        echo -e "  ${BRIGHT_MAGENTA}sshpass${RESET} ${BRIGHT_BLUE}-p${RESET} ${BRIGHT_YELLOW}'${SSH_PASS}'${RESET} ${BRIGHT_MAGENTA}rsync${RESET} ${BRIGHT_BLUE}${RSYNC_OPTIONS}${RESET} ${BRIGHT_BLUE}${SSH_OPTIONS}${RESET} ${BRIGHT_YELLOW}\"${SOURCE}\"${RESET} ${BRIGHT_YELLOW}\"${DEST}\"${RESET}"
+    else
+		echo -e "  ${BRIGHT_MAGENTA}rsync${RESET} ${BRIGHT_BLUE}${RSYNC_OPTIONS}${RESET} ${BRIGHT_BLUE}${SSH_OPTIONS}${RESET} ${BRIGHT_YELLOW}\"${SOURCE}\"${RESET} ${BRIGHT_YELLOW}\"${DEST}\"${RESET}"
+    fi
+    echo
+
+    # Construct and execute the rsync command
+    if [[ -n "$SSH_PASS" ]]; then
+        # Ensure sshpass is installed
+        if ! hascommand --strict sshpass; then
+            echo -e "${BRIGHT_RED}Error: ${BRIGHT_CYAN}Install sshpass or use SSH keys instead${RESET}"
+            return 1
+        fi
+        RSYNC_COMMAND="sshpass -p '${SSH_PASS}' rsync ${RSYNC_OPTIONS} ${SSH_OPTIONS}"
+    else
+        RSYNC_COMMAND="rsync ${RSYNC_OPTIONS} ${SSH_OPTIONS}"
+    fi
+
+    # Execute the rsync command
+    eval "${RSYNC_COMMAND}" "${SOURCE}" "${DEST}"
+
+    # Check the result of the rsync command
+    if [[ $? -ne 0 ]]; then
+        echo -e "${BRIGHT_RED}Error:${RESET} rsync command ${BRIGHT_RED}failed${RESET} to synchronize files"
+        return 1
+    fi
+    echo -e "${BRIGHT_GREEN}Files synchronized successfully${RESET}"
+}
 # Copies an entire directory (Documents/) to cronos
 #rsync -ravP ~/Documents/ ${USER}@cronos.hpc.edf.fr:${HOME}/${USER}/
 #sync2ssh ~/Documents/ ${USER}@cronos.hpc.edf.fr ${HOME}/${USER}/
@@ -622,7 +757,7 @@ ${BRIGHT_YELLOW}\"$input_file\"${RESET}"
 
 	# Check if gs command was successful
 	if [ $? -ne 0 ]; then
-		echo -e "${BRIGHT_RED}Error:${RESET} Ghostscript failed to compress the PDF."
+		echo -e "${BRIGHT_RED}Error:${RESET} Ghostscript ${BRIGHT_RED}failed${RESET} to compress the PDF."
 		return 1
 	fi
 
