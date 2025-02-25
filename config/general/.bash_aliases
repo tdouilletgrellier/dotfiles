@@ -96,47 +96,53 @@ function welcome_greeting() {
 
 # Print system information with neofetch, if it's installed
 function welcome_sysinfo() {
-	if hascommand --strict neofetch; then
-		if [[ -f "${HOME}/.config/neofetch/neofetch.conf" ]]; then
-			neofetch --config ${HOME}/.config/neofetch/neofetch.conf
+	if hascommand --strict fastfetch; then
+		if [[ -f "${HOME}/.config/fastfetch/fastfetch.jsonc" ]]; then
+			fastfetch --config ${HOME}/.config/fastfetch/fastfetch.jsonc
 		else
-			neofetch --disable title separator underline bar gpu memory disk cpu users local_ip public_ip font wm_theme --os --host --kernel --uptime --packages --shell --resolution --de --wm --terminal
+			fastfetch --config Archey
+		fi
+	else
+		if hascommand --strict neofetch; then
+			if [[ -f "${HOME}/.config/neofetch/neofetch.conf" ]]; then
+				neofetch --config ${HOME}/.config/neofetch/neofetch.conf
+			else
+				neofetch --disable title separator underline bar gpu memory disk cpu users local_ip public_ip font wm_theme --os --host --kernel --uptime --packages --shell --resolution --de --wm --terminal
+			fi
 		fi
 	fi
 }
 
 # Print todays info: Date, IP, weather, etc
 function welcome_today() {
-    # Ensure reset before printing
-    echo -e "${RESET}"
-    
-    # Get last login info (more efficient command)
-    last_login=$(last -1 "$USER" | head -1 | awk '{print $4" "$6" "$5" at "$7}')
-    
-    # Get date and time with more reliable format specifiers
-    current_date=$(date '+%a %d %b %Y at %H:%M')
-    
-    # Get hostname and OS info
-    host_info="$(hostname) ($(grep -m1 "^NAME=" /etc/os-release | cut -d= -f2 | tr -d '\"'))"
-    
-    # Get uptime in a human-readable format
-    uptime_info=$(uptime -p | sed 's/^up //')
-    
-    # Output with fallback for missing unicode symbols
-    if [[ $BORING = true ]]; then
-        echo -e "${GREEN}⧗ ${last_login:-Unknown}${RESET}"
-        echo -e "${GREEN}⏲ ${current_date}${RESET}"
-        echo -e "${GREEN}⌂ ${host_info}${RESET}"
-        echo -e "${GREEN}↑ ${uptime_info}${RESET}"
-    else
-        # Colorful version with cleaner variable expansion
-        echo -e "${BRIGHT_GREEN}⧗${RESET} ${BRIGHT_GREEN}${last_login:-Unknown}"
-        echo -e "${BRIGHT_YELLOW}⏲${RESET} ${BRIGHT_YELLOW}${current_date}"
-        echo -e "${BRIGHT_RED}⌂${RESET} ${BRIGHT_RED}${host_info}"
-        echo -e "${BRIGHT_WHITE}↑${RESET} ${BRIGHT_WHITE}${uptime_info}"
-    fi
-    
-    echo -e "${RESET}" # Reset colors at the end
+	# Ensure reset before printing
+	echo -e "${RESET}"
+
+	# Get last login info (more efficient command)
+	last_login=$(last | grep "^$USER " | head -1 | awk '{print $4, $5, $6, $7}')
+
+	# Convert last login time to the desired format
+	formatted_last_login=$(date -j -f "%b %d %H:%M" "$last_login" "+%a %d %b at %H:%M" 2>/dev/null)
+
+	# Get date and time with more reliable format specifiers
+	current_date=$(date '+%a %d %b at %H:%M')
+
+	# Get hostname
+	host_info="$(hostname)"
+
+	# Output with fallback for missing unicode symbols
+	if [[ $BORING = true ]]; then
+		echo -e "${GREEN}⧗ ${formatted_last_login}${RESET}"
+		echo -e "${GREEN}⏲ ${current_date}${RESET}"
+		echo -e "${GREEN}⌂ ${host_info}${RESET}"
+	else
+		# Colorful version with cleaner variable expansion
+		echo -e "${BRIGHT_GREEN}⧗${RESET} ${BRIGHT_GREEN}${formatted_last_login}"
+		echo -e "${BRIGHT_YELLOW}⏲${RESET} ${BRIGHT_YELLOW}${current_date}"
+		echo -e "${BRIGHT_RED}⌂${RESET} ${BRIGHT_RED}${host_info}"
+	fi
+
+	echo -e "${RESET}" # Reset colors at the end
 }
 
 function weather() {
@@ -179,16 +185,15 @@ function welcome() {
 			clear
 			printf '\e[3J'
 		}
-
-		# welcome_greeting
-		if hascommand --strict neofetch; then
-			welcome_sysinfo
-		else
+		# if hascommand --strict neofetch || hascommand --strict fastfetch; then
+			# welcome_sysinfo
+		# else
+			welcome_greeting
 			welcome_today
-		fi
-		# weather
-		# display_fortune
-		# display_sparkbars
+			# weather
+			display_fortune
+			# display_sparkbars
+		# fi
 	fi
 }
 

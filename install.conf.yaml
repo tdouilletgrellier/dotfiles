@@ -102,14 +102,17 @@
     ~/.config/kitty: config/kitty
 
     #oh_my-zsh
-    ~/.oh-my-zsh: config/oh-my-zsh    
+    ~/.oh-my-zsh: config/oh-my-zsh
 
     #zsh
-    ~/.zshrc: config/zsh/.zshrc 
-    ~/.zsh_custom: config/zsh/custom    
+    ~/.zshrc: config/zsh/.zshrc
+    ~/.zsh_custom: config/zsh/custom
 
     #neofetch
-    ~/.config/neofetch/neofetch.conf : config/neofetch/neofetch.conf 
+    ~/.config/neofetch/neofetch.conf: config/neofetch/neofetch.conf
+
+    #fastfetch
+    ~/.config/fastfetch/fastfetch.jsonc: config/fastfetch/fastfetch.jsonc
 
     #tools
     ~/bin:
