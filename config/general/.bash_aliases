@@ -180,12 +180,15 @@ function welcome() {
 			printf '\e[3J'
 		}
 
-		welcome_greeting
-		# welcome_sysinfo
-		welcome_today
+		# welcome_greeting
+		if hascommand --strict neofetch; then
+			welcome_sysinfo
+		else
+			welcome_today
+		fi
 		# weather
-		display_fortune
-		display_sparkbars
+		# display_fortune
+		# display_sparkbars
 	fi
 }
 
@@ -368,47 +371,6 @@ function _exit() { # Function to run upon exit of shell.
 if [[ "${SHLVL}" -lt 2 ]]; then
 	trap _exit EXIT
 fi
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# # Welcome message
-# # If not running in nested shell, then show welcome message :)
-# if [[ "${SHLVL}" -lt 2 ]]; then
-# 	if [ -n "$SSH_CLIENT" ]; then
-# 		if [ -z "${TMUX}" ]; then
-# 			clear && printf '\e[3J'
-# 		else
-# 			printf '\e[3J'
-# 		fi
-# 	else
-# 		# echo "no ssh"
-# 		clear && printf '\e[3J'
-# 	fi
-# 	welcome
-# 	# Fortune message
-# 	if hascommand --strict lolcat; then
-# 		if [[ $BORING = true ]]; then
-# 			if [ -x /usr/games/fortune ]; then
-# 				echo -e '\e[m'
-# 				echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
-# 			fi
-# 			echo -e '\e[m'
-# 			echo -e "$GREEN$(sparkbars)${RESET}"
-# 		else
-# 			if [ -x /usr/games/fortune ]; then
-# 				echo -e '\e[m'
-# 				/usr/games/fortune -s | lolcat # Makes our day a bit more fun.... :-)
-# 				echo -e '\e[m'
-# 				sparkbars | lolcat
-# 			fi
-# 		fi
-# 	else
-# 		if [ -z "${TMUX}" ]; then
-# 			echo -e '\e[m'
-# 			echo -e "$GREEN$(sparkbars)${RESET}"
-# 		fi
-# 	fi
-# fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
