@@ -107,42 +107,40 @@ function welcome_sysinfo() {
 
 # Print todays info: Date, IP, weather, etc
 function welcome_today() {
-    echo -e "${RESET}"  # Ensure reset before printing
+	echo -e "${RESET}" # Ensure reset before printing
 
-    # Get last login info
-    last_login=$(last | grep "^$USER " | head -1 | awk '{print $4" "$6" "$5" at "$7}')
-    
-    # Get date and time
-    current_date=$(date '+%a %d %b at %H:%M')
-    
-    # Get hostname
-    host_info="$(hostname)"
-    
-    # Get IP address (commented out by default)
-    # if hascommand --strict ip; then
-    #     ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-    #     ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
-    #     ip_info="🜨  $(curl -s -m 0.5 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
-    # fi
+	# Get last login info
+	last_login=$(last | grep "^$USER " | head -1 | awk '{print $4" "$6" "$5" at "$7}')
 
-    # Boring version (using basic green colors)
-    if [[ $BORING = true ]]; then
-        echo -e "${GREEN}⧗${RESET}  ${last_login}"
-        echo -e "${GREEN}⏲${RESET}  ${current_date}"
-        echo -e "${GREEN}⌂${RESET}  ${host_info}"
-        # echo -e "${GREEN}🜨${RESET}  ${ip_info}"
-    else
-        # Reggae version
-        echo -e "${BRIGHT_GREEN}⧗${RESET}  ${BRIGHT_GREEN}${last_login}"
-        echo -e "${BRIGHT_YELLOW}⏲${RESET}  ${BRIGHT_YELLOW}${current_date}"
-        echo -e "${BRIGHT_RED}⌂${RESET}  ${BRIGHT_RED}${host_info}"
-        # echo -e "${BRIGHT_WHITE}🜨${RESET}  ${BRIGHT_WHITE}${ip_info}"
-    fi
+	# Get date and time
+	current_date=$(date '+%a %d %b at %H:%M')
 
-    echo -e "${RESET}"  # Reset colors at the end
+	# Get hostname
+	host_info="$(hostname)"
+
+	# Get IP address (commented out by default)
+	# if hascommand --strict ip; then
+	#     ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+	#     ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
+	#     ip_info="🜨  $(curl -s -m 0.5 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
+	# fi
+
+	# Boring version (using basic green colors)
+	if [[ $BORING = true ]]; then
+		echo -e "${GREEN}⧗${RESET}  ${last_login}"
+		echo -e "${GREEN}⏲${RESET}  ${current_date}"
+		echo -e "${GREEN}⌂${RESET}  ${host_info}"
+		# echo -e "${GREEN}🜨${RESET}  ${ip_info}"
+	else
+		# Reggae version
+		echo -e "${BRIGHT_GREEN}⧗${RESET}  ${BRIGHT_GREEN}${last_login}"
+		echo -e "${BRIGHT_YELLOW}⏲${RESET}  ${BRIGHT_YELLOW}${current_date}"
+		echo -e "${BRIGHT_RED}⌂${RESET}  ${BRIGHT_RED}${host_info}"
+		# echo -e "${BRIGHT_WHITE}🜨${RESET}  ${BRIGHT_WHITE}${ip_info}"
+	fi
+
+	echo -e "${RESET}" # Reset colors at the end
 }
-
-
 
 function weather() {
 	timeout=0.5
@@ -151,49 +149,51 @@ function weather() {
 }
 
 function display_fortune() {
-    echo -e "${RESET}"  # Reset colors once
+	echo -e "${RESET}" # Reset colors once
 
-    if hascommand --strict lolcat; then
-        if [[ $BORING = true ]]; then
-            [ -x /usr/games/fortune ] && echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
-        else
-            [ -x /usr/games/fortune ] && /usr/games/fortune -s | lolcat
-        fi
-    fi
+	if hascommand --strict lolcat; then
+		if [[ $BORING = true ]]; then
+			[ -x /usr/games/fortune ] && echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
+		else
+			[ -x /usr/games/fortune ] && /usr/games/fortune -s | lolcat
+		fi
+	fi
 }
 
 function display_sparkbars() {
-    echo -e "${RESET}"  # Reset colors once
+	echo -e "${RESET}" # Reset colors once
 
-    if hascommand --strict lolcat; then
-        if [[ $BORING = true ]]; then
-            echo -e "$GREEN$(sparkbars)${RESET}"
-        else
-            sparkbars | lolcat
-        fi
-    else
-        [[ -z "${TMUX}" ]] && echo -e "$GREEN$(sparkbars)${RESET}"
-    fi
+	if hascommand --strict lolcat; then
+		if [[ $BORING = true ]]; then
+			echo -e "$GREEN$(sparkbars)${RESET}"
+		else
+			sparkbars | lolcat
+		fi
+	else
+		[[ -z "${TMUX}" ]] && echo -e "$GREEN$(sparkbars)${RESET}"
+	fi
 }
 
 # Main welcome function
 function welcome() {
-    # Only run if in a login shell (SHLVL < 2)
-    if [[ "${SHLVL}" -lt 2 ]]; then
-        [[ -z "${TMUX}" || -n "$SSH_CLIENT" ]] && { clear; printf '\e[3J'; }
+	# Only run if in a login shell (SHLVL < 2)
+	if [[ "${SHLVL}" -lt 2 ]]; then
+		[[ -z "${TMUX}" || -n "$SSH_CLIENT" ]] && {
+			clear
+			printf '\e[3J'
+		}
 
 		welcome_greeting
 		# welcome_sysinfo
 		welcome_today
 		# weather
 		display_fortune
-    	display_sparkbars
+		display_sparkbars
 	fi
 }
 
 # Run welcome message at login
 welcome
-
 
 #-------------------------------------------------------------
 
