@@ -107,39 +107,36 @@ function welcome_sysinfo() {
 
 # Print todays info: Date, IP, weather, etc
 function welcome_today() {
-	echo -e "${RESET}" # Ensure reset before printing
-
-	# Get last login info
-	last_login=$(last | grep "^$USER " | head -1 | awk '{print $4" "$6" "$5" at "$7}')
-
-	# Get date and time
-	current_date=$(date '+%a %d %b at %H:%M')
-
-	# Get hostname
-	host_info="$(hostname)"
-
-	# Get IP address (commented out by default)
-	# if hascommand --strict ip; then
-	#     ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-	#     ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
-	#     ip_info="🜨  $(curl -s -m 0.5 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
-	# fi
-
-	# Boring version (using basic green colors)
-	if [[ $BORING = true ]]; then
-		echo -e "${GREEN}⧗${RESET}  ${last_login}"
-		echo -e "${GREEN}⏲${RESET}  ${current_date}"
-		echo -e "${GREEN}⌂${RESET}  ${host_info}"
-		# echo -e "${GREEN}🜨${RESET}  ${ip_info}"
-	else
-		# Reggae version
-		echo -e "${BRIGHT_GREEN}⧗${RESET}  ${BRIGHT_GREEN}${last_login}"
-		echo -e "${BRIGHT_YELLOW}⏲${RESET}  ${BRIGHT_YELLOW}${current_date}"
-		echo -e "${BRIGHT_RED}⌂${RESET}  ${BRIGHT_RED}${host_info}"
-		# echo -e "${BRIGHT_WHITE}🜨${RESET}  ${BRIGHT_WHITE}${ip_info}"
-	fi
-
-	echo -e "${RESET}" # Reset colors at the end
+    # Ensure reset before printing
+    echo -e "${RESET}"
+    
+    # Get last login info (more efficient command)
+    last_login=$(last -1 "$USER" | head -1 | awk '{print $4" "$6" "$5" at "$7}')
+    
+    # Get date and time with more reliable format specifiers
+    current_date=$(date '+%a %d %b %Y at %H:%M')
+    
+    # Get hostname and OS info
+    host_info="$(hostname) ($(grep -m1 "^NAME=" /etc/os-release | cut -d= -f2 | tr -d '\"'))"
+    
+    # Get uptime in a human-readable format
+    uptime_info=$(uptime -p | sed 's/^up //')
+    
+    # Output with fallback for missing unicode symbols
+    if [[ $BORING = true ]]; then
+        echo -e "${GREEN}⧗${RESET}  ${last_login:-Unknown}"
+        echo -e "${GREEN}⏲${RESET}  ${current_date}"
+        echo -e "${GREEN}⌂${RESET}  ${host_info}"
+        echo -e "${GREEN}↑${RESET}  ${uptime_info}"
+    else
+        # Colorful version with cleaner variable expansion
+        echo -e "${BRIGHT_GREEN}⧗${RESET}  ${BRIGHT_GREEN}${last_login:-Unknown}"
+        echo -e "${BRIGHT_YELLOW}⏲${RESET}  ${BRIGHT_YELLOW}${current_date}"
+        echo -e "${BRIGHT_RED}⌂${RESET}  ${BRIGHT_RED}${host_info}"
+        echo -e "${BRIGHT_WHITE}↑${RESET}  ${BRIGHT_WHITE}${uptime_info}"
+    fi
+    
+    echo -e "${RESET}" # Reset colors at the end
 }
 
 function weather() {
@@ -495,7 +492,8 @@ if hascommand --strict fzf; then
   	--bind 'ctrl-x:reload("$FZF_CTRL_T_COMMAND")'
   	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'
   	--bind 'ctrl-y:execute-silent(echo -n {} | $CLIP_COMMAND)+abort'
-  	--header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel'"
+  	--bind 'ctrl-o:execute($OPEN_COMMAND {})'
+  	--header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel│C-o:open'"
 	if hascommand --strict fdfind || hascommand --strict fd; then
 		export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
 	fi
@@ -526,7 +524,7 @@ if hascommand --strict fzf; then
     --multi"
 	# --- setup fzf theme ---
 	export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS}
-  	--color=fg:2,fg+:3,bg:0,bg+:0
+  	--color=fg:10,fg+:3,bg:0,bg+:0
   	--color=hl:4,hl+:12,info:6,marker:11
   	--color=prompt:1,spinner:13,pointer:5,header:8
   	--color=border:8,label:7,query:10
