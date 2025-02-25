@@ -124,16 +124,16 @@ function welcome_today() {
     
     # Output with fallback for missing unicode symbols
     if [[ $BORING = true ]]; then
-        echo -e "${GREEN}⧗${RESET}  ${last_login:-Unknown}"
-        echo -e "${GREEN}⏲${RESET}  ${current_date}"
-        echo -e "${GREEN}⌂${RESET}  ${host_info}"
-        echo -e "${GREEN}↑${RESET}  ${uptime_info}"
+        echo -e "${GREEN}⧗ ${last_login:-Unknown}${RESET}"
+        echo -e "${GREEN}⏲ ${current_date}${RESET}"
+        echo -e "${GREEN}⌂ ${host_info}${RESET}"
+        echo -e "${GREEN}↑ ${uptime_info}${RESET}"
     else
         # Colorful version with cleaner variable expansion
-        echo -e "${BRIGHT_GREEN}⧗${RESET}  ${BRIGHT_GREEN}${last_login:-Unknown}"
-        echo -e "${BRIGHT_YELLOW}⏲${RESET}  ${BRIGHT_YELLOW}${current_date}"
-        echo -e "${BRIGHT_RED}⌂${RESET}  ${BRIGHT_RED}${host_info}"
-        echo -e "${BRIGHT_WHITE}↑${RESET}  ${BRIGHT_WHITE}${uptime_info}"
+        echo -e "${BRIGHT_GREEN}⧗${RESET} ${BRIGHT_GREEN}${last_login:-Unknown}"
+        echo -e "${BRIGHT_YELLOW}⏲${RESET} ${BRIGHT_YELLOW}${current_date}"
+        echo -e "${BRIGHT_RED}⌂${RESET} ${BRIGHT_RED}${host_info}"
+        echo -e "${BRIGHT_WHITE}↑${RESET} ${BRIGHT_WHITE}${uptime_info}"
     fi
     
     echo -e "${RESET}" # Reset colors at the end
