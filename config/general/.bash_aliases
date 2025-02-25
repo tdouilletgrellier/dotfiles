@@ -97,12 +97,11 @@ function welcome_greeting() {
 # Print system information with neofetch, if it's installed
 function welcome_sysinfo() {
 	if hascommand --strict neofetch; then
-		neofetch --shell_version off \
-			--disable kernel distro shell resolution de wm wm_theme theme icons term packages gpu \
-			--backend off \
-			--colors 4 8 4 4 8 6 \
-			--color_blocks off \
-			--memory_display info
+		if [[ -f "${HOME}/.config/neofetch/neofetch.conf" ]]; then
+			neofetch --config ${HOME}/.config/neofetch/neofetch.conf
+		else
+			neofetch --disable title separator underline bar gpu memory disk cpu users local_ip public_ip font wm_theme --os --host --kernel --uptime --packages --shell --resolution --de --wm --terminal
+		fi
 	fi
 }
 
@@ -133,11 +132,11 @@ function welcome_today() {
         echo -e "${GREEN}⌂${RESET}  ${host_info}"
         # echo -e "${GREEN}🜨${RESET}  ${ip_info}"
     else
-        # Colorful version: symbol/colon in one color, text in another
+        # Reggae version
         echo -e "${BRIGHT_GREEN}⧗${RESET}  ${BRIGHT_GREEN}${last_login}"
         echo -e "${BRIGHT_YELLOW}⏲${RESET}  ${BRIGHT_YELLOW}${current_date}"
         echo -e "${BRIGHT_RED}⌂${RESET}  ${BRIGHT_RED}${host_info}"
-        # echo -e "${BRIGHT_BLUE}🜨${RESET}  ${BRIGHT_MAGENTA}${ip_info}"
+        # echo -e "${BRIGHT_WHITE}🜨${RESET}  ${BRIGHT_WHITE}${ip_info}"
     fi
 
     echo -e "${RESET}"  # Reset colors at the end
@@ -185,7 +184,6 @@ function welcome() {
 
 		welcome_greeting
 		# welcome_sysinfo
-		# neofetch
 		welcome_today
 		# weather
 		display_fortune
@@ -310,7 +308,8 @@ if [[ -f "${HOME}/paraview/bin/paraview" ]]; then
 	export PATH=${HOME}/paraview/bin/:${PATH}
 fi
 if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
-	alias epxenv="source ${HOME}/dev/epx/devtools/env.sh"
+	# Define a function instead of an alias to ensure immediate availability
+	function epxenv { source "${HOME}/dev/epx/devtools/env.sh"; }
 	if [[ "${SHLVL}" -lt 2 ]]; then
 		if [ -z "${TMUX}" ]; then
 			epxenv 1>/dev/null
@@ -318,7 +317,7 @@ if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
 	fi
 fi
 if [[ -f "${HOME}/dev/manta/devtools/env.sh" ]]; then
-	alias mantaenv="source ${HOME}/dev/manta/devtools/env.sh"
+	function mantaenv { source "${HOME}/dev/manta/devtools/env.sh"; }
 	if [[ "${SHLVL}" -lt 2 ]]; then
 		if [ -z "${TMUX}" ]; then
 			mantaenv 1>/dev/null

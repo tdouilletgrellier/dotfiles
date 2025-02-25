@@ -108,6 +108,9 @@
     ~/.zshrc: config/zsh/.zshrc 
     ~/.zsh_custom: config/zsh/custom    
 
+    #neofetch
+    ~/.config/neofetch/neofetch.conf : config/neofetch/neofetch.conf 
+
     #tools
     ~/bin:
       path: utils/
