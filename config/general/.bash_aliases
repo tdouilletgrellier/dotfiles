@@ -1,10 +1,10 @@
 #-------------------------------------------------------------
-#  _____ _   _ _   _  ____ _____ ___ ___  _   _ ____          
-# |  ___| | | | \ | |/ ___|_   _|_ _/ _ \| \ | / ___|         
-# | |_  | | | |  \| | |     | |  | | | | |  \| \___ \         
-# |  _| | |_| | |\  | |___  | |  | | |_| | |\  |___) |        
-# |_|    \___/|_| \_|\____| |_| |___\___/|_| \_|____/         
-#                                                             
+#  _____ _   _ _   _  ____ _____ ___ ___  _   _ ____
+# |  ___| | | | \ | |/ ___|_   _|_ _/ _ \| \ | / ___|
+# | |_  | | | |  \| | |     | |  | | | | |  \| \___ \
+# |  _| | |_| | |\  | |___  | |  | | |_| | |\  |___) |
+# |_|    \___/|_| \_|\____| |_| |___\___/|_| \_|____/
+#
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -479,7 +479,7 @@ function welcome() {
 # Set EDF Proxy
 function proxy() {
 	# Help message
-	if [[ $# -eq 1 && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
 		echo -e "${BRIGHT_WHITE}proxy:${RESET} Sets HTTP/HTTPS proxy environment variables and runs a test with curl."
 		echo -e "This function sets the HTTP/HTTPS proxy environment variables and tests connectivity."
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
@@ -501,8 +501,11 @@ function proxy() {
 	# Parse arguments
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
-			-v|--verbose) verbose=true ;;
-			*) echo "Invalid option: $1" >&2; return 1 ;;
+		-v | --verbose) verbose=true ;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
 		esac
 		shift
 	done
@@ -533,7 +536,7 @@ function proxy() {
 # Unset EDF proxy
 function unset_proxy() {
 	# Help message
-	if [[ $# -eq 1 && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
 		echo -e "${BRIGHT_WHITE}unset_proxy:${RESET} Unsets HTTP/HTTPS proxy environment variables and removes proxy settings from git."
 		echo -e "This function unsets the HTTP/HTTPS proxy environment variables and removes any proxy settings from Git."
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
@@ -552,8 +555,11 @@ function unset_proxy() {
 	# Parse arguments
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
-			-v|--verbose) verbose=true ;;
-			*) echo "Invalid option: $1" >&2; return 1 ;;
+		-v | --verbose) verbose=true ;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
 		esac
 		shift
 	done
@@ -583,7 +589,7 @@ function unset_proxy() {
 		git config --local --unset-all https.proxy
 		git config --local --unset-all http.proxy
 		git config --global --unset-all core.gitProxy
-	
+
 		# Display git proxy settings (optional)
 		if $verbose; then
 			echo -e "Current git proxy settings after unsetting:"
@@ -605,7 +611,7 @@ function unset_proxy() {
 # EDF Load Intel
 function my_load_intel() {
 	# Help message
-	if [[ $# -eq 1 && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
 		echo -e "${BRIGHT_WHITE}load_intel:${RESET} Loads Intel compilers and runtime libraries."
 		echo -e "This function automatically checks for the presence of Intel compilers (ifort, icc) and loads the necessary modules."
 		echo -e "If no local Intel installation is found, it attempts to load modules from predefined directories."
@@ -659,7 +665,7 @@ function my_load_intel() {
 # TheFuck wrapper function
 function fuck() {
 	# Help message
-	if [[ $# -eq 1 && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
 		echo -e "${BRIGHT_WHITE}fuck:${RESET} A wrapper around TheFuck to fix the previous command."
 		echo -e "This function allows you to use ${BRIGHT_CYAN}TheFuck${RESET} to correct the last command you typed."
 		echo -e "It sets up environment variables like ${BRIGHT_YELLOW}TF_SHELL, TF_ALIAS, TF_HISTORY${RESET} before calling ${BRIGHT_CYAN}TheFuck${RESET}."
@@ -709,98 +715,98 @@ function fuck() {
 #-------------------------------------------------------------
 # cd with immediate ll afterwards
 function cdll() {
-    # Help message
-    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-        echo -e "${BRIGHT_WHITE}cdll:${RESET} Customizes the behavior of the 'cd' command."
-        echo -e "The function changes the current directory and always lists the contents of the new directory."
-        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}cdll${RESET} ${BRIGHT_YELLOW}[OPTIONS]${RESET}"
-        echo -e "${BRIGHT_WHITE}Options:${RESET}"
-        echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
-        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}cdll${RESET}    # Changes the directory and lists contents"
-        return 0
-    fi
+	# Help message
+	if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+		echo -e "${BRIGHT_WHITE}cdll:${RESET} Customizes the behavior of the 'cd' command."
+		echo -e "The function changes the current directory and always lists the contents of the new directory."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}cdll${RESET} ${BRIGHT_YELLOW}[OPTIONS]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}cdll${RESET}    # Changes the directory and lists contents"
+		return 0
+	fi
 
-    if hascommand --strict zoxide; then
-        # Issues with zoxide and tmux
-        if [ -z "${TMUX}" ]; then
-            # Use zoxide when not in tmux
-            cd() {
-                z "$@"  # Use zoxide for directory navigation
-                ls      # List contents of the new directory
-            }
-        else
-            # Use regular cd when in tmux
-            cd() {
-                builtin cd "$@"  # Use default cd command
-                ls               # List contents of the new directory
-            }
-        fi
-    else
-        # Use regular cd if zoxide is not available
-        cd() {
-            builtin cd "$@"  # Use default cd command
-            ls               # List contents of the new directory
-        }
-    fi
+	if hascommand --strict zoxide; then
+		# Issues with zoxide and tmux
+		if [ -z "${TMUX}" ]; then
+			# Use zoxide when not in tmux
+			cd() {
+				z "$@" # Use zoxide for directory navigation
+				ls     # List contents of the new directory
+			}
+		else
+			# Use regular cd when in tmux
+			cd() {
+				builtin cd "$@" # Use default cd command
+				ls              # List contents of the new directory
+			}
+		fi
+	else
+		# Use regular cd if zoxide is not available
+		cd() {
+			builtin cd "$@" # Use default cd command
+			ls              # List contents of the new directory
+		}
+	fi
 }
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # Exit message
 function _exit() {
-    # Help message
-    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-        echo -e "${BRIGHT_WHITE}_exit:${RESET} Function to show a custom exit message when the shell exits."
-        echo -e "The function displays a farewell message and a sparkbar graphic."
-        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}_exit${RESET} ${BRIGHT_YELLOW}[OPTIONS]${RESET}"
-        echo -e "${BRIGHT_WHITE}Options:${RESET}"
-        echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
-        echo -e "  ${BRIGHT_YELLOW}-m, --message${RESET} Customize the farewell message"
-        echo -e "  ${BRIGHT_YELLOW}-s, --no-sparkbar${RESET} Disable the sparkbar graphic"
-        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}_exit${RESET}    # Displays the default exit message"
-        echo -e "  ${BRIGHT_CYAN}_exit -m 'Goodbye!'${RESET}  # Custom farewell message"
-        return 0
-    fi
+	# Help message
+	if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+		echo -e "${BRIGHT_WHITE}_exit:${RESET} Function to show a custom exit message when the shell exits."
+		echo -e "The function displays a farewell message and a sparkbar graphic."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}_exit${RESET} ${BRIGHT_YELLOW}[OPTIONS]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
+		echo -e "  ${BRIGHT_YELLOW}-m, --message${RESET} Customize the farewell message"
+		echo -e "  ${BRIGHT_YELLOW}-s, --no-sparkbar${RESET} Disable the sparkbar graphic"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}_exit${RESET}    # Displays the default exit message"
+		echo -e "  ${BRIGHT_CYAN}_exit -m 'Goodbye!'${RESET}  # Custom farewell message"
+		return 0
+	fi
 
-    local message="${BRIGHT_RED}So long Space Cowboy...${RESET}"
-    # local message="${BRIGHT_RED}Hasta la vista, baby${RESET}"
-    local show_sparkbar=true
+	local message="${BRIGHT_RED}So long Space Cowboy...${RESET}"
+	# local message="${BRIGHT_RED}Hasta la vista, baby${RESET}"
+	local show_sparkbar=true
 
-    # Parse options for customizing the exit message
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -m|--message)
-                message="$2"
-                shift 2
-                ;;
-            -s|--no-sparkbar)
-                show_sparkbar=false
-                shift
-                ;;
-            *)
-                echo "Invalid option: $1" >&2
-                return 1
-                ;;
-        esac
-    done
+	# Parse options for customizing the exit message
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-m | --message)
+			message="$2"
+			shift 2
+			;;
+		-s | --no-sparkbar)
+			show_sparkbar=false
+			shift
+			;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
+		esac
+	done
 
-    # Display message and sparkbar
-    echo -e '\e[m'
-    echo -e "$message"
-    echo -e '\e[m'
-    if $show_sparkbar; then
-        echo -e "$BRIGHT_RED$(sparkbars)${RESET}"
-        echo -e '\e[m'
-    fi
+	# Display message and sparkbar
+	echo -e '\e[m'
+	echo -e "$message"
+	echo -e '\e[m'
+	if $show_sparkbar; then
+		echo -e "$BRIGHT_RED$(sparkbars)${RESET}"
+		echo -e '\e[m'
+	fi
 }
 
 # If not running in a nested shell, show the exit message
 if [[ "${SHLVL}" -lt 2 ]]; then
-    trap _exit EXIT
+	trap _exit EXIT
 fi
 #-------------------------------------------------------------
 
@@ -1479,12 +1485,12 @@ function ggcd() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-#  _____ __________         
-# |  ___|__  /  ___|        
-# | |_    / /| |_           
-# |  _|  / /_|  _|          
-# |_|   /____|_|           
-#                                                             
+#  _____ __________
+# |  ___|__  /  ___|
+# | |_    / /| |_
+# |  _|  / /_|  _|
+# |_|   /____|_|
+#
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -1614,12 +1620,12 @@ fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-#  ____   _  _____ _   _        
-# |  _ \ / \|_   _| | | |       
-# | |_) / _ \ | | | |_| |       
-# |  __/ ___ \| | |  _  |       
-# |_| /_/   \_\_| |_| |_|      
-#                                                                 
+#  ____   _  _____ _   _
+# |  _ \ / \|_   _| | | |
+# | |_) / _ \ | | | |_| |
+# |  __/ ___ \| | |  _  |
+# |_| /_/   \_\_| |_| |_|
+#
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -1628,12 +1634,12 @@ pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmu
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-#  _______  ______   ___  ____ _____ ____        
-# | ____\ \/ /  _ \ / _ \|  _ \_   _/ ___|       
-# |  _|  \  /| |_) | | | | |_) || | \___ \       
-# | |___ /  \|  __/| |_| |  _ < | |  ___) |      
-# |_____/_/\_\_|    \___/|_| \_\|_| |____/      
-#                                                                                  
+#  _______  ______   ___  ____ _____ ____
+# | ____\ \/ /  _ \ / _ \|  _ \_   _/ ___|
+# |  _|  \  /| |_) | | | | |_) || | \___ \
+# | |___ /  \|  __/| |_| |  _ < | |  ___) |
+# |_____/_/\_\_|    \___/|_| \_\|_| |____/
+#
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -1662,12 +1668,12 @@ export SELECTED_EDITOR=$EDITOR
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-#     _    _     ___    _    ____  _____ ____        
-#    / \  | |   |_ _|  / \  / ___|| ____/ ___|       
-#   / _ \ | |    | |  / _ \ \___ \|  _| \___ \       
-#  / ___ \| |___ | | / ___ \ ___) | |___ ___) |      
-# /_/   \_\_____|___/_/   \_\____/|_____|____/      
-#                                                                                      
+#     _    _     ___    _    ____  _____ ____
+#    / \  | |   |_ _|  / \  / ___|| ____/ ___|
+#   / _ \ | |    | |  / _ \ \___ \|  _| \___ \
+#  / ___ \| |___ | | / ___ \ ___) | |___ ___) |
+# /_/   \_\_____|___/_/   \_\____/|_____|____/
+#
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -1742,12 +1748,12 @@ fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-#   ____    _    _     _     ____     
-#  / ___|  / \  | |   | |   / ___|    
-# | |     / _ \ | |   | |   \___ \    
-# | |___ / ___ \| |___| |___ ___) |   
-#  \____/_/   \_\_____|_____|____/   
-#                                                                       
+#   ____    _    _     _     ____
+#  / ___|  / \  | |   | |   / ___|
+# | |     / _ \ | |   | |   \___ \
+# | |___ / ___ \| |___| |___ ___) |
+#  \____/_/   \_\_____|_____|____/
+#
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
