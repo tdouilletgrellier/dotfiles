@@ -1,3 +1,12 @@
+#----------------------------------------------------------------------#
+#  ____    _    ____  _   _ ____   ____   _   _ _____ ___ _     ____   #
+# | __ )  / \  / ___|| | | |  _ \ / ___| | | | |_   _|_ _| |   / ___|  #
+# |  _ \ / _ \ \___ \| |_| | |_) | |     | | | | | |  | || |   \___ \  #
+# | |_) / ___ \ ___) |  _  |  _ <| |___  | |_| | | |  | || |___ ___) | #
+# |____/_/   \_\____/|_| |_|_| \_\\____|  \___/  |_| |___|_____|____/  #
+#                                                                      #
+#----------------------------------------------------------------------#
+
 #-------------------------------------------------------------
 # List of packages to be installed
 debian_apps=(
@@ -58,16 +67,16 @@ debian_apps=(
 	'conky-all' # Command line speed test utility
 
 	# CLI Fun
-	'cowsay'   # Outputs message with ASCII art cow
-	'figlet'   # Outputs text as 3D ASCII word art
-	'lolcat'   # Rainbow colored terminal output
-	'neofetch' # Show off distro and system info
+	'cowsay'    # Outputs message with ASCII art cow
+	'figlet'    # Outputs text as 3D ASCII word art
+	'lolcat'    # Rainbow colored terminal output
+	'neofetch'  # Show off distro and system info
+	'fastfetch' # Show off distro and system info
 )
+#-------------------------------------------------------------
 
 #-------------------------------------------------------------
-# Welcome message
-BORING=true
-# Print time-based personalized message, using figlet & lolcat if availible
+# Print time-based personalized message, using figlet & lolcat if available
 function welcome_greeting() {
 	# Help message
 	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
@@ -129,8 +138,10 @@ function welcome_greeting() {
 		fi
 	fi
 }
+#-------------------------------------------------------------
 
-# Print system information with neofetch, if it's installed
+#-------------------------------------------------------------
+# Print system information with neofetch or fastfetch if it's installed
 function welcome_sysinfo() {
 	# Help message
 	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
@@ -228,8 +239,10 @@ function welcome_sysinfo() {
 		welcome_today
 	fi
 }
+#-------------------------------------------------------------
 
-# Print todays info: Date, IP, weather, etc
+#-------------------------------------------------------------
+# Print basic info : last login, date, hostname
 function welcome_today() {
 	# Help message
 	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
@@ -309,13 +322,19 @@ function welcome_today() {
 
 	echo -e "${RESET}" # Reset colors at the end
 }
+#-------------------------------------------------------------
 
+#-------------------------------------------------------------
+# Display weather
 function weather() {
 	timeout=0.5
 	curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
 	echo -e "${RESET}"
 }
+#-------------------------------------------------------------
 
+#-------------------------------------------------------------
+# Display fortune
 function display_fortune() {
 	# Help message
 	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
@@ -372,7 +391,10 @@ function display_fortune() {
 		fi
 	fi
 }
+#-------------------------------------------------------------
 
+#-------------------------------------------------------------
+# Function to display sparkbars
 function display_sparkbars() {
 	# Help message
 	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
@@ -424,7 +446,9 @@ function display_sparkbars() {
 		[[ -z "${TMUX}" ]] && echo -e "$GREEN$(sparkbars)${RESET}"
 	fi
 }
+#-------------------------------------------------------------
 
+#-------------------------------------------------------------
 # Main welcome function
 function welcome() {
 	# Help message
@@ -517,10 +541,11 @@ function welcome() {
 		fi
 	fi
 }
+#-------------------------------------------------------------
 
+#-------------------------------------------------------------
 # Run welcome message at login
 welcome -s 8
-
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -1542,5 +1567,4 @@ function ggcd() {
 
 	echo -e "${BRIGHT_GREEN}Checked out commit:${RESET} $commit_hash"
 }
-
 #--------------------------------------------------------
