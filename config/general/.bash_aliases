@@ -122,7 +122,13 @@ function welcome_today() {
 	last_login=$(last | grep "^$USER " | head -1 | awk '{print $4, $5, $6, $7}')
 
 	# Convert last login time to the desired format
-	formatted_last_login=$(date -j -f "%b %d %H:%M" "$last_login" "+%a %d %b at %H:%M" 2>/dev/null)
+	if date --version >/dev/null 2>&1; then
+	    # GNU date (Linux)
+	    formatted_last_login=$(date -d "$last_login" '+%a %d %b at %H:%M' 2>/dev/null)
+	else
+	    # BSD date (macOS)
+	    formatted_last_login=$(date -j -f "%b %d %H:%M" "$last_login" "+%a %d %b at %H:%M" 2>/dev/null)
+	fi
 
 	# Get date and time with more reliable format specifiers
 	current_date=$(date '+%a %d %b at %H:%M')
