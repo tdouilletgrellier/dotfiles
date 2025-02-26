@@ -69,6 +69,40 @@ debian_apps=(
 BORING=true
 # Print time-based personalized message, using figlet & lolcat if availible
 function welcome_greeting() {
+	# Help message
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
+		echo -e "${BRIGHT_WHITE}welcome_greeting:${RESET} Greets the user based on the time of day"
+		echo -e "You can make the greeting boring (without formatting) using the ${BRIGHT_CYAN}-b, --boring${RESET} option."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}welcome_greeting${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-b, --boring${RESET}  Display a simple greeting without extra formatting"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}    Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}welcome_greeting${RESET}        # Normal greeting with formatting"
+		echo -e "  ${BRIGHT_CYAN}welcome_greeting -b${RESET}     # Simple greeting without formatting"
+		return 0
+	fi
+
+	local boring=0
+
+	# Parse options
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-b | --boring) boring=1 ;;
+		-h | --help) # Show help message
+			$0          # Calling itself with no arguments to display the help message
+			return 0
+			;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Get the current hour
 	h=$(date +%H)
 	h=$((10#$h))
 	if [ $h -lt 4 ] || [ $h -gt 22 ]; then
@@ -83,7 +117,9 @@ function welcome_greeting() {
 		greeting="Hello"
 	fi
 	WELCOME_MSG="$greeting $USER!"
-	if [[ $BORING = true ]]; then
+
+	# Display greeting based on the '-b' option
+	if ((boring)); then
 		echo -e "$BRIGHT_GREEN${WELCOME_MSG}${RESET}\n"
 	else
 		if hascommand --strict lolcat && hascommand --strict figlet; then
@@ -96,25 +132,141 @@ function welcome_greeting() {
 
 # Print system information with neofetch, if it's installed
 function welcome_sysinfo() {
-	if hascommand --strict fastfetch; then
-		if [[ -f "${HOME}/.config/fastfetch/fastfetch.jsonc" ]]; then
-			fastfetch --config ${HOME}/.config/fastfetch/fastfetch.jsonc
+	# Help message
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
+		echo -e "${BRIGHT_WHITE}welcome_sysinfo:${RESET} Displays system information using fastfetch or neofetch"
+		echo -e "The function automatically selects the best available tool (${BRIGHT_CYAN}fastfetch or neofetch${RESET})"
+		echo -e "You can override the selection using the options below."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}welcome_sysinfo${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-f, --fastfetch${RESET}  Force the use of fastfetch"
+		echo -e "  ${BRIGHT_YELLOW}-n, --neofetch${RESET}   Force the use of neofetch"
+		echo -e "  ${BRIGHT_YELLOW}-w, --welcome-today${RESET} Call the welcome_today function directly"
+		echo -e "  ${BRIGHT_YELLOW}-b, --boring${RESET}        Directly call welcome_today with boring output"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}       Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}welcome_sysinfo${RESET}         # Automatically chooses fastfetch or neofetch"
+		echo -e "  ${BRIGHT_CYAN}welcome_sysinfo -f${RESET}      # Force fastfetch"
+		echo -e "  ${BRIGHT_CYAN}welcome_sysinfo --neofetch${RESET}  # Force neofetch"
+		echo -e "  ${BRIGHT_CYAN}welcome_sysinfo --welcome-today${RESET}  # Directly call welcome_today"
+		echo -e "  ${BRIGHT_CYAN}welcome_sysinfo --boring${RESET}     # Directly call welcome_today with boring output"
+		return 0
+	fi
+
+	local use_fastfetch=0
+	local use_neofetch=0
+	local call_welcome_today=0
+
+	# Loop through arguments
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-f | --fastfetch) use_fastfetch=1 ;;
+		-n | --neofetch) use_neofetch=1 ;;
+		-w | --welcome-today) call_welcome_today=1 ;;
+		-b | --boring)
+			# Directly call welcome_today with the -b option
+			welcome_today -b
+			return 0
+			;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# If welcome_today is called directly, just call it
+	if ((call_welcome_today)); then
+		welcome_today
+		return 0
+	fi
+
+	# Fastfetch section
+	if ((use_fastfetch)); then
+		if hascommand --strict fastfetch; then
+			if [[ -f "${HOME}/.config/fastfetch/fastfetch.jsonc" ]]; then
+				fastfetch --config "${HOME}/.config/fastfetch/fastfetch.jsonc"
+			else
+				fastfetch --config archey
+			fi
+			return 0
 		else
-			fastfetch --config archey
+			welcome_today
+			return 1
 		fi
-	else
+	# Neofetch section
+	elif ((use_neofetch)); then
 		if hascommand --strict neofetch; then
 			if [[ -f "${HOME}/.config/neofetch/neofetch.conf" ]]; then
-				neofetch --config ${HOME}/.config/neofetch/neofetch.conf
+				neofetch --config "${HOME}/.config/neofetch/neofetch.conf"
 			else
 				neofetch --disable title separator underline bar gpu memory disk cpu users local_ip public_ip font wm_theme --os --host --kernel --uptime --packages --shell --resolution --de --wm --terminal
 			fi
+			return 0
+		else
+			welcome_today
+			return 1
 		fi
+	fi
+
+	# Default behavior: Try fastfetch, then neofetch, then fallback to welcome_today
+	if hascommand --strict fastfetch; then
+		if [[ -f "${HOME}/.config/fastfetch/fastfetch.jsonc" ]]; then
+			fastfetch --config "${HOME}/.config/fastfetch/fastfetch.jsonc"
+		else
+			fastfetch --config archey
+		fi
+	elif hascommand --strict neofetch; then
+		if [[ -f "${HOME}/.config/neofetch/neofetch.conf" ]]; then
+			neofetch --config "${HOME}/.config/neofetch/neofetch.conf"
+		else
+			neofetch --disable title separator underline bar gpu memory disk cpu users local_ip public_ip font wm_theme --os --host --kernel --uptime --packages --shell --resolution --de --wm --terminal
+		fi
+	else
+		welcome_today
 	fi
 }
 
 # Print todays info: Date, IP, weather, etc
 function welcome_today() {
+	# Help message
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
+		echo -e "${BRIGHT_WHITE}welcome_today:${RESET} Displays information about the last login, current date/time, and hostname"
+		echo -e "You can make the output boring (without color formatting) using the ${BRIGHT_CYAN}-b, --boring${RESET} option."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}welcome_today${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-b, --boring${RESET}  Display a simple output without extra formatting"
+		echo -e "  ${BRIGHT_YELLOW}-l, --lolcat${RESET}  Display a simple output with lolcat formatting"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}    Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}welcome_today${RESET}        # Normal output with color formatting"
+		echo -e "  ${BRIGHT_CYAN}welcome_today -b${RESET}     # Simple output without formatting"
+		return 0
+	fi
+
+	local boring=0
+	local lolcat=0
+
+	# Parse options
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-b | --boring) boring=1 ;;
+		-l | --lolcat) lolcat=1 ;;
+		-h | --help) # Show help message
+			$0          # Calling itself with no arguments to display the help message
+			return 0
+			;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
+		esac
+		shift
+	done
+
 	# Ensure reset before printing
 	echo -e "${RESET}"
 
@@ -123,11 +275,11 @@ function welcome_today() {
 
 	# Convert last login time to the desired format
 	if date --version >/dev/null 2>&1; then
-	    # GNU date (Linux)
-	    formatted_last_login=$(date -d "$last_login" '+%a %d %b at %H:%M' 2>/dev/null)
+		# GNU date (Linux)
+		formatted_last_login=$(date -d "$last_login" '+%a %d %b at %H:%M' 2>/dev/null)
 	else
-	    # BSD date (macOS)
-	    formatted_last_login=$(date -j -f "%b %d %H:%M" "$last_login" "+%a %d %b at %H:%M" 2>/dev/null)
+		# BSD date (macOS)
+		formatted_last_login=$(date -j -f "%b %d %H:%M" "$last_login" "+%a %d %b at %H:%M" 2>/dev/null)
 	fi
 
 	# Get date and time with more reliable format specifiers
@@ -137,15 +289,22 @@ function welcome_today() {
 	host_info="$(hostname)"
 
 	# Output with fallback for missing unicode symbols
-	if [[ $BORING = true ]]; then
+	if ((boring)); then
 		echo -e "${GREEN}⧗ ${formatted_last_login}${RESET}"
 		echo -e "${GREEN}⏲ ${current_date}${RESET}"
 		echo -e "${GREEN}⌂ ${host_info}${RESET}"
 	else
-		# Colorful version with cleaner variable expansion
-		echo -e "${BRIGHT_GREEN}⧗${RESET} ${BRIGHT_GREEN}${formatted_last_login}"
-		echo -e "${BRIGHT_YELLOW}⏲${RESET} ${BRIGHT_YELLOW}${current_date}"
-		echo -e "${BRIGHT_RED}⌂${RESET} ${BRIGHT_RED}${host_info}"
+		if ((lolcat)) && hascommand --strict lolcat; then
+			# Colorful version with cleaner variable expansion
+			echo -e "${GREEN}⧗ ${formatted_last_login}${RESET}" | lolcat
+			echo -e "${GREEN}⏲ ${current_date}${RESET}" | lolcat
+			echo -e "${GREEN}⌂ ${host_info}${RESET}" | lolcat
+		else
+			# Colorful version with cleaner variable expansion
+			echo -e "${BRIGHT_GREEN}⧗${RESET} ${BRIGHT_GREEN}${formatted_last_login}"
+			echo -e "${BRIGHT_YELLOW}⏲${RESET} ${BRIGHT_YELLOW}${current_date}"
+			echo -e "${BRIGHT_RED}⌂${RESET} ${BRIGHT_RED}${host_info}"
+		fi
 	fi
 
 	echo -e "${RESET}" # Reset colors at the end
@@ -158,54 +317,209 @@ function weather() {
 }
 
 function display_fortune() {
-	echo -e "${RESET}" # Reset colors once
+	# Help message
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
+		echo -e "${BRIGHT_WHITE}display_fortune:${RESET} Displays a fortune with an option for a boring (plain) version"
+		echo -e "You can make the output boring (without formatting) using the ${BRIGHT_CYAN}-b, --boring${RESET} option."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}display_fortune${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-b, --boring${RESET}  Display a plain fortune without extra formatting"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}    Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}display_fortune${RESET}        # Fortune with formatting"
+		echo -e "  ${BRIGHT_CYAN}display_fortune -b${RESET}     # Plain fortune without formatting"
+		return 0
+	fi
 
+	local boring=0
+
+	# Parse options
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-b | --boring) boring=1 ;;
+		-h | --help) # Show help message
+			$0          # Calling itself with no arguments to display the help message
+			return 0
+			;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Reset colors before output
+	echo -e "${RESET}"
+
+	# Check for the presence of the `lolcat` command
 	if hascommand --strict lolcat; then
-		if [[ $BORING = true ]]; then
+		if ((boring)); then
+			# Plain fortune without any formatting
 			[ -x /usr/games/fortune ] && echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
 		else
+			# Fortune with `lolcat` formatting
 			[ -x /usr/games/fortune ] && /usr/games/fortune -s | lolcat
+		fi
+	else
+		if ((boring)); then
+			# Plain fortune without any formatting
+			[ -x /usr/games/fortune ] && echo -e "$GREEN$(/usr/games/fortune -s)${RESET}"
+		else
+			# Fortune with `lolcat` formatting
+			[ -x /usr/games/fortune ] && echo -e "$YELLOW$(/usr/games/fortune -s)${RESET}"
 		fi
 	fi
 }
 
 function display_sparkbars() {
-	echo -e "${RESET}" # Reset colors once
+	# Help message
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
+		echo -e "${BRIGHT_WHITE}display_sparkbars:${RESET} Displays sparkbars with an option for a boring (plain) version"
+		echo -e "You can make the output boring (without formatting) using the ${BRIGHT_CYAN}-b, --boring${RESET} option."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}display_sparkbars${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-b, --boring${RESET}  Display sparkbars without extra formatting"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}    Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}display_sparkbars${RESET}        # Sparkbars with formatting"
+		echo -e "  ${BRIGHT_CYAN}display_sparkbars -b${RESET}     # Plain sparkbars without formatting"
+		return 0
+	fi
 
+	local boring=0
+
+	# Parse options
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-b | --boring) boring=1 ;;
+		-h | --help) # Show help message
+			$0          # Calling itself with no arguments to display the help message
+			return 0
+			;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Reset colors before output
+	echo -e "${RESET}"
+
+	# Check for the presence of the `lolcat` command
 	if hascommand --strict lolcat; then
-		if [[ $BORING = true ]]; then
+		if ((boring)); then
+			# Plain sparkbars without any formatting
 			echo -e "$GREEN$(sparkbars)${RESET}"
 		else
+			# Sparkbars with `lolcat` formatting
 			sparkbars | lolcat
 		fi
 	else
+		# Fallback for when `lolcat` is not available
 		[[ -z "${TMUX}" ]] && echo -e "$GREEN$(sparkbars)${RESET}"
 	fi
 }
 
 # Main welcome function
 function welcome() {
+	# Help message
+	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
+		echo -e "${BRIGHT_WHITE}welcome:${RESET} Displays a personalized greeting and system info"
+		echo -e "You can choose a style for the greeting and output using the options below."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}welcome${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-s, --style${RESET}    Choose the style of output (1 or 2)"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}       Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}welcome --style n${RESET}   # Run style n "
+		return 0
+	fi
+
+	local style=1
+
+	# Parse arguments for style option
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-s | --style)
+			style="$2"
+			shift
+			;;
+		*)
+			echo "Invalid option: $1" >&2
+			return 1
+			;;
+		esac
+		shift
+	done
+
 	# Only run if in a login shell (SHLVL < 2)
 	if [[ "${SHLVL}" -lt 2 ]]; then
 		[[ -z "${TMUX}" || -n "$SSH_CLIENT" ]] && {
 			clear
 			printf '\e[3J'
 		}
-		# if hascommand --strict neofetch || hascommand --strict fastfetch; then
-			# welcome_sysinfo
-			# display_fortune
-		# else
+
+		# Style 1
+		if [[ "$style" -eq 1 ]]; then
+			welcome_greeting -b
+			welcome_sysinfo -b
+			display_fortune -b
+
+		# Style 2
+		elif [[ "$style" -eq 2 ]]; then
 			welcome_greeting
-			welcome_today
-			# weather
+			welcome_today -l
 			display_fortune
-			# display_sparkbars
-		# fi
+			display_sparkbars
+
+		# Style 3
+		elif [[ "$style" -eq 3 ]]; then
+			welcome_greeting
+			welcome_sysinfo
+			display_fortune
+			display_sparkbars
+
+		# Style 4
+		elif [[ "$style" -eq 4 ]]; then
+			welcome_sysinfo -f
+			display_fortune -b
+			display_sparkbars -b
+
+		# Style 5
+		elif [[ "$style" -eq 5 ]]; then
+			welcome_sysinfo -n
+			display_fortune -b
+			display_sparkbars -b
+
+		# Style 6
+		elif [[ "$style" -eq 6 ]]; then
+			welcome_sysinfo -f
+
+		# Style 7
+		elif [[ "$style" -eq 7 ]]; then
+			welcome_sysinfo -n
+			display_fortune -b
+
+		# Style 8
+		elif [[ "$style" -eq 8 ]]; then
+			welcome_greeting -b
+			display_fortune -b
+
+		else
+			echo "Invalid style option: $style" >&2
+			return 1
+		fi
 	fi
 }
 
 # Run welcome message at login
-welcome
+welcome -s 7
 
 #-------------------------------------------------------------
 
