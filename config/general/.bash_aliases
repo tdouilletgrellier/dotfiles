@@ -259,9 +259,37 @@ function welcome_today() {
 #-------------------------------------------------------------
 # Display weather
 function weather() {
-	timeout=0.5
-	curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
-	echo -e "${RESET}"
+    # Help message
+    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+        echo -e "${BRIGHT_WHITE}weather:${RESET} Displays the current weather conditions."
+        echo -e "Fetches weather data from wttr.in with a short timeout."
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}weather${RESET} ${BRIGHT_YELLOW}[OPTIONS]${RESET}"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}  Show this help message"
+        echo -e "  ${BRIGHT_YELLOW}-t, --timeout <sec>${RESET}  Set a custom timeout for the request (default: 0.5s)"
+        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}weather${RESET}        # Get the current weather with the default timeout"
+        echo -e "  ${BRIGHT_CYAN}weather -t 1.5${RESET}  # Set a custom timeout of 1.5 seconds"
+        return 0
+    fi
+
+    # Default timeout value
+    local timeout=0.5
+
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -t|--timeout) shift; timeout="$1" ;;
+            *) echo "Invalid option: $1" >&2; return 1 ;;
+        esac
+        shift
+    done
+
+    # Fetch weather with a timeout
+    curl -s -m "$timeout" "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
+
+    echo -e "${RESET}"
 }
 #-------------------------------------------------------------
 
