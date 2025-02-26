@@ -1,78 +1,10 @@
-#----------------------------------------------------------------------#
-#  ____    _    ____  _   _ ____   ____   _   _ _____ ___ _     ____   #
-# | __ )  / \  / ___|| | | |  _ \ / ___| | | | |_   _|_ _| |   / ___|  #
-# |  _ \ / _ \ \___ \| |_| | |_) | |     | | | | | |  | || |   \___ \  #
-# | |_) / ___ \ ___) |  _  |  _ <| |___  | |_| | | |  | || |___ ___) | #
-# |____/_/   \_\____/|_| |_|_| \_\\____|  \___/  |_| |___|_____|____/  #
-#                                                                      #
-#----------------------------------------------------------------------#
-
 #-------------------------------------------------------------
-# List of packages to be installed
-debian_apps=(
-	# Essentials
-	'git'        # Version controll
-	'neovim'     # Text editor
-	'ranger'     # Directory browser
-	'tmux'       # Term multiplexer
-	'terminator' # Terminal emulator
-	'wget'       # Download files
-
-	# CLI Power Basics
-	'aria2'         # Resuming download util (better wget)
-	'bat'           # Output highlighting (better cat)
-	'broot'         # Interactive directory navigation
-	'ctags'         # Indexing of file info + headers
-	'diff-so-fancy' # Readable file compares (better diff)
-	'grc'           # Colorized lots basic CLI tools
-	'duf'           # Get info on mounted disks (better df)
-	'eza'           # Listing files with info (better ls)
-	'fd-find'       # Fuzzy file finder and filtering
-	'fzf'           # Fuzzy file finder and filtering
-	'hyperfine'     # Benchmarking for arbitrary commands
-	'just'          # Powerful command runner (better make)
-	'jq'            # JSON parser, output and query files
-	'most'          # Multi-window scroll pager (better less)
-	'procs'         # Advanced process viewer (better ps)
-	'ripgrep'       # Searching within files (better grep)
-	'scrot'         # Screenshots programmatically via CLI
-	'sd'            # RegEx find and replace (better sed)
-	'thefuck'       # Auto-correct miss-typed commands
-	'tealdeer'      # Reader for command docs (better man)
-	'tree'          # Directory listings as tree structure
-	'tokei'         # Count lines of code (better cloc)
-	'trash-cli'     # Record and restore removed files
-	'xsel'          # Copy paste access to the X clipboard
-	'zoxide'        # Auto-learning navigation (better cd)
-	'delta'         # git-delta
-	'lazygit'       # lazygit
-	'micro'         # micro
-	'tree-sitter'   # syntax hl
-	'xdotools'      # keys
-	'grc'           # color
-	'zellij'        # term multiplexer
-	'ble.sh'        # bash syntax hl
-	'wmctrl'        # Window management
-
-	# Languages, compilers, runtimes, etc
-	'gcc'
-	'g++'
-	'gfortran'
-	'python'
-	'LateX'
-	'zathura'
-
-	# Monitoring, management and stats
-	'bpytop'    # Live system resource monitoring
-	'conky-all' # Command line speed test utility
-
-	# CLI Fun
-	'cowsay'    # Outputs message with ASCII art cow
-	'figlet'    # Outputs text as 3D ASCII word art
-	'lolcat'    # Rainbow colored terminal output
-	'neofetch'  # Show off distro and system info
-	'fastfetch' # Show off distro and system info
-)
+#  _____ _   _ _   _  ____ _____ ___ ___  _   _ ____          
+# |  ___| | | | \ | |/ ___|_   _|_ _/ _ \| \ | / ___|         
+# | |_  | | | |  \| | |     | |  | | | | |  \| \___ \         
+# |  _| | |_| | |\  | |___  | |  | | |_| | |\  |___) |        
+# |_|    \___/|_| \_|\____| |_| |___\___/|_| \_|____/         
+#                                                             
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -544,61 +476,179 @@ function welcome() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-# Run welcome message at login
-welcome -s 8
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# License file for ArmForge DDT (i think)
-export LM_LICENSE_FILE=27000@noeyyr5y.noe.edf.fr
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# EDF Proxy
+# Set EDF Proxy
 function proxy() {
-	export http_proxy='http://vip-users.proxy.edf.fr:3131/'
-	export https_proxy='http://vip-users.proxy.edf.fr:3131/'
-	export HTTP_PROXY='http://vip-users.proxy.edf.fr:3131/'
-	export HTTPS_PROXY='http://vip-users.proxy.edf.fr:3131/'
-	export no_proxy='localhost,127.0.0.1,.edf.fr,.edf.com'
-	curl --silent --proxy-negotiate --user : http://www.gstatic.com/generate_204
+	# Help message
+	if [[ $# -eq 1 && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+		echo -e "${BRIGHT_WHITE}proxy:${RESET} Sets HTTP/HTTPS proxy environment variables and runs a test with curl."
+		echo -e "This function sets the HTTP/HTTPS proxy environment variables and tests connectivity."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}proxy${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-v, --verbose${RESET}      Show detailed output from the curl request"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}         Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}proxy${RESET}          # Set default proxy settings"
+		echo -e "  ${BRIGHT_CYAN}proxy --verbose${RESET}  # Show verbose output"
+		return 0
+	fi
+
+	# Default values
+	local proxy_url='http://vip-users.proxy.edf.fr:3131/'
+	local no_proxy_value='localhost,127.0.0.1,.edf.fr,.edf.com'
+	local verbose=false
+
+	# Parse arguments
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+			-v|--verbose) verbose=true ;;
+			*) echo "Invalid option: $1" >&2; return 1 ;;
+		esac
+		shift
+	done
+
+	# Check if curl is installed
+	if ! hascommand --strict curl; then
+		echo "curl is not installed. Please install curl to proceed."
+		return 1
+	fi
+
+	# Set proxy environment variables
+	export http_proxy="$proxy_url"
+	export https_proxy="$proxy_url"
+	export HTTP_PROXY="$proxy_url"
+	export HTTPS_PROXY="$proxy_url"
+	export no_proxy="$no_proxy_value"
+
+	# Run curl with silent mode, negotiate proxy, and display the result
+	if $verbose; then
+		curl --verbose --proxy-negotiate --user : http://www.gstatic.com/generate_204
+	else
+		curl --silent --proxy-negotiate --user : http://www.gstatic.com/generate_204
+	fi
 }
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Unset EDF proxy
 function unset_proxy() {
+	# Help message
+	if [[ $# -eq 1 && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+		echo -e "${BRIGHT_WHITE}unset_proxy:${RESET} Unsets HTTP/HTTPS proxy environment variables and removes proxy settings from git."
+		echo -e "This function unsets the HTTP/HTTPS proxy environment variables and removes any proxy settings from Git."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}unset_proxy${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-v, --verbose${RESET}      Show detailed output of the unset process"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}         Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}unset_proxy${RESET}          # Unsets the proxy settings"
+		echo -e "  ${BRIGHT_CYAN}unset_proxy --verbose${RESET}  # Show verbose output"
+		return 0
+	fi
+
+	local verbose=false
+
+	# Parse arguments
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+			-v|--verbose) verbose=true ;;
+			*) echo "Invalid option: $1" >&2; return 1 ;;
+		esac
+		shift
+	done
+
+	# Check if proxy environment variables are set
+	if [[ -z "$http_proxy" && -z "$https_proxy" && -z "$HTTP_PROXY" && -z "$HTTPS_PROXY" && -z "$no_proxy" ]]; then
+		echo "No proxy environment variables are set."
+	fi
+
+	# Unset proxy environment variables
 	unset http_proxy
 	unset https_proxy
 	unset HTTP_PROXY
 	unset HTTPS_PROXY
 	unset no_proxy
-	git config --global --unset-all https.proxy
-	git config --global --unset-all http.proxy
-	git config --global --unset-all http.https://github.com.proxy
-	git config --global --unset-all http.https://codev-tuleap.cea.fr.proxy
-	git config --global --unset-all http.https://codev-tuleap.cea.fr.proxy
-	git config --global -l | grep proxy
+
+	# Check if git is installed
+	if hascommand --strict git; then
+		# Remove proxy settings from git config (for global, local, and system levels)
+		git config --global --unset-all https.proxy
+		git config --global --unset-all http.proxy
+		git config --global --unset-all http.https://github.com.proxy
+		git config --global --unset-all http.https://codev-tuleap.cea.fr.proxy
+		git config --global --unset-all http.https://codev-tuleap.cea.fr.proxy
+		git config --system --unset-all https.proxy
+		git config --system --unset-all http.proxy
+		git config --local --unset-all https.proxy
+		git config --local --unset-all http.proxy
+		git config --global --unset-all core.gitProxy
+	
+		# Display git proxy settings (optional)
+		if $verbose; then
+			echo -e "Current git proxy settings after unsetting:"
+			git config --global -l | grep proxy
+			git config --local -l | grep proxy
+			git config --system -l | grep proxy
+		fi
+
+		# Confirmation message
+		echo "Proxy environment variables and Git proxy settings have been unset."
+	else
+		# Confirmation message
+		echo "Proxy environment variables have been unset."
+	fi
 }
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # EDF Load Intel
-function load_intel() {
+function my_load_intel() {
+	# Help message
+	if [[ $# -eq 1 && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+		echo -e "${BRIGHT_WHITE}load_intel:${RESET} Loads Intel compilers and runtime libraries."
+		echo -e "This function automatically checks for the presence of Intel compilers (ifort, icc) and loads the necessary modules."
+		echo -e "If no local Intel installation is found, it attempts to load modules from predefined directories."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}load_intel${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}      Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}load_intel${RESET}              # Attempt to load Intel compilers"
+		return 0
+	fi
 
-	if [ $(which ifort) ]; then
-		echo "Intel local installation is loaded..."
+	# Check if Intel compilers are available locally
+	if hascommand --strict ifort; then
+		echo "Intel local installation is already loaded..."
 		echo $(which ifort)
 		echo $(which icc)
+
+	# Try loading modules from the predefined directories
 	elif [ -d /projets/europlexus ]; then
+		echo "GAIA - Loading Intel compilers from /projets/europlexus..."
 		module load ifort/2018.1.038 icc/2018.1.038 mkl/2018.1.038 impi/2018.1.038
+
 	elif [ -d /software/restricted ]; then
+		echo "CRONOS - Loading Intel compilers from /software/restricted..."
 		module load intel/2023
-	elif [ $INTEL_INSTALL_DIR ]; then
-		module use --append $(find $INTEL_INSTALL_DIR -name modulefiles)
+
+	# Try using environment variable INTEL_INSTALL_DIR
+	elif [ -n "$INTEL_INSTALL_DIR" ]; then
+		echo "Loading Intel compilers from ${INTEL_INSTALL_DIR}..."
+		module use --append $(find "$INTEL_INSTALL_DIR" -name modulefiles)
 		module load icc mkl mpi
+
+	# Check the default installation directory
 	elif [ -d /opt/intel ]; then
+		echo "Loading Intel compilers from /opt/intel..."
 		module use --append $(find /opt/intel -name modulefiles)
 		module load icc mkl mpi
+
+	# No Intel installation found
 	else
-		echo "Intel compilation and runtime are only available on the calculation clusters"
-		echo "Please use the gnu version..."
+		echo "Intel compilation and runtime are not available."
+		echo "Please use GNU."
 		return 4
 	fi
 	return 0
@@ -606,272 +656,153 @@ function load_intel() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-# Fuck
+# TheFuck wrapper function
 function fuck() {
-	TF_PYTHONIOENCODING=$PYTHONIOENCODING
+	# Help message
+	if [[ $# -eq 1 && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+		echo -e "${BRIGHT_WHITE}fuck:${RESET} A wrapper around TheFuck to fix the previous command."
+		echo -e "This function allows you to use ${BRIGHT_CYAN}TheFuck${RESET} to correct the last command you typed."
+		echo -e "It sets up environment variables like ${BRIGHT_YELLOW}TF_SHELL, TF_ALIAS, TF_HISTORY${RESET} before calling ${BRIGHT_CYAN}TheFuck${RESET}."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}fuck${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}      Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}fuck${RESET}              # Fix the last command using TheFuck"
+		return 0
+	fi
+
+	# Save original environment variables
+	local TF_PYTHONIOENCODING=$PYTHONIOENCODING
+
+	# Set necessary environment variables for TheFuck
 	export TF_SHELL=bash
 	export TF_ALIAS=fuck
 	export TF_SHELL_ALIASES=$(alias)
 	export TF_HISTORY=$(fc -ln -10)
 	export PYTHONIOENCODING=utf-8
-	TF_CMD=$(
-		thefuck THEFUCK_ARGUMENT_PLACEHOLDER "$@"
-	) && eval "$TF_CMD"
+
+	# Run TheFuck and evaluate the command returned
+	TF_CMD=$(thefuck THEFUCK_ARGUMENT_PLACEHOLDER "$@")
+
+	# Check if TheFuck returned a valid command
+	if [[ $? -ne 0 || -z "$TF_CMD" ]]; then
+		echo -e "${BRIGHT_RED}Error: TheFuck did not return a valid command.${RESET}"
+		unset TF_HISTORY
+		export PYTHONIOENCODING=$TF_PYTHONIOENCODING
+		return 1
+	fi
+
+	# Execute the suggested command
+	eval "$TF_CMD"
+
+	# Reset environment variables and update shell history
 	unset TF_HISTORY
 	export PYTHONIOENCODING=$TF_PYTHONIOENCODING
-	history -s $TF_CMD
+	history -s "$TF_CMD"
+
+	# Optionally, output the suggested command for the user
+	echo -e "${BRIGHT_GREEN}Executed:${RESET} $TF_CMD"
 }
-alias fk='fuck'
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # cd with immediate ll afterwards
-if hascommand --strict zoxide; then
-	# Issues with zoxide and tmux
-	if [ -z "${TMUX}" ]; then
-		# echo "not in tmux"
-		cd() {
-			z "$@"
-			ls
-		} # Always list directory contents upon 'cd'
-	else
-		# echo "in tmux"
-		cd() {
-			builtin cd "$@"
-			ls
-		} # Always list directory contents upon 'cd'
-	fi
-else
-	cd() {
-		builtin cd "$@"
-		ls
-	} # Always list directory contents upon 'cd'
-fi
-#-------------------------------------------------------------
+function cdll() {
+    # Help message
+    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+        echo -e "${BRIGHT_WHITE}cdll:${RESET} Customizes the behavior of the 'cd' command."
+        echo -e "The function changes the current directory and always lists the contents of the new directory."
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}cdll${RESET} ${BRIGHT_YELLOW}[OPTIONS]${RESET}"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
+        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}cdll${RESET}    # Changes the directory and lists contents"
+        return 0
+    fi
 
-#-------------------------------------------------------------
-# Custom aliases
-if [[ -f "/opt/sublime_text/sublime_text" ]]; then
-	alias sublime_text='/opt/sublime_text/sublime_text'
-fi
-if [[ -f "${HOME}/paraview/bin/paraview" ]]; then
-	alias paraview="${HOME}/paraview/bin/paraview &"
-	export PATH=${HOME}/paraview/bin/:${PATH}
-fi
-if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
-	# Define a function instead of an alias to ensure immediate availability
-	function epxenv { source "${HOME}/dev/epx/devtools/env.sh"; }
-	if [[ "${SHLVL}" -lt 2 ]]; then
-		if [ -z "${TMUX}" ]; then
-			epxenv 1>/dev/null
-		fi
-	fi
-fi
-if [[ -f "${HOME}/dev/manta/devtools/env.sh" ]]; then
-	function mantaenv { source "${HOME}/dev/manta/devtools/env.sh"; }
-	if [[ "${SHLVL}" -lt 2 ]]; then
-		if [ -z "${TMUX}" ]; then
-			mantaenv 1>/dev/null
-		fi
-	fi
-fi
-if [[ -f "${HOME}/arm/forge/22.1.2/bin/ddt" ]]; then
-	alias ddt="${HOME}/arm/forge/22.1.2/bin/ddt &"
-fi
-alias c='clear'         # c:            Clear terminal display
-alias which='type -all' # which:        Find executables
-if hascommand --strict eza; then
-	unalias ldir
-	alias ldir="eza -lD"
-	unalias lfile
-	alias lfile="eza -lf --color=always | grep -v /"
-	alias lsh="eza ${_EZA_COMMON_FLAGS} --group-directories-first --hyperlink"
-	alias llh="eza ${_EZA_LONG_FLAGS} --hyperlink"
-fi
-if hascommand --strict nvim; then
-	alias {v,vi,vim}='nvim'
-	alias svi='sudo nvim'
-	alias vis='nvim "+set si"'
-elif hascommand --strict vim; then
-	alias {v,vi}='vim'
-	alias svi='sudo vim'
-	alias vis='vim "+set si"'
-elif hascommand --strict vi; then
-	alias v='vi'
-	alias svi='sudo vi'
-fi
-if hascommand --strict batcat; then
-	alias bat='batcat --color=always'
-fi
-if hascommand --strict bat; then
-	alias bat='bat --color=always'
-fi
+    if hascommand --strict zoxide; then
+        # Issues with zoxide and tmux
+        if [ -z "${TMUX}" ]; then
+            # Use zoxide when not in tmux
+            cd() {
+                z "$@"  # Use zoxide for directory navigation
+                ls      # List contents of the new directory
+            }
+        else
+            # Use regular cd when in tmux
+            cd() {
+                builtin cd "$@"  # Use default cd command
+                ls               # List contents of the new directory
+            }
+        fi
+    else
+        # Use regular cd if zoxide is not available
+        cd() {
+            builtin cd "$@"  # Use default cd command
+            ls               # List contents of the new directory
+        }
+    fi
+}
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
 # Exit message
-function _exit() { # Function to run upon exit of shell.
-	#echo -e "${BRIGHT_RED}Hasta la vista, baby${RESET}"
-	echo -e '\e[m'
-	echo -e "${BRIGHT_RED}So long Space Cowboy...${RESET}"
-	echo -e '\e[m'
-	echo -e "$BRIGHT_RED$(sparkbars)${RESET}"
-	echo -e '\e[m'
+function _exit() {
+    # Help message
+    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+        echo -e "${BRIGHT_WHITE}_exit:${RESET} Function to show a custom exit message when the shell exits."
+        echo -e "The function displays a farewell message and a sparkbar graphic."
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}_exit${RESET} ${BRIGHT_YELLOW}[OPTIONS]${RESET}"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message"
+        echo -e "  ${BRIGHT_YELLOW}-m, --message${RESET} Customize the farewell message"
+        echo -e "  ${BRIGHT_YELLOW}-s, --no-sparkbar${RESET} Disable the sparkbar graphic"
+        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}_exit${RESET}    # Displays the default exit message"
+        echo -e "  ${BRIGHT_CYAN}_exit -m 'Goodbye!'${RESET}  # Custom farewell message"
+        return 0
+    fi
+
+    local message="${BRIGHT_RED}So long Space Cowboy...${RESET}"
+    # local message="${BRIGHT_RED}Hasta la vista, baby${RESET}"
+    local show_sparkbar=true
+
+    # Parse options for customizing the exit message
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -m|--message)
+                message="$2"
+                shift 2
+                ;;
+            -s|--no-sparkbar)
+                show_sparkbar=false
+                shift
+                ;;
+            *)
+                echo "Invalid option: $1" >&2
+                return 1
+                ;;
+        esac
+    done
+
+    # Display message and sparkbar
+    echo -e '\e[m'
+    echo -e "$message"
+    echo -e '\e[m'
+    if $show_sparkbar; then
+        echo -e "$BRIGHT_RED$(sparkbars)${RESET}"
+        echo -e '\e[m'
+    fi
 }
-# If not running in nested shell, then show exit message :)
+
+# If not running in a nested shell, show the exit message
 if [[ "${SHLVL}" -lt 2 ]]; then
-	trap _exit EXIT
+    trap _exit EXIT
 fi
 #-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# Some formatting
-export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
-export HISTIGNORE="&:bg:fg:ll:h"
-export HISTTIMEFORMAT="$(echo -e ${BRIGHT_CYAN})[%d/%m %H:%M:%S]$(echo -e ${RESET}) "
-export HISTCONTROL=ignoredups
-export HOSTFILE=$HOME/.hosts # Put a list of remote hosts in ~/.hosts
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# Bat theme
-export BAT_THEME=base16
-export BAT_STYLE=plain
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# Default editor in ranger
-export SELECTED_EDITOR=$EDITOR
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# Fzf config
-if hascommand --strict fzf; then
-	if hascommand --strict fdfind; then
-		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude '.git' --exclude 'node_modules' --exclude '.cache' --exclude '.local' --exclude 'target'"
-	elif hascommand --strict fd; then
-		export FZF_DEFAULT_COMMAND="fd --hidden --exclude '.git' --exclude 'node_modules' --exclude '.cache' --exclude '.local' --exclude 'target'"
-	fi
-	if hascommand --strict bat; then
-		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
-	elif hascommand --strict batcat; then
-		export FZF_PREVIEW_COMMAND_FILE='batcat -n --color=always -r :500 {}'
-	else
-		export FZF_PREVIEW_COMMAND_FILE='cat -n {}'
-	fi
-	if hascommand --strict eza; then
-		export FZF_PREVIEW_COMMAND_DIR='eza --tree --level 1 --color=always --icons {}'
-	else
-		export FZF_PREVIEW_COMMAND_DIR='tree -C {}'
-	fi
-	if [[ $TERM = xterm-kitty ]]; then
-		export FZF_PREVIEW_COMMAND_IMG='kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {}'
-		export FZF_PREVIEW_COMMAND_IMG_CLEAR='printf "\x1b_Ga=d,d=A\x1b\\" &&'
-	else
-		export FZF_PREVIEW_COMMAND_IMG='echo image: {}'
-		export FZF_PREVIEW_COMMAND_IMG_CLEAR=""
-	fi
-	if hascommand --strict pbcopy; then
-		CLIP_COMMAND="pbcopy"
-	elif hascommand --strict xclip; then
-		CLIP_COMMAND="xclip -selection clipboard"
-	elif hascommand --strict xsel; then
-		CLIP_COMMAND="xsel --clipboard"
-	else
-		CLIP_COMMAND=${FZF_PREVIEW_COMMAND_FILE}
-	fi
-	if hascommand --strict xdg-open; then
-		OPEN_COMMAND="xdg-open"
-	elif hascommand --strict open; then
-		OPEN_COMMAND="open"
-	else
-		OPEN_COMMAND="echo Opening not supported" # Fallback
-	fi
-	export FZF_PREVIEW_COMMAND_DEFAULT='echo {}'
-	export FZF_PREVIEW_COMMAND_FILE=''${FZF_PREVIEW_COMMAND_IMG_CLEAR}' [[ $(file --mime {}) =~ image ]] && '${FZF_PREVIEW_COMMAND_IMG}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
-	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
-	export FZF_PREVIEW_COMMAND='('${FZF_PREVIEW_COMMAND_IMG}' || '${FZF_PREVIEW_COMMAND_FILE}' || '${FZF_PREVIEW_COMMAND_DIR}' || '${FZF_PREVIEW_COMMAND_DEFAULT}') 2> /dev/null'
-	if hascommand --strict fdfind || hascommand --strict fd; then
-		export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND} --type f"
-	fi
-	export FZF_CTRL_T_OPTS="
-  	--walker-skip .git,node_modules,target
-  	--border-label='╢ Ctrl-T:Files ╟'
-  	--preview '${FZF_PREVIEW_COMMAND_FILE}'
-  	--preview-window 'right:50%:wrap'
-  	--bind 'ctrl-/:change-preview-window(down,50%,border-top|hidden|)'
-  	--bind 'ctrl-u:preview-half-page-up'
-  	--bind 'ctrl-d:preview-half-page-down'
-  	--bind 'ctrl-x:reload("$FZF_CTRL_T_COMMAND")'
-  	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'
-  	--bind 'ctrl-y:execute-silent(echo -n {} | $CLIP_COMMAND)+abort'
-  	--bind 'ctrl-o:execute($OPEN_COMMAND {})'
-  	--header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel│C-o:open'"
-	if hascommand --strict fdfind || hascommand --strict fd; then
-		export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
-	fi
-	export FZF_ALT_C_OPTS="
-  	--walker-skip .git,node_modules,target
-  	--preview '${FZF_PREVIEW_COMMAND_DIR}'
-  	--preview-window 'right:50%:wrap'
-  	--border-label='╢ Alt-C:Dirs ╟'
-  	--bind 'ctrl-/:change-preview-window(down,50%,border-top|hidden|)'
-  	--bind 'ctrl-u:preview-half-page-up'
-  	--bind 'ctrl-d:preview-half-page-down'
-  	--bind 'ctrl-x:reload("$FZF_ALT_C_COMMAND")'
-  	--bind 'ctrl-w:reload("$FZF_ALT_C_COMMAND" --max-depth 1)'
-  	--bind 'ctrl-o:execute($OPEN_COMMAND {})'
-    --header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel│C-o:open'"
-	export FZF_CTRL_R_OPTS="
-    --preview 'echo {}'
-    --border-label='╢ Ctrl-R:History ╟'
-    --preview-window down:3:hidden:wrap
-    --bind 'ctrl-/:toggle-preview'
-    --bind 'ctrl-y:execute-silent(echo -n {2..} | $CLIP_COMMAND)+abort'
-    --header 'C-/:prev│C-y:copy'"
-	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up --cycle
-	--history='${HOME}/.fzf_history'
-    --history-size=100000
-    --no-mouse
-    --bind='ctrl-space:toggle'
-    --multi"
-	# --- setup fzf theme ---
-	export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS}
-  	--color=fg:10,fg+:3,bg:0,bg+:0
-  	--color=hl:4,hl+:12,info:6,marker:11
-  	--color=prompt:1,spinner:13,pointer:5,header:8
-  	--color=border:8,label:7,query:10
-  	--color=header:italic"
-	# --- setup fzf default options ---
-	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
-	--border="rounded" --border-label=""
-	--prompt="  " --pointer="❯" --marker=" "'
-	# --- setup fzf completions options ---
-	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
-		export FZF_TAB_COMPLETION_PROMPT='  '
-	fi
-fi
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# Fzf-git
-if hascommand --strict fzf; then
-	if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
-		source "$HOME/dotfiles/config/fzf-git/fzf-git.sh"
-		_fzf_git_fzf() {
-			fzf --height=50% --tmux 90%,70% \
-				--layout=reverse --multi --min-height=20 --border \
-				--border-label-pos=2 \
-				--color='header:italic:underline,label:blue' \
-				--preview-window='right,50%,border-left' \
-				--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
-		}
-	fi
-fi
-#-------------------------------------------------------------
-
-# Path prepend
-pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmux/"
 
 #-------------------------------------------------------------
 # Sync with cronos to back up my data
@@ -1017,17 +948,6 @@ function sync2ssh() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-# Fancy clear
-# if [[ -f "${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/clear_color_spark" ]]; then
-# source ${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/clear_color_spark
-# fi
-# TTY Terminal colors
-# if [[ -f "${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/tty_terminal_color_scheme" ]]; then
-# 	source ${HOME}/dotfiles/config/ExtremeUltimateBashrc/bashrc.d/tty_terminal_color_scheme
-# fi
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
 # Reduce pdf size with gs
 function compresspdf() {
 	if ! hascommand --strict gs; then
@@ -1114,17 +1034,6 @@ function compresspdf() {
 
 	echo -e "${BRIGHT_GREEN}Compressed PDF saved as:${RESET} $output_file"
 }
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# Change ssh alias if kitty otherwise $TERM is unknown
-if [ ! -n "$SSH_CLIENT" ]; then
-	if [[ $TERM = xterm-kitty ]]; then
-		alias ssh='kitten ssh'
-		alias icat="kitten icat"
-		alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
-	fi
-fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -1567,4 +1476,286 @@ function ggcd() {
 
 	echo -e "${BRIGHT_GREEN}Checked out commit:${RESET} $commit_hash"
 }
-#--------------------------------------------------------
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+#  _____ __________         
+# |  ___|__  /  ___|        
+# | |_    / /| |_           
+# |  _|  / /_|  _|          
+# |_|   /____|_|           
+#                                                             
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Fzf config
+if hascommand --strict fzf; then
+	if hascommand --strict fdfind; then
+		export FZF_DEFAULT_COMMAND="fdfind --hidden --exclude '.git' --exclude 'node_modules' --exclude '.cache' --exclude '.local' --exclude 'target'"
+	elif hascommand --strict fd; then
+		export FZF_DEFAULT_COMMAND="fd --hidden --exclude '.git' --exclude 'node_modules' --exclude '.cache' --exclude '.local' --exclude 'target'"
+	fi
+	if hascommand --strict bat; then
+		export FZF_PREVIEW_COMMAND_FILE='bat -n --color=always -r :500 {}'
+	elif hascommand --strict batcat; then
+		export FZF_PREVIEW_COMMAND_FILE='batcat -n --color=always -r :500 {}'
+	else
+		export FZF_PREVIEW_COMMAND_FILE='cat -n {}'
+	fi
+	if hascommand --strict eza; then
+		export FZF_PREVIEW_COMMAND_DIR='eza --tree --level 1 --color=always --icons {}'
+	else
+		export FZF_PREVIEW_COMMAND_DIR='tree -C {}'
+	fi
+	if [[ $TERM = xterm-kitty ]]; then
+		export FZF_PREVIEW_COMMAND_IMG='kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {}'
+		export FZF_PREVIEW_COMMAND_IMG_CLEAR='printf "\x1b_Ga=d,d=A\x1b\\" &&'
+	else
+		export FZF_PREVIEW_COMMAND_IMG='echo image: {}'
+		export FZF_PREVIEW_COMMAND_IMG_CLEAR=""
+	fi
+	if hascommand --strict pbcopy; then
+		CLIP_COMMAND="pbcopy"
+	elif hascommand --strict xclip; then
+		CLIP_COMMAND="xclip -selection clipboard"
+	elif hascommand --strict xsel; then
+		CLIP_COMMAND="xsel --clipboard"
+	else
+		CLIP_COMMAND=${FZF_PREVIEW_COMMAND_FILE}
+	fi
+	if hascommand --strict xdg-open; then
+		OPEN_COMMAND="xdg-open"
+	elif hascommand --strict open; then
+		OPEN_COMMAND="open"
+	else
+		OPEN_COMMAND="echo Opening not supported" # Fallback
+	fi
+	export FZF_PREVIEW_COMMAND_DEFAULT='echo {}'
+	export FZF_PREVIEW_COMMAND_FILE=''${FZF_PREVIEW_COMMAND_IMG_CLEAR}' [[ $(file --mime {}) =~ image ]] && '${FZF_PREVIEW_COMMAND_IMG}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
+	# export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ directory ]] && '${FZF_PREVIEW_COMMAND_DIR}' || ([[ $(file --mime {}) =~ binary ]] && '${FZF_PREVIEW_COMMAND_DEFAULT}'is binary file  || '${FZF_PREVIEW_COMMAND_FILE}')'
+	export FZF_PREVIEW_COMMAND='('${FZF_PREVIEW_COMMAND_IMG}' || '${FZF_PREVIEW_COMMAND_FILE}' || '${FZF_PREVIEW_COMMAND_DIR}' || '${FZF_PREVIEW_COMMAND_DEFAULT}') 2> /dev/null'
+	if hascommand --strict fdfind || hascommand --strict fd; then
+		export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND} --type f"
+	fi
+	export FZF_CTRL_T_OPTS="
+  	--walker-skip .git,node_modules,target
+  	--border-label='╢ Ctrl-T:Files ╟'
+  	--preview '${FZF_PREVIEW_COMMAND_FILE}'
+  	--preview-window 'right:50%:wrap'
+  	--bind 'ctrl-/:change-preview-window(down,50%,border-top|hidden|)'
+  	--bind 'ctrl-u:preview-half-page-up'
+  	--bind 'ctrl-d:preview-half-page-down'
+  	--bind 'ctrl-x:reload("$FZF_CTRL_T_COMMAND")'
+  	--bind 'ctrl-w:reload("$FZF_CTRL_T_COMMAND" --max-depth 1)'
+  	--bind 'ctrl-y:execute-silent(echo -n {} | $CLIP_COMMAND)+abort'
+  	--bind 'ctrl-o:execute($OPEN_COMMAND {})'
+  	--header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel│C-o:open'"
+	if hascommand --strict fdfind || hascommand --strict fd; then
+		export FZF_ALT_C_COMMAND="${FZF_DEFAULT_COMMAND} --type d"
+	fi
+	export FZF_ALT_C_OPTS="
+  	--walker-skip .git,node_modules,target
+  	--preview '${FZF_PREVIEW_COMMAND_DIR}'
+  	--preview-window 'right:50%:wrap'
+  	--border-label='╢ Alt-C:Dirs ╟'
+  	--bind 'ctrl-/:change-preview-window(down,50%,border-top|hidden|)'
+  	--bind 'ctrl-u:preview-half-page-up'
+  	--bind 'ctrl-d:preview-half-page-down'
+  	--bind 'ctrl-x:reload("$FZF_ALT_C_COMMAND")'
+  	--bind 'ctrl-w:reload("$FZF_ALT_C_COMMAND" --max-depth 1)'
+  	--bind 'ctrl-o:execute($OPEN_COMMAND {})'
+    --header 'C-x:reload│C-w:depth│C-/:prev│C-y:copy│C-u/d:scroll│C-⎵:sel│C-o:open'"
+	export FZF_CTRL_R_OPTS="
+    --preview 'echo {}'
+    --border-label='╢ Ctrl-R:History ╟'
+    --preview-window down:3:hidden:wrap
+    --bind 'ctrl-/:toggle-preview'
+    --bind 'ctrl-y:execute-silent(echo -n {2..} | $CLIP_COMMAND)+abort'
+    --header 'C-/:prev│C-y:copy'"
+	export FZF_DEFAULT_OPTS="--bind=tab:down,shift-tab:up --cycle
+	--history='${HOME}/.fzf_history'
+    --history-size=100000
+    --no-mouse
+    --bind='ctrl-space:toggle'
+    --multi"
+	# --- setup fzf theme ---
+	export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS}
+  	--color=fg:10,fg+:3,bg:0,bg+:0
+  	--color=hl:4,hl+:12,info:6,marker:11
+  	--color=prompt:1,spinner:13,pointer:5,header:8
+  	--color=border:8,label:7,query:10
+  	--color=header:italic"
+	# --- setup fzf default options ---
+	export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS}'
+	--border="rounded" --border-label=""
+	--prompt="  " --pointer="❯" --marker=" "'
+	# --- setup fzf completions options ---
+	if [[ -f "${HOME}/fzf-tab-completion/bash/fzf-bash-completion.sh" ]]; then
+		export FZF_TAB_COMPLETION_PROMPT='  '
+	fi
+fi
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Fzf-git
+if hascommand --strict fzf; then
+	if [[ -f "$HOME/dotfiles/config/fzf-git/fzf-git.sh" ]]; then
+		source "$HOME/dotfiles/config/fzf-git/fzf-git.sh"
+		_fzf_git_fzf() {
+			fzf --height=50% --tmux 90%,70% \
+				--layout=reverse --multi --min-height=20 --border \
+				--border-label-pos=2 \
+				--color='header:italic:underline,label:blue' \
+				--preview-window='right,50%,border-left' \
+				--bind='ctrl-/:change-preview-window(down,50%,border-top|hidden|)' "$@"
+		}
+	fi
+fi
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+#  ____   _  _____ _   _        
+# |  _ \ / \|_   _| | | |       
+# | |_) / _ \ | | | |_| |       
+# |  __/ ___ \| | |  _  |       
+# |_| /_/   \_\_| |_| |_|      
+#                                                                 
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Path prepend
+pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmux/"
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+#  _______  ______   ___  ____ _____ ____        
+# | ____\ \/ /  _ \ / _ \|  _ \_   _/ ___|       
+# |  _|  \  /| |_) | | | | |_) || | \___ \       
+# | |___ /  \|  __/| |_| |  _ < | |  ___) |      
+# |_____/_/\_\_|    \___/|_| \_\|_| |____/      
+#                                                                                  
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# License file for ArmForge DDT (i think)
+export LM_LICENSE_FILE=27000@noeyyr5y.noe.edf.fr
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Some formatting
+export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
+export HISTIGNORE="&:bg:fg:ll:h"
+export HISTTIMEFORMAT="$(echo -e ${BRIGHT_CYAN})[%d/%m %H:%M:%S]$(echo -e ${RESET}) "
+export HISTCONTROL=ignoredups
+export HOSTFILE=$HOME/.hosts # Put a list of remote hosts in ~/.hosts
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Bat theme
+export BAT_THEME=base16
+export BAT_STYLE=plain
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Default editor in ranger
+export SELECTED_EDITOR=$EDITOR
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+#     _    _     ___    _    ____  _____ ____        
+#    / \  | |   |_ _|  / \  / ___|| ____/ ___|       
+#   / _ \ | |    | |  / _ \ \___ \|  _| \___ \       
+#  / ___ \| |___ | | / ___ \ ___) | |___ ___) |      
+# /_/   \_\_____|___/_/   \_\____/|_____|____/      
+#                                                                                      
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Custom aliases
+if [[ -f "/opt/sublime_text/sublime_text" ]]; then
+	alias sublime_text='/opt/sublime_text/sublime_text'
+fi
+if [[ -f "${HOME}/paraview/bin/paraview" ]]; then
+	alias paraview="${HOME}/paraview/bin/paraview &"
+	export PATH=${HOME}/paraview/bin/:${PATH}
+fi
+if [[ -f "${HOME}/dev/epx/devtools/env.sh" ]]; then
+	# Define a function instead of an alias to ensure immediate availability
+	function epxenv { source "${HOME}/dev/epx/devtools/env.sh"; }
+	if [[ "${SHLVL}" -lt 2 ]]; then
+		if [ -z "${TMUX}" ]; then
+			epxenv 1>/dev/null
+		fi
+	fi
+fi
+if [[ -f "${HOME}/dev/manta/devtools/env.sh" ]]; then
+	function mantaenv { source "${HOME}/dev/manta/devtools/env.sh"; }
+	if [[ "${SHLVL}" -lt 2 ]]; then
+		if [ -z "${TMUX}" ]; then
+			mantaenv 1>/dev/null
+		fi
+	fi
+fi
+if [[ -f "${HOME}/arm/forge/22.1.2/bin/ddt" ]]; then
+	alias ddt="${HOME}/arm/forge/22.1.2/bin/ddt &"
+fi
+alias c='clear'         # c:            Clear terminal display
+alias which='type -all' # which:        Find executables
+if hascommand --strict eza; then
+	unalias ldir
+	alias ldir="eza -lD"
+	unalias lfile
+	alias lfile="eza -lf --color=always | grep -v /"
+	alias lsh="eza ${_EZA_COMMON_FLAGS} --group-directories-first --hyperlink"
+	alias llh="eza ${_EZA_LONG_FLAGS} --hyperlink"
+fi
+if hascommand --strict nvim; then
+	alias {v,vi,vim}='nvim'
+	alias svi='sudo nvim'
+	alias vis='nvim "+set si"'
+elif hascommand --strict vim; then
+	alias {v,vi}='vim'
+	alias svi='sudo vim'
+	alias vis='vim "+set si"'
+elif hascommand --strict vi; then
+	alias v='vi'
+	alias svi='sudo vi'
+fi
+if hascommand --strict batcat; then
+	alias bat='batcat --color=always'
+fi
+if hascommand --strict bat; then
+	alias bat='bat --color=always'
+fi
+alias fk='fuck'
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Change ssh alias if kitty otherwise $TERM is unknown
+if [ ! -n "$SSH_CLIENT" ]; then
+	if [[ $TERM = xterm-kitty ]]; then
+		alias ssh='kitten ssh'
+		alias icat="kitten icat"
+		alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
+	fi
+fi
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+#   ____    _    _     _     ____     
+#  / ___|  / \  | |   | |   / ___|    
+# | |     / _ \ | |   | |   \___ \    
+# | |___ / ___ \| |___| |___ ___) |   
+#  \____/_/   \_\_____|_____|____/   
+#                                                                       
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Automatically set up the custom 'cd' function : cd && ll
+cdll
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Run welcome message at login
+welcome -s 8
+#-------------------------------------------------------------
