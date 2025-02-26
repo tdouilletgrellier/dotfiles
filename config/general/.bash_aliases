@@ -519,7 +519,7 @@ function welcome() {
 }
 
 # Run welcome message at login
-welcome -s 7
+welcome -s 8
 
 #-------------------------------------------------------------
 
