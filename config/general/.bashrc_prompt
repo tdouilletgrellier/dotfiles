@@ -7,10 +7,9 @@
 # Get current branch in git repo
 function git_branch() {
 	if command -v git >/dev/null 2>&1; then
-		BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
-		if [ ! "${BRANCH}" == "" ]
-		then
-			STAT=`git_status`
+		BRANCH=$(git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+		if [ ! "${BRANCH}" == "" ]; then
+			STAT=$(git_status)
 			echo "[${BRANCH}${STAT}] "
 		else
 			echo ""
@@ -23,13 +22,31 @@ function git_branch() {
 # Get current status of git repo
 function git_status {
 	if command -v git >/dev/null 2>&1; then
-		status=`git status 2>&1 | tee`
-		dirty=`echo -n "${status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?"`
-		untracked=`echo -n "${status}" 2> /dev/null | grep "Untracked files" &> /dev/null; echo "$?"`
-		ahead=`echo -n "${status}" 2> /dev/null | grep "Your branch is ahead of" &> /dev/null; echo "$?"`
-		newfile=`echo -n "${status}" 2> /dev/null | grep "new file:" &> /dev/null; echo "$?"`
-		renamed=`echo -n "${status}" 2> /dev/null | grep "renamed:" &> /dev/null; echo "$?"`
-		deleted=`echo -n "${status}" 2> /dev/null | grep "deleted:" &> /dev/null; echo "$?"`
+		status=$(git status 2>&1 | tee)
+		dirty=$(
+			echo -n "${status}" 2>/dev/null | grep "modified:" &>/dev/null
+			echo "$?"
+		)
+		untracked=$(
+			echo -n "${status}" 2>/dev/null | grep "Untracked files" &>/dev/null
+			echo "$?"
+		)
+		ahead=$(
+			echo -n "${status}" 2>/dev/null | grep "Your branch is ahead of" &>/dev/null
+			echo "$?"
+		)
+		newfile=$(
+			echo -n "${status}" 2>/dev/null | grep "new file:" &>/dev/null
+			echo "$?"
+		)
+		renamed=$(
+			echo -n "${status}" 2>/dev/null | grep "renamed:" &>/dev/null
+			echo "$?"
+		)
+		deleted=$(
+			echo -n "${status}" 2>/dev/null | grep "deleted:" &>/dev/null
+			echo "$?"
+		)
 		bits=''
 		if [ "${renamed}" == "0" ]; then
 			bits=">${bits}"
@@ -61,8 +78,7 @@ function git_status {
 
 alias cpu="grep 'cpu ' /proc/stat | awk '{usage=(\$2+\$4)*100/(\$2+\$4+\$5)} END {print usage}' | awk '{printf(\"%.1f\n\", \$1)}'"
 
-function __setprompt
-{
+function __setprompt {
 	local LAST_COMMAND=$? # Must come first!
 
 	# Define colors
@@ -129,7 +145,7 @@ function __setprompt
 
 	# Date
 	PS1+="\[${DARKGRAY}\]("
-	PS1+="\[${CYAN}\]$(date +'%-I':%M:%S%P)" # Time
+	PS1+="\[${CYAN}\]$(date +'%-I':%M:%S%P)"         # Time
 	PS1+="\[${BLUE}\] $(date +%a) $(date +%b-'%-m')" # Date
 	PS1+="\[${DARKGRAY}\])-"
 
@@ -165,7 +181,7 @@ function __setprompt
 	PS1+="\n"
 
 	# GIT support:
-	PS1+="\[${DARKGRAY}${GITCOLOR}\]`git_branch`\[${NOCOLOR}\] "
+	PS1+="\[${DARKGRAY}${GITCOLOR}\]$(git_branch)\[${NOCOLOR}\] "
 
 	if [[ $EUID -ne 0 ]]; then
 		PS1+="\[${GREEN}\]>\[${NOCOLOR}\] " # Normal user
@@ -184,16 +200,15 @@ function __setprompt
 
 	# If we are in tmux, change the window name to our current path
 	# If tmux is installed
-	if command -v tmux>/dev/null; then
+	if command -v tmux >/dev/null; then
 		# If we are in tmux
 		if [ ! -z "$TMUX" ]; then
-			tmux rename-window ${PWD//*\//};
+			tmux rename-window ${PWD//*\//}
 		fi
 	fi
 }
 
-function __my_setprompt
-{
+function __my_setprompt {
 	local LAST_COMMAND=$? # Must come first!
 
 	# Define colors
@@ -214,7 +229,7 @@ function __my_setprompt
 	local CYAN="\033[0;36m"
 	local LIGHTCYAN="\033[1;36m"
 	local NOCOLOR="\033[0m"
-	local GITCOLOR="${GREEN}"	
+	local GITCOLOR="${GREEN}"
 
 	if [[ $LAST_COMMAND != 0 ]]; then
 		_COLOR_LAST_COMMAND="${LIGHTRED}"
@@ -232,13 +247,12 @@ function __my_setprompt
 	# No extra line for clarity
 	# PS1=""
 
-	
 	if [[ $_GIT_IS_SLOW = true ]]; then
 		# Prompt using faster and less intensive functions on Git Bash
 		if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 			PS1=${PS1}"\[${GREEN}\]\[${MAGENTA}\](\u\[${MAGENTA}\]@\[${MAGENTA}\]\h\[${MAGENTA}\]) \[${BROWN}\]{\w}\[${RED}\]\`_prompt_git_fast\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
 		else
-			PS1=${PS1}"\[${GREEN}\]\[${BROWN}\]{\w}\[${RED}\]\`_prompt_git_fast\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "	
+			PS1=${PS1}"\[${GREEN}\]\[${BROWN}\]{\w}\[${RED}\]\`_prompt_git_fast\`\[${NOCOLOR}\]\n\[${GREEN}\]\[${_COLOR_LAST_COMMAND}\]${_PROMPT}\[${NOCOLOR}\] "
 		fi
 
 	else
@@ -248,7 +262,7 @@ function __my_setprompt
 		else
 			_COLOR_USER="${LIGHTRED}"
 		fi
-	
+
 		# Only if connected SSH, show the host
 		if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
 			if [[ $_PROMPT_BUILTIN_FULL_PATH = false ]]; then
@@ -266,8 +280,8 @@ function __my_setprompt
 				# Local with full path (2 lines)
 				PS1=${PS1}"\[${_COLOR_USER}\]┌── \[${BROWN}\]{\w}\[${RED}\]\`_prompt_git_branch\`\[${NOCOLOR}\]\n\[${_COLOR_USER}\]└─\[${_COLOR_LAST_COMMAND}\]${_PROMPT_SSH}\[${NOCOLOR}\] "
 			fi
+		fi
 	fi
-	fi		
 }
 
 # export PROMPT_COMMAND="history -a; history -c; history -r; __setprompt" # Breaks error trapping
