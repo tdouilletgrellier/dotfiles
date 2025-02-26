@@ -15,4 +15,6 @@
     { "keys": ["alt+enter"], "command": "toggle_full_screen" },
     { "keys": ["shift+alt+enter"], "command": "toggle_distraction_free" },
 
+    { "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser", "parser":"markdown"} },
+
 ]
