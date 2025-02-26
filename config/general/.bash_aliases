@@ -100,7 +100,7 @@ function welcome_sysinfo() {
 		if [[ -f "${HOME}/.config/fastfetch/fastfetch.jsonc" ]]; then
 			fastfetch --config ${HOME}/.config/fastfetch/fastfetch.jsonc
 		else
-			fastfetch --config Archey
+			fastfetch --config archey
 		fi
 	else
 		if hascommand --strict neofetch; then
@@ -193,6 +193,7 @@ function welcome() {
 		}
 		# if hascommand --strict neofetch || hascommand --strict fastfetch; then
 			# welcome_sysinfo
+			# display_fortune
 		# else
 			welcome_greeting
 			welcome_today
