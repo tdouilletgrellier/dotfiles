@@ -78,7 +78,7 @@
     ~/.config/nvim: config/nvim
 
     #bash-completion
-    ~/.config/bash-completion: config/bash-completion/bash_completion
+    ~/.config/bash_completion: config/bash-completion/bash_completion
 
     #fzf-tab-completion
     ~/fzf-tab-completion: config/fzf-tab-completion
