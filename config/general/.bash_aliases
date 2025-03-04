@@ -1125,9 +1125,9 @@ function findstr() {
 	# Parse options
 	while [[ "$1" == --* ]]; do
 		case "$1" in
-		--sudo) SUDO_PREFIX="sudo " ;;
-		--case-sensitive) case_sensitive=1 ;;
-		--no-hidden) hidden_files=0 ;;
+		-s | --sudo) SUDO_PREFIX="sudo " ;;
+		-c | --case-sensitive) case_sensitive=1 ;;
+		-n | --no-hidden) hidden_files=0 ;;
 		*)
 			echo -e "Unknown option: $1"
 			return 1
@@ -1146,9 +1146,9 @@ function findstr() {
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
 		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <search_text>${RESET}"
 		echo -e "${BRIGHT_WHITE}Options:${RESET}"
-		echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
-		echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
-		echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
+		echo -e "  ${BRIGHT_GREEN}-s, --sudo${RESET}          Run with elevated permissions"
+		echo -e "  ${BRIGHT_GREEN}-c, --case-sensitive${RESET}  Perform case-sensitive search"
+		echo -e "  ${BRIGHT_GREEN}-n, --no-hidden${RESET}      Ignore hidden files and directories"
 		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
 		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_YELLOW}'*.epx' 'PASF'${RESET}"
 		echo -e "  ${BRIGHT_CYAN}findstr${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.epx' 'todo'${RESET}"
@@ -1185,10 +1185,10 @@ function findall() {
 	# Parse options
 	while [[ "$1" == --* ]]; do
 		case "$1" in
-		--sudo) SUDO_PREFIX="sudo " ;;
-		--case-sensitive) case_sensitive=1 ;;
-		--no-hidden) hidden_files=0 ;;
-		--show-match) show_match=1 ;;
+		-s | --sudo) SUDO_PREFIX="sudo " ;;
+		-c | --case-sensitive) case_sensitive=1 ;;
+		-n | --no-hidden) hidden_files=0 ;;
+		-m | --show-match) show_match=1 ;;
 		*)
 			echo -e "Unknown option: $1"
 			return 1
@@ -1214,10 +1214,10 @@ function findall() {
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
 		echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <pattern1> [pattern2] [pattern3...]${RESET}"
 		echo -e "${BRIGHT_WHITE}Options:${RESET}"
-		echo -e "  ${BRIGHT_GREEN}--sudo${RESET}          Run with elevated permissions"
-		echo -e "  ${BRIGHT_GREEN}--case-sensitive${RESET}  Perform case-sensitive search"
-		echo -e "  ${BRIGHT_GREEN}--no-hidden${RESET}      Ignore hidden files and directories"
-		echo -e "  ${BRIGHT_GREEN}--show-match${RESET}      Show all pattern matches"
+		echo -e "  ${BRIGHT_GREEN}-s, --sudo${RESET}          Run with elevated permissions"
+		echo -e "  ${BRIGHT_GREEN}-c, --case-sensitive${RESET}  Perform case-sensitive search"
+		echo -e "  ${BRIGHT_GREEN}-n, --no-hidden${RESET}      Ignore hidden files and directories"
+		echo -e "  ${BRIGHT_GREEN}-m, --show-match${RESET}      Show all pattern matches"
 		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
 		echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_YELLOW}'*.txt' 'error' 'critical' 'failed'${RESET}"
 		echo -e "  ${BRIGHT_CYAN}findall${RESET} ${BRIGHT_GREEN}--sudo${RESET} ${BRIGHT_YELLOW}'*.log' 'WARNING' 'memory'${RESET}"
@@ -1515,6 +1515,211 @@ function ggcd() {
 	fi
 
 	echo -e "${BRIGHT_GREEN}Checked out commit:${RESET} $commit_hash"
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Replace a string by another in globbed files
+function replacestr() {
+
+	# Initialize variables
+	local SUDO_PREFIX=""
+	local case_sensitive=0
+	local hidden_files=1
+	local backup=0
+	local pattern=""
+	local old_text=""
+	local new_text=""
+	local total_replacements=0
+	local total_files=0
+	local files_processed=0
+	local finder_cmd=""
+	local preview=0
+
+	# Determine available commands upfront
+	if hascommand --strict fd; then
+		finder_cmd="fd"
+	elif hascommand --strict fdfind; then
+		finder_cmd="fdfind"
+	else
+		finder_cmd="find"
+	fi
+
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}replacestr:${RESET} Replaces text in specified file types recursively"
+		echo -e "You can use both ${BRIGHT_YELLOW}plain text${RESET} and ${BRIGHT_YELLOW}regular expressions${RESET} for search and replace"
+		echo -e "To use elevated permissions include the ${BRIGHT_YELLOW}--sudo${RESET} option"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}replacestr${RESET} ${BRIGHT_YELLOW}[options] <file_pattern> <old_text> <new_text>${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-s, --sudo${RESET}          Run with elevated permissions"
+		echo -e "  ${BRIGHT_GREEN}-c, --case-sensitive${RESET}  Perform case-sensitive search"
+		echo -e "  ${BRIGHT_GREEN}-n, --no-hidden${RESET}      Ignore hidden files and directories"
+		echo -e "  ${BRIGHT_GREEN}-b, --backup${RESET}         Create backup files (.bak)"
+		echo -e "  ${BRIGHT_GREEN}-p, --preview${RESET}         Show lines matching old_text before replacement"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}           Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}replacestr${RESET} ${BRIGHT_YELLOW}'*.lua' 'oldFunction' 'newFunction'${RESET}"
+		echo -e "  ${BRIGHT_CYAN}replacestr${RESET} ${BRIGHT_GREEN}-s${RESET} ${BRIGHT_YELLOW}'*.conf' 'port=8080' 'port=9090'${RESET}"
+		echo -e "  ${BRIGHT_CYAN}replacestr${RESET} ${BRIGHT_GREEN}-p${RESET} ${BRIGHT_YELLOW}'*.txt' 'oldText' 'newText'${RESET}"
+		return 1
+	}
+
+	# Show help if no arguments or help option
+	if [ $# -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+		show_help
+		return
+	fi
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--sudo | -s) SUDO_PREFIX="sudo " ;;
+		--case-sensitive | -c) case_sensitive=1 ;;
+		--no-hidden | -n) hidden_files=0 ;;
+		--backup | -b) backup=1 ;;
+		--preview | -p) preview=1 ;;
+		--help | -h)
+			show_help
+			return
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Determine available commands upfront
+	if hascommand --strict rg; then
+		grep_cmd="rg --count-matches"
+		[[ $case_sensitive -eq 0 ]] && grep_cmd="rg -i --count-matches"
+	else
+		grep_cmd="grep -c"
+		[[ $case_sensitive -eq 0 ]] && grep_cmd="grep -ci"
+	fi
+
+	# Determine the sed command based on OS
+	sed_cmd="sed -i"
+	[ "$(uname)" == "Darwin" ] && sed_cmd="sed -i ''"
+
+	# Validate and assign required parameters
+	pattern="$1"
+	old_text="$2"
+	new_text="$3"
+
+	if [ -z "$pattern" ] || [ -z "$old_text" ] || [ -z "$new_text" ]; then
+		show_help
+		return 1
+	fi
+
+	if [ $preview -eq 1 ]; then
+		local options=""
+		if [ $case_sensitive -eq 1 ]; then
+			options="--case-sensitive"
+		fi
+		if [ $hidden_files -eq 0 ]; then
+			options="$options --no-hidden"
+		fi
+		if [ -n "$SUDO_PREFIX" ]; then
+			options="$options --sudo"
+		fi
+		echo -e "${BRIGHT_CYAN}Showing lines matching \"${BRIGHT_YELLOW}$old_text${BRIGHT_CYAN}\" in files matching pattern \"${BRIGHT_YELLOW}$pattern${BRIGHT_CYAN}\":${RESET}"
+		findstr $options "$pattern" "$old_text"
+		echo -e "${BRIGHT_CYAN}Remove the \"${BRIGHT_YELLOW}-p${BRIGHT_CYAN}\" or \"${BRIGHT_YELLOW}--preview${BRIGHT_CYAN}\" option to perform the replacement(s).${RESET}"
+		return 0
+	fi
+
+	# Find files based on the determined command
+	local files_array=()
+	echo -e "${BRIGHT_CYAN}Finding files with ${BRIGHT_YELLOW}$finder_cmd${BRIGHT_CYAN}:${RESET}"
+
+	if [ "$finder_cmd" = "fd" ] || [ "$finder_cmd" = "fdfind" ]; then
+		local fd_options=("--type" "f" "--glob" "$pattern")
+		[[ $hidden_files -eq 1 ]] && fd_options=("--hidden" "--no-ignore" "${fd_options[@]}")
+
+		while IFS= read -r file; do
+			[ -n "$file" ] && files_array+=("$file")
+		done < <(${SUDO_PREFIX}$finder_cmd "${fd_options[@]}" 2>/dev/null)
+	else
+		local find_cmd="find . -type f -name \"$pattern\""
+		[[ $hidden_files -eq 0 ]] && find_cmd="$find_cmd -not -path \"*/\\.*\""
+
+		while IFS= read -r -d '' file; do
+			files_array+=("$file")
+		done < <(${SUDO_PREFIX}$finder_cmd "${fd_options[@]}" -print0 2>/dev/null)
+
+	fi
+
+	local file_count=${#files_array[@]}
+
+	if [ $file_count -eq 0 ]; then
+		echo -e "${BRIGHT_YELLOW}No files matching pattern found.${RESET}"
+		return 0
+	fi
+
+	echo -e "${BRIGHT_CYAN}Replacing ${BRIGHT_YELLOW}\"$old_text\"${BRIGHT_CYAN} with ${BRIGHT_YELLOW}\"$new_text\"${BRIGHT_CYAN} in ${BRIGHT_YELLOW}${file_count}${RESET} ${BRIGHT_CYAN}matching files:${RESET}"
+
+	# Prepare sed options
+	local sed_options="s/$old_text/$new_text/g"
+	[[ $case_sensitive -eq 0 ]] && sed_options="s/$old_text/$new_text/gi" # If case-sensitive is not set, make it case-insensitive
+
+	# Process each file without pipe to allow variable updating
+	for ((i = 0; i < file_count; i++)); do
+		local file="${files_array[$i]}"
+		if [ ! -f "$file" ]; then
+			continue
+		fi
+
+		files_processed=$((files_processed + 1))
+
+		# Improved progress bar with hidden cursor
+		if [ $file_count -gt 0 ]; then
+			local percent=$((files_processed * 100 / file_count))
+			local bar_size=50
+			local filled_size=$((percent * bar_size / 100))
+
+			# Build progress bar in a single printf to prevent flickering
+			printf "\r${BRIGHT_WHITE}Progress: [${BRIGHT_GREEN}%-${bar_size}s${BRIGHT_WHITE}] %3d%%${RESET}" "$(printf '%0.s#' $(seq 1 $filled_size))" "$percent"
+		fi
+
+		# Count occurrences before replacement using rg if available, otherwise grep
+		local count=0
+		if [ -n "$grep_cmd" ]; then
+			count=$(${SUDO_PREFIX}$grep_cmd "$old_text" "$file" 2>/dev/null || echo 0)
+		fi
+
+		# Only process files with matches
+		if [ "$count" -gt 0 ]; then
+			# Create backup only for files that will be modified and if backup option is enabled
+			if [ $backup -eq 1 ]; then
+				${SUDO_PREFIX}cp "$file" "$file.bak"
+			fi
+
+			# Perform replacement
+			${SUDO_PREFIX}$sed_cmd "$sed_options" "$file"
+
+			total_replacements=$((total_replacements + count))
+			total_files=$((total_files + 1))
+
+			# Clear progress line and show file info
+			printf "\r%-80s\r" "" # Clear the line
+			echo -e "Processing: ${BRIGHT_YELLOW}$file${RESET}"
+			echo -e "  ${BRIGHT_GREEN}Replacements: $count${RESET}"
+		fi
+	done
+
+	# Clear progress line
+	printf "\r%-80s\r" ""
+
+	# Print summary with the original format
+	if [ "$total_replacements" -gt 0 ]; then
+		echo -e "${BRIGHT_CYAN}${total_replacements} replacement(s) done in ${total_files} file(s).${RESET}"
+	else
+		echo -e "${BRIGHT_CYAN}No replacements made.${RESET}"
+	fi
 }
 #-------------------------------------------------------------
 
