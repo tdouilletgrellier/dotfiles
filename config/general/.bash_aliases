@@ -546,7 +546,7 @@ function proxy() {
 
 	# Check if curl is installed
 	if ! hascommand --strict curl; then
-		echo "curl is not installed. Please install curl to proceed."
+		echo "${BRIGHT_YELLOW}curl${RESET} is not installed. Please install curl to proceed."
 		return 1
 	fi
 
@@ -848,7 +848,7 @@ fi
 # Sync with cronos to back up my data
 function sync2ssh() {
 	if ! hascommand --strict rsync; then
-		echo -e "${BRIGHT_RED}Error:${RESET} rsync is not installed or not in the PATH."
+		echo -e "${BRIGHT_RED}Error:${RESET} ${BRIGHT_YELLOW}rsync${RESET} is not installed or not in the PATH."
 		return 1
 	fi
 
@@ -991,7 +991,7 @@ function sync2ssh() {
 # Reduce pdf size with gs
 function compresspdf() {
 	if ! hascommand --strict gs; then
-		echo -e "${BRIGHT_RED}Error:${RESET} Ghostscript (gs) is not installed or not in the PATH."
+		echo -e "${BRIGHT_RED}Error:${RESET} Ghostscript (${BRIGHT_YELLOW}gs${RESET}) is not installed or not in the PATH."
 		return 1
 	fi
 
@@ -1724,6 +1724,213 @@ function replacestr() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
+# Various actions on PNG files : crop, transparent ...
+function pngfix() {
+	local pattern="*.png"
+	local trim=0
+	local transparent=0
+	local fuzz="5%"
+	local backup=0
+	local recursive=0
+	local finder_cmd=""
+
+	if ! hascommand --strict convert; then
+		echo -e "${BRIGHT_RED}Error:${RESET} ImageMagick (${BRIGHT_YELLOW}convert${RESET}) is not installed or not in the PATH."
+		return 1
+	fi
+
+	# Determine best finder command
+	if hascommand --strict fd; then
+		finder_cmd="fd"
+	elif hascommand --strict fdfind; then
+		finder_cmd="fdfind"
+	else
+		finder_cmd="find"
+	fi
+
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}pngfix:${RESET} Batch process PNG images with ImageMagick"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}pngfix${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-t, --trim${RESET}            Trim images"
+		echo -e "  ${BRIGHT_GREEN}-x, --transparent${RESET}      Make white pixels transparent"
+		echo -e "  ${BRIGHT_GREEN}-f, --fuzz <value>${RESET}    Set fuzz percentage for transparency (default: 5%)"
+		echo -e "  ${BRIGHT_GREEN}-p, --pattern <glob>${RESET}  File pattern (default: *.png)"
+		echo -e "  ${BRIGHT_GREEN}-b, --backup${RESET}          Create backup (.bak) before modification"
+		echo -e "  ${BRIGHT_GREEN}-r, --recursive${RESET}       Process files recursively"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}            Show this help message"
+		return 1
+	}
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--trim | -t) trim=1 ;;
+		--transparent | -x) transparent=1 ;;
+		--fuzz | -f)
+			fuzz="$2"
+			shift
+			;;
+		--pattern | -p)
+			pattern="$2"
+			shift
+			;;
+		--backup | -b) backup=1 ;;
+		--recursive | -r) recursive=1 ;;
+		--help | -h)
+			show_help
+			return
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	if [ $trim -eq 0 ] && [ $transparent -eq 0 ]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} At least one of --trim or --transparent must be specified."
+		return 1
+	fi
+
+	# Find files
+	local files_array=()
+	echo -e "${BRIGHT_CYAN}Finding files with ${BRIGHT_YELLOW}$finder_cmd${BRIGHT_CYAN}:${RESET}"
+
+	if [ "$finder_cmd" = "fd" ] || [ "$finder_cmd" = "fdfind" ]; then
+		local fd_options=("--type" "f" "--glob" "$pattern")
+		[[ $recursive -eq 1 ]] || fd_options+=("--max-depth" "1")
+		while IFS= read -r file; do
+			files_array+=("$file")
+		done < <($finder_cmd "${fd_options[@]}" 2>/dev/null)
+	else
+		local find_cmd="find . -type f -name '$pattern'"
+		[[ $recursive -eq 0 ]] && find_cmd="$find_cmd -maxdepth 1"
+		while IFS= read -r file; do
+			files_array+=("$file")
+		done < <(eval "$find_cmd" 2>/dev/null)
+	fi
+
+	local file_count=${#files_array[@]}
+	if [ $file_count -eq 0 ]; then
+		echo -e "${BRIGHT_YELLOW}No matching files found.${RESET}"
+		return 0
+	fi
+
+	echo -e "${BRIGHT_CYAN}Processing ${BRIGHT_YELLOW}$file_count${BRIGHT_CYAN} file(s)...${RESET}"
+	for file in "${files_array[@]}"; do
+		echo -e "Processing: ${BRIGHT_YELLOW}$file${RESET}"
+		[ $backup -eq 1 ] && cp "$file" "$file.bak"
+
+		if [ $trim -eq 1 ]; then
+			convert "$file" -trim "$file"
+		fi
+
+		if [ $transparent -eq 1 ]; then
+			output_file="${file/.png/""}.png"
+			convert "$file" -fuzz "$fuzz" -transparent white "$output_file"
+		fi
+	done
+
+	echo -e "${BRIGHT_CYAN}Processing completed.${RESET}"
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Automatic latex reindentation
+function texindent {
+	local pattern="*.tex"
+	local backup=0
+	local recursive=0
+	local finder_cmd=""
+
+	if ! hascommand --strict latexindent; then
+		echo -e "${BRIGHT_RED}Error:${RESET} ${BRIGHT_YELLOW}latexindent${RESET} is not installed or not in the PATH."
+		return 1
+	fi
+
+	# Determine best finder command
+	if hascommand --strict fd; then
+		finder_cmd="fd"
+	elif hascommand --strict fdfind; then
+		finder_cmd="fdfind"
+	else
+		finder_cmd="find"
+	fi
+
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}texindent:${RESET} Batch indent LaTeX files using latexindent"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}texindent${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-p, --pattern <glob>${RESET}  File pattern (default: *.tex)"
+		echo -e "  ${BRIGHT_GREEN}-b, --backup${RESET}          Create backup (.bak) before modification"
+		echo -e "  ${BRIGHT_GREEN}-r, --recursive${RESET}       Process files recursively"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}            Show this help message"
+		return 1
+	}
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--pattern | -p)
+			pattern="$2"
+			shift
+			;;
+		--backup | -b) backup=1 ;;
+		--recursive | -r) recursive=1 ;;
+		--help | -h)
+			show_help
+			return
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Find files
+	local files_array=()
+	echo -e "${BRIGHT_CYAN}Finding files with ${BRIGHT_YELLOW}$finder_cmd${BRIGHT_CYAN}:${RESET}"
+
+	if [ "$finder_cmd" = "fd" ] || [ "$finder_cmd" = "fdfind" ]; then
+		local fd_options=("--type" "f" "--glob" "$pattern")
+		[[ $recursive -eq 1 ]] || fd_options+=("--max-depth" "1")
+		while IFS= read -r file; do
+			files_array+=("$file")
+		done < <($finder_cmd "${fd_options[@]}" 2>/dev/null)
+	else
+		local find_cmd="find . -type f -name '$pattern'"
+		[[ $recursive -eq 0 ]] && find_cmd="$find_cmd -maxdepth 1"
+		while IFS= read -r file; do
+			files_array+=("$file")
+		done < <(eval "$find_cmd" 2>/dev/null)
+	fi
+
+	local file_count=${#files_array[@]}
+	if [ $file_count -eq 0 ]; then
+		echo -e "${BRIGHT_YELLOW}No matching files found.${RESET}"
+		return 0
+	fi
+
+	echo -e "${BRIGHT_CYAN}Processing ${BRIGHT_YELLOW}$file_count${BRIGHT_CYAN} file(s)...${RESET}"
+	for file in "${files_array[@]}"; do
+		echo -e "Processing: ${BRIGHT_YELLOW}$file${RESET}"
+		[ $backup -eq 1 ] && cp "$file" "$file.bak"
+		latexindent -w -s "$file"
+	done
+
+	echo -e "${BRIGHT_CYAN}Processing completed.${RESET}"
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
 # Convert a gif to PNG files usable in a .tex file
 function gif2tex() {
 
@@ -1733,6 +1940,11 @@ function gif2tex() {
 	local frame_count=0
 	local first_frame=0
 	local last_frame=0
+
+	if ! hascommand --strict convert; then
+		echo -e "${BRIGHT_RED}Error:${RESET} ImageMagick (${BRIGHT_YELLOW}convert${RESET}) is not installed or not in the PATH."
+		return 1
+	fi
 
 	# Help function
 	show_help() {
@@ -1811,6 +2023,117 @@ function gif2tex() {
 	fps=$(identify -format "%T\n" "$gif_file" | awk '{sum += 100/$1; count++} END {if (count > 0) print int(sum/count); else print 25}')
 	echo -e "${BRIGHT_CYAN}Extraction complete: ${BRIGHT_YELLOW}$frame_count${BRIGHT_CYAN} frames (${BRIGHT_YELLOW}$first_frame to $last_frame${BRIGHT_CYAN}).${RESET}"
 	echo -e "${BRIGHT_CYAN}In your .tex file, use : ${BRIGHT_WHITE}\\\\animategraphics[autoplay,loop,width=1.0\\\\textwidth]{$fps}{./$output_dir/${gif_file%.*}-}{$first_frame}{$last_frame}${RESET}"
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+function avi2gif() {
+	local pattern="*.avi"
+	local fps=10
+	local width=1080
+	local backup=0
+	local recursive=0
+	local finder_cmd=""
+
+	if ! hascommand --strict ffmpeg; then
+		echo -e "${BRIGHT_RED}Error:${RESET} ${BRIGHT_YELLOW}ffmpeg${RESET} is not installed or not in the PATH."
+		return 1
+	fi
+
+	if ! hascommand --strict convert; then
+		echo -e "${BRIGHT_RED}Error:${RESET} ImageMagick (${BRIGHT_YELLOW}convert${RESET}) is not installed or not in the PATH."
+		return 1
+	fi
+
+	# Determine best finder command
+	if hascommand --strict fd; then
+		finder_cmd="fd"
+	elif hascommand --strict fdfind; then
+		finder_cmd="fdfind"
+	else
+		finder_cmd="find"
+	fi
+
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}avi2gif:${RESET} Convert AVI videos to optimized GIFs using FFmpeg and ImageMagick"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}avi2gif${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-f, --fps <value>${RESET}       Set frame rate (default: 10)"
+		echo -e "  ${BRIGHT_GREEN}-w, --width <pixels>${RESET}    Set GIF width (default: 1080, -1 keeps aspect ratio)"
+		echo -e "  ${BRIGHT_GREEN}-p, --pattern <glob>${RESET}   File pattern (default: *.avi)"
+		echo -e "  ${BRIGHT_GREEN}-b, --backup${RESET}           Create backup (.bak) before modification"
+		echo -e "  ${BRIGHT_GREEN}-r, --recursive${RESET}        Process files recursively"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}             Show this help message"
+		return 1
+	}
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--fps | -f)
+			fps="$2"
+			shift
+			;;
+		--width | -w)
+			width="$2"
+			shift
+			;;
+		--pattern | -p)
+			pattern="$2"
+			shift
+			;;
+		--backup | -b) backup=1 ;;
+		--recursive | -r) recursive=1 ;;
+		--help | -h)
+			show_help
+			return
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Find files
+	local files_array=()
+	echo -e "${BRIGHT_CYAN}Finding files with ${BRIGHT_YELLOW}$finder_cmd${BRIGHT_CYAN}:${RESET}"
+
+	if [ "$finder_cmd" = "fd" ] || [ "$finder_cmd" = "fdfind" ]; then
+		local fd_options=("--type" "f" "--glob" "$pattern")
+		[[ $recursive -eq 1 ]] || fd_options+=("--max-depth" "1")
+		while IFS= read -r file; do
+			files_array+=("$file")
+		done < <($finder_cmd "${fd_options[@]}" 2>/dev/null)
+	else
+		local find_cmd="find . -type f -name '$pattern'"
+		[[ $recursive -eq 0 ]] && find_cmd="$find_cmd -maxdepth 1"
+		while IFS= read -r file; do
+			files_array+=("$file")
+		done < <(eval "$find_cmd" 2>/dev/null)
+	fi
+
+	local file_count=${#files_array[@]}
+	if [ $file_count -eq 0 ]; then
+		echo -e "${BRIGHT_YELLOW}No matching files found.${RESET}"
+		return 0
+	fi
+
+	echo -e "${BRIGHT_CYAN}Processing ${BRIGHT_YELLOW}$file_count${BRIGHT_CYAN} file(s)...${RESET}"
+	for file in "${files_array[@]}"; do
+		echo -e "Processing: ${BRIGHT_YELLOW}$file${RESET}"
+		[ $backup -eq 1 ] && cp "$file" "$file.bak"
+
+		local filename="${file%.*}"
+		ffmpeg -i "$file" -vf "fps=$fps,scale=$width:-1:flags=lanczos" -c:v pam \
+			-f image2pipe - |
+			convert -delay "$((100 / fps))" - -loop 0 -layers optimize "$filename.gif"
+	done
+
+	echo -e "${BRIGHT_CYAN}Processing completed.${RESET}"
 }
 #-------------------------------------------------------------
 
