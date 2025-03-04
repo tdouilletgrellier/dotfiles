@@ -1764,6 +1764,12 @@ function pngfix() {
 		return 1
 	}
 
+	# Show help if no arguments
+	if [ $# -eq 0 ]; then
+		show_help
+		return
+	fi
+
 	# Parse options
 	while [[ "$1" == -* ]]; do
 		case "$1" in
@@ -1873,6 +1879,12 @@ function texindent {
 		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}            Show this help message"
 		return 1
 	}
+
+	# Show help if no arguments
+	if [ $# -eq 0 ]; then
+		show_help
+		return
+	fi
 
 	# Parse options
 	while [[ "$1" == -* ]]; do
@@ -2069,6 +2081,12 @@ function avi2gif() {
 		return 1
 	}
 
+	# Show help if no arguments
+	if [ $# -eq 0 ]; then
+		show_help
+		return
+	fi
+	
 	# Parse options
 	while [[ "$1" == -* ]]; do
 		case "$1" in
