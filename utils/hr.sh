@@ -8,21 +8,22 @@
 
 # Determine width of terminal
 hr_col_count="$(tput cols)"
-if [ ! -n "${hr_col_count+set}" ] || [ $hr_col_count -lt 1 ]; then
+if [ -z "$hr_col_count" ] || [ "$hr_col_count" -lt 1 ]; then
     hr_col_count="${COLUMNS:-80}"
 fi
 
 # Colors
-hr_color="${hr_color:=\u001b[46;1m}"
-hr_reset="\u001b[0m"
+# hr_color=${hr_color:-$'\e[46;1m'}
+hr_color=${hr_color:-$'\e[1m'}  # Only bold text, no background
+hr_reset=$'\e[0m'
 
 # Prints the HR line
 hr_draw_char() {
     local CHAR="$1"
-    local LINE=''
-    LINE=$(printf "%*s" "$hr_col_count - 2")
+    local LINE
+    LINE=$(printf "%*s" $((hr_col_count - 2)))
     LINE="${LINE// /${CHAR}}"
-    printf "◀${hr_color}${LINE:0:${hr_col_count}}${hr_reset}▶"
+    printf "◀${hr_color}${LINE:0:$hr_col_count}${hr_reset}▶\n"
 }
 
 # Passes param and calls hr()
@@ -42,5 +43,5 @@ hr() {
 if [ $sourced -eq 0 ]; then
   [ "$0" == "$BASH_SOURCE" ] && hr "$@"
 else
-  export alias hr='hr'
+  alias hr='hr'
 fi
