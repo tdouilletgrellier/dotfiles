@@ -1725,7 +1725,7 @@ function replacestr() {
 
 #-------------------------------------------------------------
 # Convert a gif to PNG files usable in a .tex file
-function gif_to_tex() {
+function gif2tex() {
 
 	# Initialize variables
 	local output_dir=""
@@ -1736,15 +1736,15 @@ function gif_to_tex() {
 
 	# Help function
 	show_help() {
-		echo -e "${BRIGHT_WHITE}gif_to_tex:${RESET} Extracts frames from a GIF into PNG images"
+		echo -e "${BRIGHT_WHITE}gif2tex:${RESET} Extracts frames from a GIF into PNG images"
 		echo -e "Uses ImageMagick's convert command to extract and save frames."
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-		echo -e "  ${BRIGHT_CYAN}gif_to_tex${RESET} ${BRIGHT_YELLOW}<gif_file>${RESET}"
+		echo -e "  ${BRIGHT_CYAN}gif2tex${RESET} ${BRIGHT_YELLOW}<gif_file>${RESET}"
 		echo -e "${BRIGHT_WHITE}Options:${RESET}"
 		echo -e "  ${BRIGHT_GREEN}-o, --output <dir>${RESET}   Specify output directory (default: same as GIF name)"
 		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}           Show this help message"
 		echo -e "${BRIGHT_WHITE}Example:${RESET}"
-		echo -e "  ${BRIGHT_CYAN}gif_to_tex${RESET} ${BRIGHT_YELLOW}animation.gif${RESET}"
+		echo -e "  ${BRIGHT_CYAN}gif2tex${RESET} ${BRIGHT_YELLOW}animation.gif${RESET}"
 		return 1
 	}
 
@@ -1811,7 +1811,6 @@ function gif_to_tex() {
 	fps=$(identify -format "%T\n" "$gif_file" | awk '{sum += 100/$1; count++} END {if (count > 0) print int(sum/count); else print 25}')
 	echo -e "${BRIGHT_CYAN}Extraction complete: ${BRIGHT_YELLOW}$frame_count${BRIGHT_CYAN} frames (${BRIGHT_YELLOW}$first_frame to $last_frame${BRIGHT_CYAN}).${RESET}"
 	echo -e "${BRIGHT_CYAN}In your .tex file, use : ${BRIGHT_WHITE}\\\\animategraphics[autoplay,loop,width=1.0\\\\textwidth]{$fps}{./$output_dir/${gif_file%.*}-}{$first_frame}{$last_frame}${RESET}"
-
 }
 #-------------------------------------------------------------
 
