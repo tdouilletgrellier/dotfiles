@@ -1724,6 +1724,98 @@ function replacestr() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
+# Convert a gif to PNG files usable in a .tex file
+function gif_to_tex() {
+
+	# Initialize variables
+	local output_dir=""
+	local gif_file=""
+	local frame_count=0
+	local first_frame=0
+	local last_frame=0
+
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}gif_to_tex:${RESET} Extracts frames from a GIF into PNG images"
+		echo -e "Uses ImageMagick's convert command to extract and save frames."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}gif_to_tex${RESET} ${BRIGHT_YELLOW}<gif_file>${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-o, --output <dir>${RESET}   Specify output directory (default: same as GIF name)"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}           Show this help message"
+		echo -e "${BRIGHT_WHITE}Example:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}gif_to_tex${RESET} ${BRIGHT_YELLOW}animation.gif${RESET}"
+		return 1
+	}
+
+	# Show help if no arguments or help option
+	if [ $# -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+		show_help
+		return
+	fi
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--output | -o)
+			shift
+			output_dir="$1"
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Validate and assign required parameter
+	gif_file="$1"
+	if [ -z "$gif_file" ]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} No GIF file specified."
+		show_help
+		return 1
+	fi
+
+	# Check if file exists
+	if [ ! -f "$gif_file" ]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} File '$gif_file' not found."
+		return 1
+	fi
+
+	# Determine output directory name if not specified
+	if [ -z "$output_dir" ]; then
+		output_dir="${gif_file%.*}"
+	fi
+
+	# Create output directory if it doesn't exist
+	mkdir -p "$output_dir"
+
+	echo -e "${BRIGHT_CYAN}Extracting frames to '${BRIGHT_YELLOW}$output_dir${BRIGHT_CYAN}'...${RESET}"
+
+	# Extract frames using ImageMagick convert
+	convert -coalesce "$gif_file" "$output_dir/${gif_file%.*}.png"
+
+	# Count the number of frames extracted
+	frame_count=$(ls "$output_dir" | grep -E "${gif_file%.*}-[0-9]+\.png" | wc -l)
+	if [ "$frame_count" -eq 0 ]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} No frames extracted. Check if ImageMagick is installed."
+		return 1
+	fi
+
+	# Determine first and last frame index
+	first_frame=0
+	last_frame=$((frame_count - 1))
+
+	# Display summary
+	fps=$(identify -format "%T\n" "$gif_file" | awk '{sum += 100/$1; count++} END {if (count > 0) print int(sum/count); else print 25}')
+	echo -e "${BRIGHT_CYAN}Extraction complete: ${BRIGHT_YELLOW}$frame_count${BRIGHT_CYAN} frames (${BRIGHT_YELLOW}$first_frame to $last_frame${BRIGHT_CYAN}).${RESET}"
+	echo -e "${BRIGHT_CYAN}In your .tex file, use : ${BRIGHT_WHITE}\\\\animategraphics[autoplay,loop,width=1.0\\\\textwidth]{$fps}{./$output_dir/${gif_file%.*}-}{$first_frame}{$last_frame}${RESET}"
+
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
 #  _____ __________
 # |  ___|__  /  ___|
 # | |_    / /| |_
