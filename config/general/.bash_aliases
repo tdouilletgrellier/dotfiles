@@ -77,8 +77,8 @@ function welcome_greeting() {
 function welcome_sysinfo() {
 	# Help message
 	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
-		echo -e "${BRIGHT_WHITE}welcome_sysinfo:${RESET} Displays system information using fastfetch or neofetch"
-		echo -e "The function automatically selects the best available tool (${BRIGHT_CYAN}fastfetch or neofetch${RESET})"
+		echo -e "${BRIGHT_WHITE}welcome_sysinfo:${RESET} Displays system information using ${BRIGHT_CYAN}fastfetch${RESET} or ${BRIGHT_CYAN}neofetch${RESET}"
+		echo -e "The function automatically selects the best available tool (${BRIGHT_CYAN}fastfetch${RESET} or ${BRIGHT_CYAN}neofetch${RESET})"
 		echo -e "You can override the selection using the options below."
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
 		echo -e "  ${BRIGHT_CYAN}welcome_sysinfo${RESET} [${BRIGHT_YELLOW}OPTIONS${RESET}]"
@@ -700,7 +700,7 @@ function my_load_intel() {
 function fuck() {
 	# Help message
 	if [[ $# -eq 1 && ("$1" == "-h" || "$1" == "--help") ]]; then
-		echo -e "${BRIGHT_WHITE}fuck:${RESET} A wrapper around TheFuck to fix the previous command."
+		echo -e "${BRIGHT_WHITE}fuck:${RESET} A wrapper around ${BRIGHT_CYAN}TheFuck${RESET} to fix the previous command."
 		echo -e "This function allows you to use ${BRIGHT_CYAN}TheFuck${RESET} to correct the last command you typed."
 		echo -e "It sets up environment variables like ${BRIGHT_YELLOW}TF_SHELL, TF_ALIAS, TF_HISTORY${RESET} before calling ${BRIGHT_CYAN}TheFuck${RESET}."
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
@@ -708,7 +708,7 @@ function fuck() {
 		echo -e "${BRIGHT_WHITE}Options:${RESET}"
 		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}      Show this help message"
 		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-		echo -e "  ${BRIGHT_CYAN}fuck${RESET}              # Fix the last command using TheFuck"
+		echo -e "  ${BRIGHT_CYAN}fuck${RESET}              # Fix the last command using ${BRIGHT_CYAN}TheFuck${RESET}"
 		return 0
 	fi
 
@@ -855,7 +855,7 @@ function sync2ssh() {
 	# Show help if no arguments or first argument isn't push/pull
 	if [ $# -eq 0 ] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
 
-		echo -e "${BRIGHT_WHITE}sync2ssh:${RESET} Synchronize files between local and remote systems using rsync"
+		echo -e "${BRIGHT_WHITE}sync2ssh:${RESET} Synchronize files between local and remote systems using ${BRIGHT_CYAN}rsync${RESET}"
 		echo -e "Uses ${BRIGHT_CYAN}rsync${RESET} for efficient file transfer with ${BRIGHT_YELLOW}progress tracking${RESET} and ${BRIGHT_YELLOW}resume capability${RESET}."
 		echo -e "Supports both ${BRIGHT_YELLOW}password authentication${RESET} and ${BRIGHT_YELLOW}SSH key-based${RESET} connections."
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
@@ -1863,7 +1863,7 @@ function texindent {
 
 	# Help function
 	show_help() {
-		echo -e "${BRIGHT_WHITE}texindent:${RESET} Batch indent LaTeX files using latexindent"
+		echo -e "${BRIGHT_WHITE}texindent:${RESET} Batch indent LaTeX files using ${BRIGHT_CYAN}latexindent${RESET}"
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
 		echo -e "  ${BRIGHT_CYAN}texindent${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
 		echo -e "${BRIGHT_WHITE}Options:${RESET}"
@@ -2036,7 +2036,7 @@ function avi2gif() {
 	local finder_cmd=""
 
 	if ! hascommand --strict ffmpeg; then
-		echo -e "${BRIGHT_RED}Error:${RESET} ${BRIGHT_YELLOW}ffmpeg${RESET} is not installed or not in the PATH."
+		echo -e "${BRIGHT_RED}Error:${RESET} FFmpeg (${BRIGHT_YELLOW}ffmpeg${RESET}) is not installed or not in the PATH."
 		return 1
 	fi
 
@@ -2056,7 +2056,7 @@ function avi2gif() {
 
 	# Help function
 	show_help() {
-		echo -e "${BRIGHT_WHITE}avi2gif:${RESET} Convert AVI videos to optimized GIFs using FFmpeg and ImageMagick"
+		echo -e "${BRIGHT_WHITE}avi2gif:${RESET} Convert AVI videos to optimized GIFs using ${BRIGHT_CYAN}FFmpeg${RESET} and ${BRIGHT_CYAN}ImageMagick${RESET}"
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
 		echo -e "  ${BRIGHT_CYAN}avi2gif${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
 		echo -e "${BRIGHT_WHITE}Options:${RESET}"
