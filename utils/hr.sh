@@ -5,6 +5,7 @@
 # Inspired by @LuRsT's script of the same name
 # Can be called directly, or source'd in *rc file
 # Licensed under MIT, (C) Alicia Sykes 2022
+# Enhanced
 
 # Determine width of terminal
 hr_col_count="$(tput cols)"
