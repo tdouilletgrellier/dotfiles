@@ -699,7 +699,7 @@ function my_load_intel() {
 # TheFuck wrapper function
 function fuck() {
 
-	if ! hascommand --strict rsync; then
+	if ! hascommand --strict thefuck; then
 		echo -e "${BRIGHT_RED}Error:${RESET} TheFuck (${BRIGHT_YELLOW}thefuck${RESET}) is not installed or not in the PATH."
 		return 1
 	fi
