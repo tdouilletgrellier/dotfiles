@@ -751,7 +751,7 @@ function fuck() {
 function cdll() {
 	# Help message
 	if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-		echo -e "${BRIGHT_WHITE}cdll:${RESET} Customizes the behavior of the 'cd' command."
+		echo -e "${BRIGHT_WHITE}cdll:${RESET} Customizes the behavior of the builtin ${BRIGHT_CYAN}cd${RESET} command."
 		echo -e "The function changes the current directory and always lists the contents of the new directory."
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
 		echo -e "  ${BRIGHT_CYAN}cdll${RESET} ${BRIGHT_YELLOW}[OPTIONS]${RESET}"
@@ -2086,7 +2086,7 @@ function avi2gif() {
 		show_help
 		return
 	fi
-	
+
 	# Parse options
 	while [[ "$1" == -* ]]; do
 		case "$1" in
