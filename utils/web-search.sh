@@ -105,6 +105,13 @@ ws_chatgpt() {
 
 # Lists available search options
 web_search() {
+  # Define colors
+  COLOR_TITLE="\033[1;36m"  # Cyan, bold
+  COLOR_WARNING="\033[0;33m"  # Yellow
+  COLOR_ERROR="\033[0;91m"  # Light Red
+  COLOR_GOODBYE="\033[0;93m"  # Light Yellow
+  COLOR_RESET="\033[0m"  # Reset
+
   # If help flag specified, show help
   [[ $@ == *"--help"* || $@ == "help" ]] && show_ws_help && return
   # If user specified search engine, jump strait to that function
@@ -127,7 +134,7 @@ web_search() {
     wolframalpha reddit maps grepapp youtube chatgpt 'help' quit
     )
   PS3='❯ '
-  echo -e "\033[1;95mSelect a Search Option\033[0;35m"
+  echo -e "${COLOR_TITLE}Select a Search Option${COLOR_RESET}"
   select opt in ${choices[@]}; do
     case $opt in
       duckduckgo) ws_duckduckgo $@; return;;
@@ -142,15 +149,17 @@ web_search() {
       youtube) ws_youtube $@; return;;
       chatgpt) ws_chatgpt $@; return;;
       help) show_ws_help; break;;
-      quit) echo -e "\033[0;93mBye 👋\e[0m"; break ;;
+      quit) echo -e "${COLOR_GOODBYE}Bye 👋${COLOR_RESET}"; break ;;
       *)
-        echo -e "\033[0;93mInvalid option: '$REPLY'\e[0m"
-        echo -e "\033[0;33mEnter the number corresponding to one of the above options\e[0m"
+        echo -e "${COLOR_ERROR}Invalid option: '$REPLY'${COLOR_RESET}"
+        echo -e "${COLOR_WARNING}Enter the number corresponding to one of the above options${COLOR_RESET}"
         break
       ;;
     esac
   done
 }
+
+
 
 # Set up some shorthand aliases
 alias web-search='web_search'
