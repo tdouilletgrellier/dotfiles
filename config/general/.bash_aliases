@@ -2327,6 +2327,93 @@ function getnode() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
+# scancel wrapper
+function killjob() {
+
+	if ! hascommand --strict scancel; then
+		echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}scancel${RESET} command is not installed or not in the PATH."
+		return 1
+	fi
+
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}killjob:${RESET} Cancel one or more jobs using SLURM's ${BRIGHT_CYAN}scancel${RESET}"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}killjob${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}      Show this help message"
+	}
+
+	# Check if fzf is available
+	if ! hascommand --strict fzf; then
+		use_select=true
+	else
+		use_select=false
+	fi
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--help | -h)
+			show_help
+			return
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Function to display jobs and select one
+	select_job() {
+		# Get the list of jobs to cancel with additional details
+		local jobs
+		jobs=$(squeue -u $(whoami) --format="%i %j %T %N %D %P %M %l" | tail -n +2)
+
+		if [ -z "$jobs" ]; then
+			echo -e "${BRIGHT_YELLOW}No jobs found to cancel.${RESET}"
+			return 1
+		fi
+
+		# Format headers
+		local job_list
+		job_list=$(echo "$jobs" | awk '{print "Job ID: "$1"\nJob Name: "$2"\nStatus: "$3"\nNodes: "$4"\nNumber of Nodes: "$5"\nPartition: "$6"\nTime: "$7"\nTime Limit: "$8"\n"}')
+
+		if [ "$use_select" = true ]; then
+			echo -e "${BRIGHT_CYAN}Select a job to cancel:${RESET}"
+			select job in $(echo "$jobs" | awk '{print $2}'); do
+				if [ -n "$job" ]; then
+					local job_id
+					job_id=$(echo "$jobs" | grep "$job" | awk '{print $1}')
+					scancel "$job_id"
+					echo -e "${BRIGHT_GREEN}Job ${BRIGHT_YELLOW}$job_id${RESET} (${BRIGHT_YELLOW}$job${RESET}) cancelled successfully."
+					break
+				else
+					echo -e "${BRIGHT_RED}Invalid selection, try again.${RESET}"
+				fi
+			done
+		else
+			# Use fzf for job selection
+			echo -e "${BRIGHT_CYAN}Select jobs to cancel (use Ctrl+Space to select multiple):${RESET}"
+			local selected_job
+			selected_jobs=$(echo "$jobs" | fzf --ansi --multi --preview "printf \"\033[1;32mJob ID:\033[0m \033[1;36m{1}\033[0m\n\033[1;34mJob Name:\033[0m \033[1;34m{2}\033[0m\n\033[1;33mStatus:\033[0m \033[1;33m{3}\033[0m\n\033[1;35mNodes:\033[0m \033[1;35m{4}\033[0m\n\033[1;36mNumber of Nodes:\033[0m \033[1;36m{5}\033[0m\n\033[1;37mPartition:\033[0m \033[1;37m{6}\033[0m\n\033[1;31mTime:\033[0m \033[1;31m{7}\033[0m\n\033[1;37mTime Limit:\033[0m \033[1;37m{8}\033[0m\"" | awk '{print $1}')
+			if [ -n "$selected_job" ]; then
+				scancel "$selected_job"
+				echo -e "${BRIGHT_GREEN}Job ${BRIGHT_YELLOW}$selected_job${RESET} cancelled successfully."
+			else
+				echo -e "${BRIGHT_RED}No job selected.${RESET}"
+			fi
+		fi
+	}
+
+	# Run the select job function
+	select_job
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
 #  _____ __________
 # |  ___|__  /  ___|
 # | |_    / /| |_
