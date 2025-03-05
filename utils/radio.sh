@@ -14,8 +14,6 @@ command_exists() {
 url_rmp='https://millepattes.ice.infomaniak.ch/millepattes-high.mp3'
 url_fip='http://direct.fipradio.fr/live/fip-webradio6.mp3'
 
-
-
 # Function to choose and play radio stations using ffplay
 play_radio() {
   echo -e "${GREEN}Select a radio station to play:${NC}"
