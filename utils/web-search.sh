@@ -68,31 +68,39 @@ ws_make_search() {
 
 # Functions that call make search, with search engines URL
 ws_duckduckgo() {
-  ws_make_search 'https://duckduckgo.com/?q=' $@
+  ws_make_search 'https://duckduckgo.com/?q=' "$@"
 }
 ws_wikipedia() {
-  ws_make_search 'https://en.wikipedia.org/w/index.php?search=' $@
+  ws_make_search 'https://en.wikipedia.org/w/index.php?search=' "$@"
 }
 ws_google() {
-  ws_make_search 'https://www.google.com/search?q=' $@
+  ws_make_search 'https://www.google.com/search?q=' "$@"
 }
 ws_github() {
-  ws_make_search 'https://github.com/search?q=' $@
+  ws_make_search 'https://github.com/search?q=' "$@"
 }
 ws_stackoverflow() {
-  ws_make_search 'https://stackoverflow.com/search?q=' $@
+  ws_make_search 'https://stackoverflow.com/search?q=' "$@"
 }
 ws_wolframalpha() {
-  ws_make_search 'https://www.wolframalpha.com/input?i=' $@
+  ws_make_search 'https://www.wolframalpha.com/input?i=' "$@"
 }
 ws_reddit() {
-  ws_make_search 'https://www.reddit.com/search/?q=' $@
+  ws_make_search 'https://www.reddit.com/search/?q=' "$@"
 }
 ws_maps() {
-  ws_make_search 'https://www.google.com/maps/search/' $@
+  ws_make_search 'https://www.google.com/maps/search/' "$@"
 }
 ws_grepapp() {
-  ws_make_search 'https://grep.app/search?q=' $@
+  ws_make_search 'https://grep.app/search?q=' "$@"
+}
+
+ws_youtube() { 
+  ws_make_search 'https://www.youtube.com/results?search_query=' "$@"
+}
+
+ws_chatgpt() { 
+  ws_make_search 'https://chat.openai.com/?q=' "$@"
 }
 
 # Lists available search options
@@ -110,11 +118,13 @@ web_search() {
     [[ $@ == "maps"* ]] && ws_maps "${@/maps/}" && return
     [[ $@ == "google"* ]] && ws_google "${@/google/}" && return
     [[ $@ == "grepapp"* ]] && ws_grepapp "${@/grepapp/}" && return
+    [[ $@ == "youtube"* ]] && ws_youtube "${@/youtube/}" && return
+    [[ $@ == "chatgpt"* ]] && ws_chatgpt "${@/chatgpt/}" && return
   fi
   # Otherwise show menu input for search engines
   choices=(
     duckduckgo wikipedia google github stackoverflow
-    wolframalpha reddit maps grepapp 'help' quit
+    wolframalpha reddit maps grepapp youtube chatgpt 'help' quit
     )
   PS3='❯ '
   echo -e "\033[1;95mSelect a Search Option\033[0;35m"
@@ -129,6 +139,8 @@ web_search() {
       reddit) ws_reddit $@; return;;
       maps) ws_maps $@; return;;
       grepapp) ws_grepapp $@; return;;
+      youtube) ws_youtube $@; return;;
+      chatgpt) ws_chatgpt $@; return;;
       help) show_ws_help; break;;
       quit) echo -e "\033[0;93mBye 👋\e[0m"; break ;;
       *)
@@ -151,6 +163,8 @@ alias wsrdt='ws_reddit'
 alias wsmap='ws_maps'
 alias wsggl='ws_google'
 alias wsgra='ws_grepapp'
+alias wsyt='ws_youtube'
+alias wsgpt='ws_chatgpt'
 
 # Set ws alias, only if not used by another program
 if ! hash ws 2> /dev/null; then
@@ -159,33 +173,46 @@ fi
 
 # Prints usage options
 show_ws_help() {
-  echo -e '\033[1;95mCLI Web Search\e[0m'
-  echo -e '\033[0;95m\x1b[2mA set of functions for searching the web from the command line.\e[0m'
+  # Define color variables
+  local CYAN='\033[1;36m'
+  local LIGHT_CYAN='\033[0;36m'
+  local GREEN='\033[0;32m'
+  local YELLOW='\033[0;33m'
+  local MAGENTA='\033[1;35m'
+  local LIGHT_MAGENTA='\033[0;35m'
+  local RESET='\e[0m'
+  local BOLD='\033[1m'
+  local UNDERLINE='\033[4m'
+
+  echo -e "${CYAN}CLI Web Search${RESET}"
+  echo -e "${LIGHT_CYAN}\x1b[2mA set of functions for searching the web from the command line.${RESET}"
   echo
-  echo -e '\033[0;95m\e[4mExample Usage:\033[0;35m'
-  echo -e '  (1) View menu, select search engine by index, then enter a search term'
-  echo -e '    $ web-search'
-  echo -e '  (2) Enter a search term, and be prompted for which search engine to use'
-  echo -e '    $ web-search Hello World!'
-  echo -e '  (3) Enter a search engine followed by search term'
-  echo -e '    $ web-search wikipedia Matrix Defense'
-  echo -e '  (4) Enter a search engine, and be prompted for the search term'
-  echo -e '    $ web-search duckduckgo'
+  echo -e "${LIGHT_CYAN}${UNDERLINE}Example Usage:${RESET}"
+  echo -e "  (1) View menu, select search engine by index, then enter a search term"
+  echo -e "    $ ${BOLD}web-search${RESET}"
+  echo -e "  (2) Enter a search term, and be prompted for which search engine to use"
+  echo -e "    $ ${BOLD}web-search Hello World!${RESET}"
+  echo -e "  (3) Enter a search engine followed by search term"
+  echo -e "    $ ${BOLD}web-search wikipedia Matrix Defense${RESET}"
+  echo -e "  (4) Enter a search engine, and be prompted for the search term"
+  echo -e "    $ ${BOLD}web-search duckduckgo${RESET}"
   echo
-  echo -e '\033[0;95m\e[4mShorthand\033[0;35m'
-  echo -e '  You can also use the `ws` alias instead of typing `web-search`'
+  echo -e "${LIGHT_CYAN}${UNDERLINE}Shorthand${GREEN}"
+  echo -e "  You can also use the ${YELLOW}ws${RESET} alias instead of typing ${BOLD}web-search${RESET}"
   echo
-  echo -e '\033[0;95m\e[4mSupported Search Engines:\033[0;35m'
-  echo -e '  \033[0;35mDuckDuckGo: \x1b[2m$ ws duckduckgo (or $ wsddg)\e[0m'
-  echo -e '  \033[0;35mWikipedia: \x1b[2m$ ws wikipedia or ($ wswiki)\e[0m'
-  echo -e '  \033[0;35mGitHub: \x1b[2m$ ws github or ($ wsgh)\e[0m'
-  echo -e '  \033[0;35mStackOverflow: \x1b[2m$ ws stackoverflow or ($ wsso)\e[0m'
-  echo -e '  \033[0;35mWolframalpha: \x1b[2m$ ws wolframalpha or ($ wswa)\e[0m'
-  echo -e '  \033[0;35mReddit: \x1b[2m$ ws reddit or ($ wsrdt)\e[0m'
-  echo -e '  \033[0;35mMaps: \x1b[2m$ ws maps or ($ wsmap)\e[0m'
-  echo -e '  \033[0;35mGoogle: \x1b[2m$ ws google or ($ wsggl)\e[0m'
-  echo -e '  \033[0;35mGrep.App: \x1b[2m$ ws grepapp or ($ wsgra)\e[0m'
-  echo -e '\e[0m'
+  echo -e "${LIGHT_CYAN}${UNDERLINE}Supported Search Engines:${GREEN}"
+  echo -e "  ${YELLOW}DuckDuckGo: \x1b[2m$ ws duckduckgo (or $ wsddg)${RESET}"
+  echo -e "  ${YELLOW}Wikipedia: \x1b[2m$ ws wikipedia or ($ wswiki)${RESET}"
+  echo -e "  ${YELLOW}GitHub: \x1b[2m$ ws github or ($ wsgh)${RESET}"
+  echo -e "  ${YELLOW}StackOverflow: \x1b[2m$ ws stackoverflow or ($ wsso)${RESET}"
+  echo -e "  ${YELLOW}Wolframalpha: \x1b[2m$ ws wolframalpha or ($ wswa)${RESET}"
+  echo -e "  ${YELLOW}Reddit: \x1b[2m$ ws reddit or ($ wsrdt)${RESET}"
+  echo -e "  ${YELLOW}Maps: \x1b[2m$ ws maps or ($ wsmap)${RESET}"
+  echo -e "  ${YELLOW}Google: \x1b[2m$ ws google or ($ wsggl)${RESET}"
+  echo -e "  ${YELLOW}Grep.App: \x1b[2m$ ws grepapp or ($ wsgra)${RESET}"
+  echo -e "  ${YELLOW}Youtube: \x1b[2m$ ws youtube or ($ wsyt)${RESET}"
+  echo -e "  ${YELLOW}ChatGPT: \x1b[2m$ ws chatgpt or ($ wsgpt)${RESET}"
+  echo -e "${RESET}"
 }
 
 # Determine if file is being run directly or sourced
