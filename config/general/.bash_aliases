@@ -2378,22 +2378,43 @@ function killjob() {
 		fi
 
 		# Format headers
-		local job_list
-		job_list=$(echo "$jobs" | awk '{print "Job ID: "$1"\nJob Name: "$2"\nStatus: "$3"\nNodes: "$4"\nNumber of Nodes: "$5"\nPartition: "$6"\nTime: "$7"\nTime Limit: "$8"\n"}')
-
 		if [ "$use_select" = true ]; then
-			echo -e "${BRIGHT_CYAN}Select a job to cancel:${RESET}"
-			select job in $(echo "$jobs" | awk '{print $2}'); do
-				if [ -n "$job" ]; then
-					local job_id
-					job_id=$(echo "$jobs" | grep "$job" | awk '{print $1}')
-					scancel "$job_id"
-					echo -e "${BRIGHT_GREEN}Job ${BRIGHT_YELLOW}$job_id${RESET} (${BRIGHT_YELLOW}$job${RESET}) cancelled successfully."
-					break
-				else
-					echo -e "${BRIGHT_RED}Invalid selection, try again.${RESET}"
-				fi
+			local formatted_jobs
+			formatted_jobs=$(echo "$jobs" | awk '{print "\033[1;32m"$1"\033[0m \033[1;34m"$2"\033[0m \033[1;33m"$3"\033[0m \033[1;35m"$4"\033[0m \033[1;36m"$5"\033[0m \033[1;37m"$6"\033[0m \033[1;31m"$7"\033[0m \033[1;37m"$8"\033[0m"}')
+			mapfile -t job_options < <(echo "$formatted_jobs")
+
+			# Display all jobs with numbers
+			echo -e "${BRIGHT_CYAN}Select jobs to cancel (comma-separated numbers, e.g., 1,3,5 or 'all' for all jobs):${RESET}"
+			for i in "${!job_options[@]}"; do
+				echo -e "$((i + 1))) ${job_options[$i]}"
 			done
+
+			# Read user input
+			echo -e "${BRIGHT_CYAN}Enter job numbers:${RESET}"
+			echo -n "❯ "
+			read -r selection
+
+			# Process selection
+			if [[ "$selection" == "all" ]]; then
+				# Cancel all jobs
+				for i in "${!job_options[@]}"; do
+					job_id=$(echo "$jobs" | sed -n "$((i + 1))p" | awk '{print $1}')
+					scancel "$job_id"
+					echo -e "${BRIGHT_GREEN}Job ${BRIGHT_YELLOW}$job_id${RESET} cancelled successfully."
+				done
+			else
+				# Process comma-separated selection
+				IFS=',' read -ra selected_indices <<<"$selection"
+				for index in "${selected_indices[@]}"; do
+					if [[ "$index" =~ ^[0-9]+$ ]] && [ "$index" -ge 1 ] && [ "$index" -le "${#job_options[@]}" ]; then
+						job_id=$(echo "$jobs" | sed -n "${index}p" | awk '{print $1}')
+						scancel "$job_id"
+						echo -e "${BRIGHT_GREEN}Job ${BRIGHT_YELLOW}$job_id${RESET} cancelled successfully."
+					else
+						echo -e "${BRIGHT_RED}Invalid selection: $index${RESET}"
+					fi
+				done
+			fi
 		else
 			# Use fzf for job selection
 			echo -e "${BRIGHT_CYAN}Select jobs to cancel (use Ctrl+Space to select multiple):${RESET}"
