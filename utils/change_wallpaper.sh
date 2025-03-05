@@ -31,7 +31,6 @@ while [[ $# -gt 0 ]]; do
             if command -v fzf >/dev/null; then
                 PIC=$(printf "%s\n" "${FILES[@]}" | fzf)
             else
-                echo "fzf not found, using basic selection"
                 select PIC in "${FILES[@]}"; do
                     [[ -n "$PIC" ]] && break
                 done
