@@ -2162,6 +2162,93 @@ function avi2gif() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
+# salloc wrapper
+function getnode() {
+	local time=30
+	local nodes=1
+	local wckey="P121K:EUROPLEXUS"
+	local partition=""
+	local job_name=""
+
+	if ! hascommand --strict salloc; then
+		echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}salloc${RESET} command is not installed or not in the PATH."
+		return 1
+	fi
+
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}getnode:${RESET} Request an exclusive job allocation using SLURM's ${BRIGHT_CYAN}salloc${RESET}"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}getnode${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-t, --time <minutes>${RESET}   Set job duration (default: 30 minutes)"
+		echo -e "  ${BRIGHT_GREEN}-n, --nodes <count>${RESET}    Set number of nodes (default: 1)"
+		echo -e "  ${BRIGHT_GREEN}-w, --wckey <key>${RESET}     Set workload key (default: P121K:EUROPLEXUS)"
+		echo -e "  ${BRIGHT_GREEN}-p, --partition <name>${RESET} Set SLURM partition (optional)"
+		echo -e "  ${BRIGHT_GREEN}-j, --job-name <name>${RESET} Set job name (optional)"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}            Show this help message"
+		return 1
+	}
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--time | -t)
+			time="$2"
+			shift
+			;;
+		--nodes | -n)
+			nodes="$2"
+			shift
+			;;
+		--wckey | -w)
+			wckey="$2"
+			shift
+			;;
+		--partition | -p)
+			partition="$2"
+			shift
+			;;
+		--job-name | -j)
+			job_name="$2"
+			shift
+			;;
+		--help | -h)
+			show_help
+			return
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	echo -e "${BRIGHT_CYAN}Requesting an exclusive job allocation...${RESET}"
+	echo -e "  Time: ${BRIGHT_YELLOW}${time} minutes${RESET}"
+	echo -e "  Nodes: ${BRIGHT_YELLOW}${nodes}${RESET}"
+	echo -e "  Workload Key: ${BRIGHT_YELLOW}${wckey}${RESET}"
+	[[ -n "$partition" ]] && echo -e "  Partition: ${BRIGHT_YELLOW}${partition}${RESET}"
+	[[ -n "$job_name" ]] && echo -e "  Job Name: ${BRIGHT_YELLOW}${job_name}${RESET}"
+
+	local salloc_cmd=(salloc --exclusive --time="$time" --nodes="$nodes" --wckey="$wckey")
+	[[ -n "$partition" ]] && salloc_cmd+=(--partition="$partition")
+	[[ -n "$job_name" ]] && salloc_cmd+=(--job-name="$job_name")
+
+	"${salloc_cmd[@]}"
+	local status=$?
+
+	if [ $status -ne 0 ]; then
+		echo -e "${BRIGHT_RED}Error:${RESET} Job allocation failed. Please check SLURM settings."
+		return $status
+	fi
+
+	echo -e "${BRIGHT_GREEN}Success:${RESET} Job allocated successfully."
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
 #  _____ __________
 # |  ___|__  /  ___|
 # | |_    / /| |_
