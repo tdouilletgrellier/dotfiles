@@ -2169,6 +2169,7 @@ function getnode() {
 	local wckey="P121K:EUROPLEXUS"
 	local partition=""
 	local job_name=""
+	local auto_ssh=0 # Default to not auto-connecting
 
 	if ! hascommand --strict salloc; then
 		echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}salloc${RESET} command is not installed or not in the PATH."
@@ -2186,6 +2187,7 @@ function getnode() {
 		echo -e "  ${BRIGHT_GREEN}-w, --wckey <key>${RESET}     Set workload key (default: P121K:EUROPLEXUS)"
 		echo -e "  ${BRIGHT_GREEN}-p, --partition <name>${RESET} Set SLURM partition (optional)"
 		echo -e "  ${BRIGHT_GREEN}-j, --job-name <name>${RESET} Set job name (optional)"
+		echo -e "  ${BRIGHT_GREEN}-s, --ssh${RESET}             Auto-connect to the first allocated node"
 		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}            Show this help message"
 		return 1
 	}
@@ -2213,6 +2215,9 @@ function getnode() {
 			job_name="$2"
 			shift
 			;;
+		--ssh | -s)
+			auto_ssh=1 # Set to 1 if -s or --ssh is provided
+			;;
 		--help | -h)
 			show_help
 			return
@@ -2232,19 +2237,92 @@ function getnode() {
 	[[ -n "$partition" ]] && echo -e "  Partition: ${BRIGHT_YELLOW}${partition}${RESET}"
 	[[ -n "$job_name" ]] && echo -e "  Job Name: ${BRIGHT_YELLOW}${job_name}${RESET}"
 
+	# Define a function to run after allocation is granted
+	get_node_info() {
+		# Load color variables
+		local BRIGHT_CYAN="\033[1;36m"
+		local BRIGHT_GREEN="\033[1;32m"
+		local BRIGHT_YELLOW="\033[1;33m"
+		local BRIGHT_WHITE="\033[1;37m"
+		local RESET="\033[0m"
+
+		# Read auto_ssh and job_name from environment variables
+		local auto_ssh="${AUTO_SSH}"
+		local job_name="${JOB_NAME}"
+
+		if [ -n "$SLURM_JOB_ID" ]; then
+			# Get node list using squeue, filtering by job ID
+			local node_info
+			node_info=$(squeue -j "$SLURM_JOB_ID" -o "%N" -h)
+
+			# Clean up any whitespace
+			local node_list
+			node_list=$(echo "$node_info" | tr -d ' \n')
+
+			echo -e "${BRIGHT_GREEN}Success:${RESET} Job allocated successfully."
+			echo -e "  Job ID: ${BRIGHT_YELLOW}${SLURM_JOB_ID}${RESET}"
+			echo -e "  Allocated nodes: ${BRIGHT_YELLOW}${node_list}${RESET}"
+
+			# Automatically connect to the first node if the -s/--ssh option was provided
+			local first_node
+			first_node=$(echo "$node_list" | cut -d',' -f1)
+
+			if [ "$auto_ssh" -eq 1 ]; then
+				echo -e "${BRIGHT_CYAN}Auto-connecting to the first node...${RESET}"
+				ssh "$first_node"
+			fi
+		else
+			# If SLURM_JOB_ID is not set, try to find the job by name/user
+			local job_name_to_match="${job_name:-interact}"
+			local user_name=$(whoami)
+
+			# Get job info using squeue, filtering by job name and username
+			local job_info
+			job_info=$(squeue -n "$job_name_to_match" -u "$user_name" -o "%i|%N" -h | head -1)
+
+			if [ -n "$job_info" ]; then
+				local found_job_id=$(echo "$job_info" | cut -d'|' -f1)
+				local found_node_list=$(echo "$job_info" | cut -d'|' -f2 | tr -d ' \n')
+
+				echo -e "${BRIGHT_GREEN}Success:${RESET} Job allocated successfully."
+				echo -e "  Job ID: ${BRIGHT_YELLOW}${found_job_id}${RESET}"
+				echo -e "  Allocated nodes: ${BRIGHT_YELLOW}${found_node_list}${RESET}"
+
+				# Automatically connect to the first node if the -s/--ssh option was provided
+				local first_node
+				first_node=$(echo "$found_node_list" | cut -d',' -f1)
+
+				if [ "$auto_ssh" -eq 1 ]; then
+					echo -e "${BRIGHT_CYAN}Auto-connecting to the first node...${RESET}"
+					ssh "$first_node"
+				fi
+			else
+				echo -e "${BRIGHT_YELLOW}Warning:${RESET} Unable to determine job information."
+			fi
+		fi
+	}
+
+	# Set the environment variables for job_name and auto_ssh
+	export JOB_NAME="$job_name"
+	export AUTO_SSH="$auto_ssh"
+
+	# Build salloc command
 	local salloc_cmd=(salloc --exclusive --time="$time" --nodes="$nodes" --wckey="$wckey")
 	[[ -n "$partition" ]] && salloc_cmd+=(--partition="$partition")
 	[[ -n "$job_name" ]] && salloc_cmd+=(--job-name="$job_name")
 
-	"${salloc_cmd[@]}"
-	local status=$?
+	# Run salloc with the get_node_info function as the command to execute in the allocation
+	"${salloc_cmd[@]}" bash -c "$(declare -f get_node_info); get_node_info; exec bash"
 
+	local status=$?
 	if [ $status -ne 0 ]; then
 		echo -e "${BRIGHT_RED}Error:${RESET} Job allocation failed. Please check SLURM settings."
 		return $status
 	fi
 
-	echo -e "${BRIGHT_GREEN}Success:${RESET} Job allocated successfully."
+	# Unset environment variables after they're used
+	unset JOB_NAME
+	unset AUTO_SSH
 }
 #-------------------------------------------------------------
 
