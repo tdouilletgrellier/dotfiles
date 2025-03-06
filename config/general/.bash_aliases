@@ -2452,7 +2452,7 @@ function sq() {
     }
     
     # Default format
-    format="%.10i %.9P %.12j %.2t %.8M %.4D %.18R"
+    format="%.10i %.9P %.12j %.8T %.9L %.6M %.4D %.4C %.18R"
     
     # Parse options
     while [[ "$1" == -* ]]; do
@@ -2462,7 +2462,7 @@ function sq() {
             return
             ;;
         --full | -f)
-            format="%.10i %.9P %.12j %.2t %.8M %.4D %.18R %.19S %.4C %.10l %.6Q %.8u %.8M"
+            format="%.10i %.9P %.16q %.12j %.8T %.9L %.6M %.4D %.4C %.18R %.12B %.40Z"
             ;;
         *)
             echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
