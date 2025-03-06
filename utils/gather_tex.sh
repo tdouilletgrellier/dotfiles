@@ -590,21 +590,48 @@ create_archive() {
 	# Handle different input file types
 	if [[ "$INPUT_EXT" == "dep" ]]; then
 		log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Reading dependency file..."
-		# Extract files from .dep file (exclude commented lines and unwanted extensions)
-		local all_files=($(grep -v '^\s*%' "$INPUT_FILE" | grep -oP '(?<=\{)[^}]+(?=\})'))
+
+		# Extract all files directly mentioned in the .dep file
+		local all_files=($(sed -n 's/.*\*{file}\s*{\([^}]*\)}.*/\1/p' "$INPUT_FILE"))
+
+		# Extract all class names used
+		local all_classes=($(sed -n 's/.*\*{class}\s*{\([^}]*\)}.*/\1/p' "$INPUT_FILE"))
+
+		# Extract all beamer themes if beamer class is used
+		local beamer_themes=()
+		if [[ " ${all_classes[*]} " =~ " beamer " ]]; then
+			beamer_themes=($(sed -n 's/.*\*{package}{beamertheme\([^}]*\)}.*/\1/p' "$INPUT_FILE"))
+			log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Beamer class detected, looking for themes..."
+		fi
+
 		files_to_process=()
 
 		# Filter out unwanted extensions
 		# =================  EXCLUDED EXTENSIONS (customize as needed) =================
 		local excluded_extensions=("bbl" "out" "aux" "log" "toc")
 		# ==============================================================================
+
+		# Process regular files
 		for file in "${all_files[@]}"; do
 			local file_ext="${file##*.}"
 			if [[ " ${excluded_extensions[*]} " =~ " ${file_ext} " ]]; then
-				log_message 1 "$YELLOW" "[${BOLD}Excluded${RESET}${YELLOW}] Skipping file with excluded extension: $file"
+				log_message 2 "$YELLOW" "[${BOLD}Excluded${RESET}${YELLOW}] Skipping file with excluded extension: $file"
 			else
 				files_to_process+=("$file")
+				log_message 2 "$BLUE" "[${BOLD}Dependency${RESET}${BLUE}] Found in .dep: $file"
 			fi
+		done
+
+		# Add class files (.cls)
+		for class in "${all_classes[@]}"; do
+			files_to_process+=("$class.cls")
+			log_message 2 "$MAGENTA" "[${BOLD}Class${RESET}${MAGENTA}] Adding class file: $class.cls"
+		done
+
+		# Add beamer theme files (.sty)
+		for theme in "${beamer_themes[@]}"; do
+			files_to_process+=("beamertheme$theme.sty")
+			log_message 2 "$MAGENTA" "[${BOLD}Beamer Theme${RESET}${MAGENTA}] Adding theme: beamertheme$theme.sty"
 		done
 
 		MAIN_FILE="$BASE_DIR/${PROJECT_NAME}.tex"
@@ -683,7 +710,7 @@ create_archive() {
 					copy_file "$found_file" "$TEMP_DIR" "$BASE_DIR"
 					log_message 1 "$GREEN" "[${BOLD}Added${RESET}${GREEN}] $(basename "$found_file")"
 				else
-					log_message 1 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found (case-insensitive): $file"
+					log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found (case-insensitive): $file"
 				fi
 			fi
 		fi
