@@ -2328,7 +2328,7 @@ function getnode() {
 
 #-------------------------------------------------------------
 # scancel wrapper
-function killjob() {
+function sc() {
 
 	if ! hascommand --strict scancel; then
 		echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}scancel${RESET} command is not installed or not in the PATH."
@@ -2337,9 +2337,9 @@ function killjob() {
 
 	# Help function
 	show_help() {
-		echo -e "${BRIGHT_WHITE}killjob:${RESET} Cancel one or more jobs using SLURM's ${BRIGHT_CYAN}scancel${RESET}"
+		echo -e "${BRIGHT_WHITE}sc:${RESET} Cancel one or more jobs using SLURM's ${BRIGHT_CYAN}scancel${RESET}"
 		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-		echo -e "  ${BRIGHT_CYAN}killjob${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sc${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
 		echo -e "${BRIGHT_WHITE}Options:${RESET}"
 		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}      Show this help message"
 	}
@@ -2431,6 +2431,49 @@ function killjob() {
 
 	# Run the select job function
 	select_job
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# squeue wrapper
+function sq() {
+    if ! hascommand --strict squeue; then
+        echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}squeue${RESET} command is not installed or not in the PATH."
+        return 1
+    fi
+    # Help function
+    show_help() {
+        echo -e "${BRIGHT_WHITE}sq:${RESET} Enhanced SLURM queue display"
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sq${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}       Show this help message"
+        echo -e "  ${BRIGHT_GREEN}-f, --full${RESET}        Show full job details"
+    }
+    
+    # Default format
+    format="%.10i %.9P %.12j %.2t %.8M %.4D %.18R"
+    
+    # Parse options
+    while [[ "$1" == -* ]]; do
+        case "$1" in
+        --help | -h)
+            show_help
+            return
+            ;;
+        --full | -f)
+            format="%.10i %.9P %.12j %.2t %.8M %.4D %.18R %.19S %.4C %.10l %.6Q %.8u %.8M"
+            ;;
+        *)
+            echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+            return 1
+            ;;
+        esac
+        shift
+    done
+    
+    # Run squeue and process the output
+    squeue --me --format="$format"
 }
 #-------------------------------------------------------------
 
