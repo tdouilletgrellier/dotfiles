@@ -502,7 +502,7 @@ copy_file() {
 			log_message 2 "$BLUE" "[${BOLD}Added${RESET}${BLUE}] $target_path"
 			return 0
 		else
-			log_message 1 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found (case-insensitive): $file"
+			log_message 1 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found : $file"
 			return 1
 		fi
 	else
@@ -615,7 +615,7 @@ create_archive() {
 		for file in "${all_files[@]}"; do
 			local file_ext="${file##*.}"
 			if [[ " ${excluded_extensions[*]} " =~ " ${file_ext} " ]]; then
-				log_message 2 "$YELLOW" "[${BOLD}Excluded${RESET}${YELLOW}] Skipping file with excluded extension: $file"
+				log_message 1 "$YELLOW" "[${BOLD}Excluded${RESET}${YELLOW}] Skipping file with excluded extension: $file"
 			else
 				files_to_process+=("$file")
 				log_message 2 "$BLUE" "[${BOLD}Dependency${RESET}${BLUE}] Found in .dep: $file"
@@ -681,6 +681,58 @@ create_archive() {
 		exit $EXIT_PERMISSION_ERROR
 	fi
 
+	# Extract the folder name from \tikzexternalize[prefix=...]
+	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Checking for TikZ externalization folder..."
+	TIKZFOLDER=$(grep -oP '\\tikzexternalize\[prefix=\K[^]]+' "$MAIN_FILE" | sed 's/\/$//' | tr -d '{}')
+
+	# If TIKZFOLDER is not empty
+	if [[ -n "$TIKZFOLDER" ]]; then
+		# Handle relative paths - make sure TIKZFOLDER is relative to BASE_DIR
+		if [[ "$TIKZFOLDER" != /* ]]; then
+			TIKZFOLDER_FULL="$BASE_DIR/$TIKZFOLDER"
+		else
+			TIKZFOLDER_FULL="$TIKZFOLDER"
+		fi
+
+		log_message 2 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Found TikZ externalization folder: ${WHITE}$TIKZFOLDER${RESET}"
+
+		# Check if the folder exists
+		if [[ ! -d "$TIKZFOLDER_FULL" ]]; then
+			# Folder doesn't exist, create it and add to TEMP_DIR
+			mkdir -p "$TEMP_DIR/$TIKZFOLDER"
+			if [ $? -ne 0 ]; then
+				log_error "Failed to create TikZ folder: $TEMP_DIR/$TIKZFOLDER"
+				# Continue execution rather than exiting
+			else
+				log_message 1 "$GREEN" "[${BOLD}Created${RESET}${GREEN}] TikZ folder: $TIKZFOLDER"
+			fi
+		elif [[ "$(ls -A "$TIKZFOLDER_FULL" 2>/dev/null)" ]]; then
+			# Folder exists and is not empty, add the files to TEMP_DIR
+			mkdir -p "$TEMP_DIR/$TIKZFOLDER"
+			if [ $? -ne 0 ]; then
+				log_error "Failed to create TikZ folder: $TEMP_DIR/$TIKZFOLDER"
+			else
+				# Copy files matching project name pattern
+				cp -r "$TIKZFOLDER_FULL/${PROJECT_NAME}"* "$TEMP_DIR/$TIKZFOLDER/" 2>/dev/null
+				if [ $? -ne 0 ]; then
+					log_message 1 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] No TikZ files matching ${PROJECT_NAME}* found in $TIKZFOLDER"
+				else
+					log_message 1 "$GREEN" "[${BOLD}Added${RESET}${GREEN}] TikZ files from: $TIKZFOLDER"
+				fi
+			fi
+		else
+			# Folder exists but is empty, add it to TEMP_DIR
+			mkdir -p "$TEMP_DIR/$TIKZFOLDER"
+			if [ $? -ne 0 ]; then
+				log_error "Failed to create TikZ folder: $TEMP_DIR/$TIKZFOLDER"
+			else
+				log_message 1 "$YELLOW" "[${BOLD}Note${RESET}${YELLOW}] TikZ folder exists but is empty: $TIKZFOLDER"
+			fi
+		fi
+	else
+		log_message 2 "$YELLOW" "[${BOLD}Info${RESET}${YELLOW}] No TikZ externalization detected in $MAIN_FILE"
+	fi
+
 	# Remove duplicates from files_to_process
 	readarray -t files_to_process_unique < <(printf '%s\n' "${files_to_process[@]}" | sort -u)
 
@@ -710,7 +762,7 @@ create_archive() {
 					copy_file "$found_file" "$TEMP_DIR" "$BASE_DIR"
 					log_message 1 "$GREEN" "[${BOLD}Added${RESET}${GREEN}] $(basename "$found_file")"
 				else
-					log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found (case-insensitive): $file"
+					log_message 1 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found : $file"
 				fi
 			fi
 		fi
