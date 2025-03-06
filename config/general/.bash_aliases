@@ -2418,11 +2418,11 @@ function sc() {
 		else
 			# Use fzf for job selection
 			echo -e "${BRIGHT_CYAN}Select jobs to cancel (use Ctrl+Space to select multiple):${RESET}"
-			local selected_job
+			local selected_jobs
 			selected_jobs=$(echo "$jobs" | fzf --ansi --multi --preview "printf \"\033[1;32mJob ID:\033[0m \033[1;36m{1}\033[0m\n\033[1;34mJob Name:\033[0m \033[1;34m{2}\033[0m\n\033[1;33mStatus:\033[0m \033[1;33m{3}\033[0m\n\033[1;35mNodes:\033[0m \033[1;35m{4}\033[0m\n\033[1;36mNumber of Nodes:\033[0m \033[1;36m{5}\033[0m\n\033[1;37mPartition:\033[0m \033[1;37m{6}\033[0m\n\033[1;31mTime:\033[0m \033[1;31m{7}\033[0m\n\033[1;37mTime Limit:\033[0m \033[1;37m{8}\033[0m\"" | awk '{print $1}')
-			if [ -n "$selected_job" ]; then
-				scancel "$selected_job"
-				echo -e "${BRIGHT_GREEN}Job ${BRIGHT_YELLOW}$selected_job${RESET} cancelled successfully."
+			if [ -n "$selected_jobs" ]; then
+				scancel "$selected_jobs"
+				echo -e "${BRIGHT_GREEN}Job(s) ${BRIGHT_YELLOW}$selected_jobs${RESET} cancelled successfully."
 			else
 				echo -e "${BRIGHT_RED}No job selected.${RESET}"
 			fi
