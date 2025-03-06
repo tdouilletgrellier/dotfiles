@@ -2421,8 +2421,10 @@ function sc() {
 			local selected_jobs
 			selected_jobs=$(echo "$jobs" | fzf --ansi --multi --preview "printf \"\033[1;32mJob ID:\033[0m \033[1;36m{1}\033[0m\n\033[1;34mJob Name:\033[0m \033[1;34m{2}\033[0m\n\033[1;33mStatus:\033[0m \033[1;33m{3}\033[0m\n\033[1;35mNodes:\033[0m \033[1;35m{4}\033[0m\n\033[1;36mNumber of Nodes:\033[0m \033[1;36m{5}\033[0m\n\033[1;37mPartition:\033[0m \033[1;37m{6}\033[0m\n\033[1;31mTime:\033[0m \033[1;31m{7}\033[0m\n\033[1;37mTime Limit:\033[0m \033[1;37m{8}\033[0m\"" | awk '{print $1}')
 			if [ -n "$selected_jobs" ]; then
-				scancel "$selected_jobs"
-				echo -e "${BRIGHT_GREEN}Job(s) ${BRIGHT_YELLOW}$selected_jobs${RESET} cancelled successfully."
+				for selected_job in $selected_jobs; do
+					scancel "$selected_job"
+					echo -e "${BRIGHT_GREEN}Job ${BRIGHT_YELLOW}$selected_job${RESET} cancelled successfully."
+				done
 			else
 				echo -e "${BRIGHT_RED}No job selected.${RESET}"
 			fi
@@ -2437,43 +2439,43 @@ function sc() {
 #-------------------------------------------------------------
 # squeue wrapper
 function sq() {
-    if ! hascommand --strict squeue; then
-        echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}squeue${RESET} command is not installed or not in the PATH."
-        return 1
-    fi
-    # Help function
-    show_help() {
-        echo -e "${BRIGHT_WHITE}sq:${RESET} Enhanced SLURM queue display"
-        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sq${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
-        echo -e "${BRIGHT_WHITE}Options:${RESET}"
-        echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}       Show this help message"
-        echo -e "  ${BRIGHT_GREEN}-f, --full${RESET}        Show full job details"
-    }
-    
-    # Default format
-    format="%.10i %.9P %.12j %.8T %.9L %.6M %.4D %.4C %.18R"
-    
-    # Parse options
-    while [[ "$1" == -* ]]; do
-        case "$1" in
-        --help | -h)
-            show_help
-            return
-            ;;
-        --full | -f)
-            format="%.10i %.9P %.16q %.12j %.8T %.9L %.6M %.4D %.4C %.18R %.12B %.40Z"
-            ;;
-        *)
-            echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
-            return 1
-            ;;
-        esac
-        shift
-    done
-    
-    # Run squeue and process the output
-    squeue --me --format="$format"
+	if ! hascommand --strict squeue; then
+		echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}squeue${RESET} command is not installed or not in the PATH."
+		return 1
+	fi
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}sq:${RESET} Enhanced SLURM queue display"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sq${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}       Show this help message"
+		echo -e "  ${BRIGHT_GREEN}-f, --full${RESET}        Show full job details"
+	}
+
+	# Default format
+	format="%.10i %.9P %.12j %.8T %.9L %.6M %.4D %.4C %.18R"
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--help | -h)
+			show_help
+			return
+			;;
+		--full | -f)
+			format="%.10i %.9P %.16q %.12j %.8T %.9L %.6M %.4D %.4C %.18R %.12B %.40Z"
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Run squeue and process the output
+	squeue --me --format="$format"
 }
 #-------------------------------------------------------------
 
