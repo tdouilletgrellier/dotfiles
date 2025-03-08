@@ -210,26 +210,28 @@ resolve_path() {
 #   File path with extension if found, empty string otherwise
 #=====================================================================
 try_extensions() {
-	local file="$1"
-	local base_dir="$2"
+    local file="$1"
+    local base_dir="$2"
 
-	# If file already has extension, just check if it exists
-	if [[ "$file" =~ \.[a-zA-Z]+$ ]]; then
-		resolve_path "$file" "$base_dir" && return 0
-		return 1
-	fi
+    # Remove leading ./ for consistency
+    file="${file#./}"
 
-	# Try common extensions in order of likelihood
-	local ext
-	for ext in tex pdf png jpg jpeg eps svg tikz; do
-		local result=$(resolve_path "${file}.${ext}" "$base_dir")
-		if [[ -n "$result" ]]; then
-			echo "$result"
-			return 0
-		fi
-	done
+    # If file already has extension, just check if it exists
+    if [[ "$file" =~ \.[a-zA-Z]+$ ]]; then
+        resolve_path "$file" "$base_dir" && return 0
+        return 1
+    fi
 
-	return 1
+    # Try common extensions in order of likelihood
+    for ext in tex pdf png jpg jpeg eps svg tikz bib sty cls; do
+        local result=$(resolve_path "${file}.${ext}" "$base_dir")
+        if [[ -n "$result" ]]; then
+            echo "$result"
+            return 0
+        fi
+    done
+
+    return 1
 }
 
 #=====================================================================
