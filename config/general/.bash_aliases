@@ -2626,6 +2626,13 @@ fi
 #-------------------------------------------------------------
 # Path prepend
 pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmux/"
+# For Mac
+if [ -d /usr/local/opt/grep/libexec/gnubin ]; then
+	pathprepend "/usr/local/opt/grep/libexec/gnubin"
+fi
+if [ -d /usr/local/opt/coreutils/libexec/gnubin ]; then
+	pathprepend "/usr/local/opt/coreutils/libexec/gnubin"
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
