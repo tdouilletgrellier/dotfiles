@@ -45,6 +45,23 @@ VALID_EXTENSIONS=(tex pdf png jpg jpeg eps svg tikz bib sty cls)
 # Excluded extensions to look for
 EXCLUDED_EXTENSIONS=(bbl out aux log toc)
 
+# LaTeX keywords by category
+LATEX_INCLUDES=("input" "include" "includeonly" "bibliography" "addbibresource" "includepdf" "includetikz")
+LATEX_GRAPHICS=("includegraphics")
+LATEX_OTHER_GRAPHICS=("pgfimage" "overpic" "includesvg" "includestandalone")
+LATEX_IMPORTS=("import" "subimport")
+LATEX_TIKZ=("input" "include")
+LATEX_PACKAGE=("usepackage")
+
+# Graphics search folders
+GRAPHICS_FOLDERS=("pictures" "figures" "images")
+TIKZ_FOLDERS=("tikz" "tikz_in")
+
+# Default file extensions
+DEFAULT_BIB_EXT=".bib"
+DEFAULT_TEX_EXT=".tex"
+DEFAULT_TIKZ_EXT=".tikz"
+
 #=====================================================================
 # COLOR DEFINITIONS
 # These colors are used for console output to make information easier
@@ -196,7 +213,8 @@ resolve_path() {
 	fi
 
 	# Strip leading ./ to normalize paths
-	local clean_file="${file#./}"
+	# local clean_file="${file#./}"
+	local clean_file="${file//.\//}"
 
 	# Try relative to base directory first (most common case)
 	if [[ -f "$base_dir/$clean_file" ]]; then
@@ -234,30 +252,30 @@ resolve_path() {
 #   File path with extension if found, empty string otherwise
 #=====================================================================
 try_extensions() {
-    local file="$1"
-    local base_dir="$2"
+	local file="$1"
+	local base_dir="$2"
 
-    # Remove leading ./ for consistency
-    file="${file#./}"
+	# Remove leading ./ for consistency
+	file="${file#./}"
 
-    # If file already has extension, just check if it exists
-    if [[ "$file" =~ \.[a-zA-Z]+$ ]]; then
-        resolve_path "$file" "$base_dir" && return 0
-        return 1
-    fi
+	# If file already has extension, just check if it exists
+	if [[ "$file" =~ \.[a-zA-Z]+$ ]]; then
+		resolve_path "$file" "$base_dir" && return 0
+		return 1
+	fi
 
-    # Try common extensions in order of likelihood
-    # for ext in tex pdf png jpg jpeg eps svg tikz bib sty cls; do
-   	for ext in "${VALID_EXTENSIONS_DICT[@]}"; do
+	# Try common extensions in order of likelihood
+	# for ext in tex pdf png jpg jpeg eps svg tikz bib sty cls; do
+	for ext in "${VALID_EXTENSIONS_DICT[@]}"; do
 
-        local result=$(resolve_path "${file}.${ext}" "$base_dir")
-        if [[ -n "$result" ]]; then
-            echo "$result"
-            return 0
-        fi
-    done
+		local result=$(resolve_path "${file}.${ext}" "$base_dir")
+		if [[ -n "$result" ]]; then
+			echo "$result"
+			return 0
+		fi
+	done
 
-    return 1
+	return 1
 }
 
 #=====================================================================
@@ -361,39 +379,48 @@ extract_tex_dependencies() {
 	local deps=()
 
 	# Use an associative array for processed files to improve lookup efficiency
-	local -A processed_tex_files
+	# local -A processed_tex_files
 
 	# To prevent infinite recursion for circular references
 	local file_hash=$(realpath "$tex_file")
-	if [[ -n "${processed_tex_files[$file_hash]}" ]]; then
-		log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] Already processed: $tex_file"
+	if [[ -n "${processed_files[$file_hash]}" ]]; then
+		log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] Already processed: $tex_file" >&2
 		return
 	fi
-	processed_tex_files[$file_hash]=1
+	processed_files[$file_hash]=1
 
-	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Scanning $tex_file for dependencies..."
+	log_message 1 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Scanning $tex_file for dependencies..." >&2
 
 	# Use grep to quickly check if each type of content exists before using perl
 	local content=$(grep -a -v '^\s*%' "$tex_file")
 
 	# Extract includes and inputs
 	local includes=""
-	if echo "$content" | grep -a -q -E '\\(input|include|includeonly|bibliography|addbibresource)'; then
+	if echo "$content" | grep -a -q -E '\\(input|include|includepdf|includeonly|bibliography|addbibresource)'; then
 		includes=$(echo "$content" |
-			perl -n -e 'while (/\\(input|include|includeonly|bibliography|addbibresource)\{([^}]+)\}/g) { print "$2\n"; }')
+			perl -n -e 'while (/\\(input|include|includepdf|includeonly|bibliography|addbibresource)\{([^}]+)\}/g) {
+			$file = $2;
+            print "tikz/$file\n";
+            print "tikz_in/$file\n";
+            print "$file\n";
+        }')
 	fi
 
 	# Extract graphics
+	LATEX_GRAPHICS_STR="${LATEX_GRAPHICS[*]}"
+	GRAPHICS_FOLDERS_STR="${GRAPHICS_FOLDERS[*]}"
 	local graphics=""
-	if echo "$content" | grep -q '\\includegraphics'; then
-		graphics=$(echo "$content" |
-			perl -n -e 'while (/\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}/g) {
+	if echo "$content" | grep -qE "$(printf '\\\\(%s)' "${LATEX_GRAPHICS[@]}" | paste -sd '|')"; then
+		graphics=$(echo "$content" | perl -n -e '
+        BEGIN {
+            @commands = split(/\s+/, "'"$LATEX_GRAPHICS_STR"'");
+            @folders = split(/\s+/, "'"$GRAPHICS_FOLDERS_STR"'");
+            $pattern = join("|", map { "\\\\" . $_ } @commands);  # Construct regex pattern
+        }
+        while (/$pattern(?:\[[^\]]*\])?\{([^}]+)\}/g) {
             $file = $1;
-            # Make sure to look in common folders if no path is specified
-            if ($file !~ /\//) {
-                print "pictures/$file\n"; # Try pictures folder
-                print "figures/$file\n";  # Try figures folder
-                print "images/$file\n";   # Try images folder
+            foreach $folder (@folders) {
+                print "$folder/$file\n";
             }
             print "$file\n";
         }')
@@ -408,9 +435,14 @@ extract_tex_dependencies() {
 
 	# Extract TikZ external graphics
 	local tikz_graphics=""
-	if echo "$content" | grep -q '\.tikz'; then
+	if echo "$content" | grep -q '\.(tikz)'; then
 		tikz_graphics=$(echo "$content" |
-			perl -n -e 'while (/\\(input|include)\{([^}]+\.tikz)\}/g) { print "$2\n"; }')
+			perl -n -e 'while (/\\(input|include|includetikz)\{([^}]+\.(tikz))\}/g) {
+            $file = $2;
+            print "tikz/$file\n"; # Try pictures folder
+            print "tikz_in/$file\n";  # Try figures folder
+            print "$file\n";
+        }')
 	fi
 
 	# Extract import/subimport packages - only if found
@@ -464,7 +496,6 @@ extract_tex_dependencies() {
 			else
 				deps+=("$dep")
 			fi
-
 			# Recursively process included tex files (only for .tex files)
 			if [[ "$type" == "tex" && "$resolved_path" == *.tex ]]; then
 				local nested_deps=($(extract_tex_dependencies "$resolved_path"))
@@ -472,7 +503,7 @@ extract_tex_dependencies() {
 			fi
 			return 0
 		else
-			log_message 1 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] Could not find $type: $dep"
+			log_message 2 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] Could not find $type: $dep" >&2
 
 			# For graphics, we still want to include the path even if file not found
 			if [[ "$type" == "image" ]]; then
@@ -488,9 +519,9 @@ extract_tex_dependencies() {
 		if [[ ! "$inc" =~ \.[a-zA-Z]+$ ]]; then
 			# For bibliography entries
 			if [[ "$inc" =~ ^.*bibliography.*$ ]]; then
-				inc="${inc}.bib"
+				inc="${inc}${DEFAULT_BIB_EXT}"
 			else
-				inc="${inc}.tex"
+				inc="${inc}${DEFAULT_TEX_EXT}"
 			fi
 		fi
 
@@ -760,7 +791,6 @@ create_archive() {
 	local files_to_process=()
 
 	log_message 1 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Processing file: ${WHITE}$INPUT_FILE${RESET}"
-	log_message 1 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Archive name: ${WHITE}$ZIP_FILE${RESET}"
 
 	# Create temporary directory
 	local TEMP_DIR=$(mktemp -d)
@@ -824,6 +854,7 @@ create_archive() {
 		MAIN_FILE="$BASE_DIR/${PROJECT_NAME}.tex"
 
 		# Add dependencies from main tex file
+		log_message 1 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Expected main LaTeX file: ${WHITE}$MAIN_FILE${RESET}"
 		if [[ -f "$MAIN_FILE" ]]; then
 			local tex_deps=($(extract_tex_dependencies "$MAIN_FILE"))
 			files_to_process+=("${tex_deps[@]}")
@@ -834,15 +865,11 @@ create_archive() {
 	elif [[ "$INPUT_EXT" == "tex" ]]; then
 		log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Extracting dependencies from LaTeX file..."
 		# Extract dependencies from .tex file
-		echo "coucou"
 		files_to_process=($(extract_tex_dependencies "$INPUT_FILE"))
-		echo "$files_to_process"
 	else
 		log_error "Unsupported input file type: .$INPUT_EXT (expected .dep or .tex)"
 		exit $EXIT_INVALID_OPTION
 	fi
-
-	log_message 1 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Expected main LaTeX file: ${WHITE}$MAIN_FILE${RESET}"
 
 	# Always include the main file
 	copy_file "$MAIN_FILE" "$TEMP_DIR" "$BASE_DIR"
