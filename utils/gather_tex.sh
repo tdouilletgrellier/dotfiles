@@ -21,6 +21,31 @@
 #=====================================================================
 
 #=====================================================================
+# GLOBAL PARAMETERS
+# Parameters that are used throughout the script
+#=====================================================================
+
+# Define exit codes for better error handling
+EXIT_SUCCESS=0
+EXIT_MISSING_ARG=1
+EXIT_FILE_NOT_FOUND=2
+EXIT_INVALID_OPTION=3
+EXIT_PERMISSION_ERROR=4
+EXIT_ZIP_ERROR=5
+
+# Default verbosity level (0=quiet, 1=normal, 2=verbose)
+VERBOSITY=1
+
+# Default extension for image sequences (animategraphics)
+DEFAULT_IMAGE_EXT_FOR_ANIMATEGRAPHICS="png"
+
+# Valid extensions to look for
+VALID_EXTENSIONS=(tex pdf png jpg jpeg eps svg tikz bib sty cls)
+
+# Excluded extensions to look for
+EXCLUDED_EXTENSIONS=(bbl out aux log toc)
+
+#=====================================================================
 # COLOR DEFINITIONS
 # These colors are used for console output to make information easier
 # to differentiate and read at a glance
@@ -37,26 +62,25 @@ ITALIC="\e[3m"    # Italic text
 UNDERLINE="\e[4m" # Underlined text
 RESET="\e[0m"     # Reset formatting
 
-# Define exit codes for better error handling
-EXIT_SUCCESS=0
-EXIT_MISSING_ARG=1
-EXIT_FILE_NOT_FOUND=2
-EXIT_INVALID_OPTION=3
-EXIT_PERMISSION_ERROR=4
-EXIT_ZIP_ERROR=5
-
-# Default verbosity level (0=quiet, 1=normal, 2=verbose)
-VERBOSITY=1
-
-# Commonly used extensions for faster lookups
-declare -A VALID_EXTENSIONS
-for ext in tex pdf png jpg jpeg eps svg tikz bib sty cls; do
-	VALID_EXTENSIONS["$ext"]=1
-done
-
+#=====================================================================
+# GLOBAL VARIABLES
+# Arrays that are used throughout the script
+#=====================================================================
 # Global variables to track processed items
 declare -A processed_files
 declare -A processed_patterns
+
+# Valid extensions to look for
+declare -A VALID_EXTENSIONS_DICT
+for ext in "${VALID_EXTENSIONS[@]}"; do
+	VALID_EXTENSIONS_DICT["$ext"]=1
+done
+
+# Excluded extensions to look for
+declare -A EXCLUDED_EXTENSIONS_DICT
+for ext in "${EXCLUDED_EXTENSIONS[@]}"; do
+	EXCLUDED_EXTENSIONS_DICT["$ext"]=1
+done
 
 #=====================================================================
 # FUNCTION: log_message
@@ -223,7 +247,9 @@ try_extensions() {
     fi
 
     # Try common extensions in order of likelihood
-    for ext in tex pdf png jpg jpeg eps svg tikz bib sty cls; do
+    # for ext in tex pdf png jpg jpeg eps svg tikz bib sty cls; do
+   	for ext in "${VALID_EXTENSIONS_DICT[@]}"; do
+
         local result=$(resolve_path "${file}.${ext}" "$base_dir")
         if [[ -n "$result" ]]; then
             echo "$result"
@@ -291,7 +317,7 @@ process_animated_graphics() {
 		else
 			# Check one time only for first frame to determine extension
 			local resolved_path=$(try_extensions "$prefix$first" "$tex_dir")
-			local ext="png" # Default extension
+			local ext="$DEFAULT_IMAGE_EXT_FOR_ANIMATEGRAPHICS" # Default extension
 
 			if [[ -n "$resolved_path" ]]; then
 				ext="${resolved_path##*.}"
@@ -772,13 +798,10 @@ create_archive() {
 			log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Beamer class detected, looking for themes..."
 		fi
 
-		# Define excluded extensions using a hash for faster lookups
-		declare -A excluded_extensions=([bbl]=1 [out]=1 [aux]=1 [log]=1 [toc]=1)
-
 		# Process regular files
 		for file in "${all_files[@]}"; do
 			local file_ext="${file##*.}"
-			if [[ -n "${excluded_extensions[$file_ext]}" ]]; then
+			if [[ -n "${EXCLUDED_EXTENSIONS_DICT[$file_ext]}" ]]; then
 				log_message 2 "$YELLOW" "[${BOLD}Excluded${RESET}${YELLOW}] Skipping file with excluded extension: $file"
 			else
 				files_to_process+=("$file")
