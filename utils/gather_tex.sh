@@ -286,7 +286,7 @@ process_animated_graphics() {
 	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Scanning $tex_file for animated graphics..."
 
 	# Use grep first to check if any animations exist before using perl
-	if ! grep -q "\\\\animategraphics" "$tex_file"; then
+	if ! grep -a -q "\\\\animategraphics" "$tex_file"; then
 		return
 	fi
 
@@ -374,11 +374,11 @@ extract_tex_dependencies() {
 	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Scanning $tex_file for dependencies..."
 
 	# Use grep to quickly check if each type of content exists before using perl
-	local content=$(grep -v '^\s*%' "$tex_file")
+	local content=$(grep -a -v '^\s*%' "$tex_file")
 
 	# Extract includes and inputs
 	local includes=""
-	if echo "$content" | grep -q -E '\\(input|include|includeonly|bibliography|addbibresource)'; then
+	if echo "$content" | grep -a -q -E '\\(input|include|includeonly|bibliography|addbibresource)'; then
 		includes=$(echo "$content" |
 			perl -n -e 'while (/\\(input|include|includeonly|bibliography|addbibresource)\{([^}]+)\}/g) { print "$2\n"; }')
 	fi
@@ -834,7 +834,9 @@ create_archive() {
 	elif [[ "$INPUT_EXT" == "tex" ]]; then
 		log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Extracting dependencies from LaTeX file..."
 		# Extract dependencies from .tex file
+		echo "coucou"
 		files_to_process=($(extract_tex_dependencies "$INPUT_FILE"))
+		echo "$files_to_process"
 	else
 		log_error "Unsupported input file type: .$INPUT_EXT (expected .dep or .tex)"
 		exit $EXIT_INVALID_OPTION
