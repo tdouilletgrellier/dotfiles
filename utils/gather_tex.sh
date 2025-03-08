@@ -48,6 +48,16 @@ EXIT_ZIP_ERROR=5
 # Default verbosity level (0=quiet, 1=normal, 2=verbose)
 VERBOSITY=1
 
+# Commonly used extensions for faster lookups
+declare -A VALID_EXTENSIONS
+for ext in tex pdf png jpg jpeg eps svg tikz bib sty cls; do
+	VALID_EXTENSIONS["$ext"]=1
+done
+
+# Global variables to track processed items
+declare -A processed_files
+declare -A processed_patterns
+
 #=====================================================================
 # FUNCTION: log_message
 #
@@ -139,73 +149,6 @@ ${RESET}"
 }
 
 #=====================================================================
-# FUNCTION: process_animated_graphics
-#
-# PURPOSE:
-#   Extracts and processes \animategraphics commands from LaTeX files.
-#   These commands are used for animations in LaTeX presentations.
-#
-# ALGORITHM:
-#   1. Scans the specified tex file for \animategraphics commands
-#   2. Extracts the prefix, first and last frame numbers
-#   3. Generates a list of all frame filenames in the sequence
-#
-# PARAMETERS:
-#   $1 - Path to the .tex file to analyze
-#
-# RETURNS:
-#   Space-separated list of animation frame files
-#
-# EXAMPLE LaTeX CODE HANDLED:
-#   \animategraphics[width=\textwidth]{12}{animation-}{1}{30}
-#=====================================================================
-process_animated_graphics() {
-	local tex_file="$1"
-	local tex_dir=$(dirname "$tex_file")
-	local deps=()
-
-	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Scanning $tex_file for animated graphics..."
-
-	# Use perl for more robust extraction of animated graphics commands
-	local animations=$(grep -v '^\s*%' "$tex_file" |
-		perl -n -e 'while (/\\animategraphics(?:\[[^\]]*\])?\{([^}]+)\}\{([^}]+)\}\{([^}]+)\}\{([^}]+)\}/g) {
-			print "$1|$2|$3|$4\n";
-		}')
-
-	while IFS='|' read -r fps prefix first last; do
-		[[ -z "$fps" ]] && continue
-
-		log_message 2 "$MAGENTA" "[${BOLD}Animation${RESET}${MAGENTA}] Found sequence: ${WHITE}$prefix${RESET}${MAGENTA} from ${WHITE}$first${RESET}${MAGENTA} to ${WHITE}$last${RESET}"
-
-		# Validate that first and last are numeric
-		if ! [[ "$first" =~ ^[0-9]+$ ]] || ! [[ "$last" =~ ^[0-9]+$ ]]; then
-			log_message 1 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] Non-numeric frame numbers: fps=$fps, prefix=$prefix, first=$first, last=$last"
-			continue
-		fi
-
-		# Generate the frame filenames
-		for ((i = first; i <= last; i++)); do
-			# Determine if we need to add an extension
-if [[ "$prefix" =~ \.[a-zA-Z]+$ ]]; then
-    deps+=("$prefix$i")
-else
-    local resolved_path=$(try_extensions "$prefix$i" "$tex_dir")
-    if [[ -n "$resolved_path" ]]; then
-        # Extract just the filename with extension
-        local filename=$(basename "$resolved_path")
-        deps+=("$filename")
-    else
-        # Default to png if no file is found
-        deps+=("$prefix$i.png")
-    fi
-fi
-		done
-	done <<<"$animations"
-
-	echo "${deps[@]}"
-}
-
-#=====================================================================
 # FUNCTION: resolve_path
 #
 # PURPOSE:
@@ -222,23 +165,31 @@ resolve_path() {
 	local file="$1"
 	local base_dir="$2"
 
+	# Fast path for absolute paths
 	if [[ "$file" == /* ]]; then
-		# Absolute path
-		if [[ -f "$file" ]]; then
-			echo "$file"
-			return 0
-		fi
-	else
-		# Try relative to base directory
-		if [[ -f "$base_dir/$file" ]]; then
-			echo "$base_dir/$file"
-			return 0
-		fi
-		# Try relative to project root
-		if [[ -f "$BASE_DIR/$file" ]]; then
-			echo "$BASE_DIR/$file"
-			return 0
-		fi
+		[[ -f "$file" ]] && echo "$file" && return 0
+		return 1
+	fi
+
+	# Strip leading ./ to normalize paths
+	local clean_file="${file#./}"
+
+	# Try relative to base directory first (most common case)
+	if [[ -f "$base_dir/$clean_file" ]]; then
+		echo "$base_dir/$clean_file"
+		return 0
+	fi
+
+	# Try relative to project root if different
+	if [[ "$base_dir" != "$BASE_DIR" && -f "$BASE_DIR/$clean_file" ]]; then
+		echo "$BASE_DIR/$clean_file"
+		return 0
+	fi
+
+	# Try current directory as last resort
+	if [[ -f "$clean_file" ]]; then
+		echo "$(pwd)/$clean_file"
+		return 0
 	fi
 
 	# File not found
@@ -262,13 +213,14 @@ try_extensions() {
 	local file="$1"
 	local base_dir="$2"
 
-	# If file already has extension
+	# If file already has extension, just check if it exists
 	if [[ "$file" =~ \.[a-zA-Z]+$ ]]; then
 		resolve_path "$file" "$base_dir" && return 0
 		return 1
 	fi
 
-	# Try different extensions
+	# Try common extensions in order of likelihood
+	local ext
 	for ext in tex pdf png jpg jpeg eps svg tikz; do
 		local result=$(resolve_path "${file}.${ext}" "$base_dir")
 		if [[ -n "$result" ]]; then
@@ -278,6 +230,79 @@ try_extensions() {
 	done
 
 	return 1
+}
+
+#=====================================================================
+# FUNCTION: process_animated_graphics
+#
+# PURPOSE:
+#   Extracts and processes \animategraphics commands from LaTeX files.
+#   These commands are used for animations in LaTeX presentations.
+#
+# ALGORITHM:
+#   1. Scans the specified tex file for \animategraphics commands
+#   2. Extracts the prefix, first and last frame numbers
+#   3. Generates a list of all frame filenames in the sequence
+#
+# PARAMETERS:
+#   $1 - Path to the .tex file to analyze
+#
+# RETURNS:
+#   Space-separated list of animation frame files
+#=====================================================================
+process_animated_graphics() {
+	local tex_file="$1"
+	local tex_dir=$(dirname "$tex_file")
+	local deps=()
+
+	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Scanning $tex_file for animated graphics..."
+
+	# Use grep first to check if any animations exist before using perl
+	if ! grep -q "\\\\animategraphics" "$tex_file"; then
+		return
+	fi
+
+	# Optimize by only processing non-commented lines with animations
+	local animations=$(grep -v '^\s*%' "$tex_file" |
+		grep "\\\\animategraphics" |
+		perl -n -e 'while (/\\animategraphics(?:\[[^\]]*\])?\{([^}]+)\}\{([^}]+)\}\{([^}]+)\}\{([^}]+)\}/g) {
+            print "$1|$2|$3|$4\n";
+        }')
+
+	while IFS='|' read -r fps prefix first last; do
+		[[ -z "$fps" ]] && continue
+
+		log_message 2 "$MAGENTA" "[${BOLD}Animation${RESET}${MAGENTA}] Found sequence: ${WHITE}$prefix${RESET}${MAGENTA} from ${WHITE}$first${RESET}${MAGENTA} to ${WHITE}$last${RESET}"
+
+		# Fast validation check for numbers
+		if [[ ! "$first" =~ ^[0-9]+$ ]] || [[ ! "$last" =~ ^[0-9]+$ ]]; then
+			log_message 1 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] Non-numeric frame numbers: fps=$fps, prefix=$prefix, first=$first, last=$last"
+			continue
+		fi
+
+		# Generate frames - optimize by checking extension only once
+		if [[ "$prefix" =~ \.[a-zA-Z]+$ ]]; then
+			# Already has extension
+			for ((i = first; i <= last; i++)); do
+				deps+=("$prefix$i")
+			done
+		else
+			# Check one time only for first frame to determine extension
+			local resolved_path=$(try_extensions "$prefix$first" "$tex_dir")
+			local ext="png" # Default extension
+
+			if [[ -n "$resolved_path" ]]; then
+				ext="${resolved_path##*.}"
+			fi
+
+			# Generate all frames with determined extension
+			for ((i = first; i <= last; i++)); do
+				deps+=("$prefix$i.$ext")
+			done
+		fi
+	done <<<"$animations"
+
+	echo "${deps[@]}"
 }
 
 #=====================================================================
@@ -308,50 +333,80 @@ extract_tex_dependencies() {
 	local deps=()
 
 	# Use an associative array for processed files to improve lookup efficiency
-	local -A processed_files
+	local -A processed_tex_files
 
 	# To prevent infinite recursion for circular references
 	local file_hash=$(realpath "$tex_file")
-	if [[ -n "${processed_files[$file_hash]}" ]]; then
+	if [[ -n "${processed_tex_files[$file_hash]}" ]]; then
 		log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] Already processed: $tex_file"
 		return
 	fi
-	processed_files[$file_hash]=1
+	processed_tex_files[$file_hash]=1
 
 	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Scanning $tex_file for dependencies..."
 
-	# Extract includes and inputs using perl for better accuracy
-	local includes=$(grep -v '^\s*%' "$tex_file" |
-		perl -n -e 'while (/\\(input|include|includeonly|bibliography|addbibresource)\{([^}]+)\}/g) { print "$2\n"; }')
+	# Use grep to quickly check if each type of content exists before using perl
+	local content=$(grep -v '^\s*%' "$tex_file")
 
-	# Extract graphics with perl for more robust extraction
-	local graphics=$(grep -v '^\s*%' "$tex_file" |
-		perl -n -e 'while (/\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}/g) { print "$1\n"; }')
+	# Extract includes and inputs
+	local includes=""
+	if echo "$content" | grep -q -E '\\(input|include|includeonly|bibliography|addbibresource)'; then
+		includes=$(echo "$content" |
+			perl -n -e 'while (/\\(input|include|includeonly|bibliography|addbibresource)\{([^}]+)\}/g) { print "$2\n"; }')
+	fi
+
+	# Extract graphics
+	local graphics=""
+	if echo "$content" | grep -q '\\includegraphics'; then
+		graphics=$(echo "$content" |
+			perl -n -e 'while (/\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}/g) {
+            $file = $1;
+            # Make sure to look in common folders if no path is specified
+            if ($file !~ /\//) {
+                print "pictures/$file\n"; # Try pictures folder
+                print "figures/$file\n";  # Try figures folder
+                print "images/$file\n";   # Try images folder
+            }
+            print "$file\n";
+        }')
+	fi
 
 	# Extract other graphics commands
-	local other_graphics=$(grep -v '^\s*%' "$tex_file" |
-		perl -n -e 'while (/\\(pgfimage|overpic|includesvg|includestandalone)(?:\[[^\]]*\])?\{([^}]+)\}/g) { print "$2\n"; }')
+	local other_graphics=""
+	if echo "$content" | grep -q -E '\\(pgfimage|overpic|includesvg|includestandalone)'; then
+		other_graphics=$(echo "$content" |
+			perl -n -e 'while (/\\(pgfimage|overpic|includesvg|includestandalone)(?:\[[^\]]*\])?\{([^}]+)\}/g) { print "$2\n"; }')
+	fi
 
 	# Extract TikZ external graphics
-	local tikz_graphics=$(grep -v '^\s*%' "$tex_file" |
-		perl -n -e 'while (/\\(input|include)\{([^}]+\.tikz)\}/g) { print "$2\n"; }')
+	local tikz_graphics=""
+	if echo "$content" | grep -q '\.tikz'; then
+		tikz_graphics=$(echo "$content" |
+			perl -n -e 'while (/\\(input|include)\{([^}]+\.tikz)\}/g) { print "$2\n"; }')
+	fi
 
-	# Extract import/subimport packages
-	local imports=$(grep -v '^\s*%' "$tex_file" |
-		perl -n -e 'while (/\\(import|subimport)\{([^}]+)\}\{([^}]+)\}/g) {
-			$dir = $2; $file = $3;
-			$file .= ".tex" unless $file =~ /\.[a-zA-Z]+$/;
-			print "$dir/$file\n";
-		}')
+	# Extract import/subimport packages - only if found
+	local imports=""
+	if echo "$content" | grep -q -E '\\(import|subimport)'; then
+		imports=$(echo "$content" |
+			perl -n -e 'while (/\\(import|subimport)\{([^}]+)\}\{([^}]+)\}/g) {
+                $dir = $2; $file = $3;
+                $file .= ".tex" unless $file =~ /\.[a-zA-Z]+$/;
+                print "$dir/$file\n";
+            }')
+	fi
 
-	# Extract LaTeX packages
-	local packages=$(grep -v '^\s*%' "$tex_file" |
-		perl -n -e 'while (/\\usepackage(?:\[[^\]]*\])?\{([^}]+)\}/g) {
-			foreach $pkg (split(/,/, $1)) {
-				$pkg =~ s/^\s+|\s+$//g; # Trim whitespace
-				print "$pkg.sty\n" unless $pkg =~ /^(standard|core)$/i;
-			}
-		}')
+	# Extract LaTeX packages - only if \usepackage is present
+	local packages=""
+	if echo "$content" | grep -q '\\usepackage'; then
+		packages=$(echo "$content" |
+			perl -n -e 'while (/\\usepackage(?:\[[^\]]*\])?\{([^}]+)\}/g) {
+                foreach $pkg (split(/,/, $1)) {
+                    $pkg =~ s/^\s+|\s+$//g; # Trim whitespace
+                    print "$pkg.sty\n" unless $pkg =~ /^(standard|core)$/i;
+                }
+            }')
+	fi
 
 	# Process animated graphics
 	local animated_graphics=($(process_animated_graphics "$tex_file"))
@@ -359,43 +414,49 @@ extract_tex_dependencies() {
 		deps+=("$anim")
 	done
 
-process_dependency() {
-    local dep="$1"
-    local tex_dir="$2"
-    local type="$3"  # "tex", "image", "package", etc.
+	# Function to process dependencies - optimized
+	process_dependency() {
+		local dep="$1"
+		local tex_dir="$2"
+		local type="$3" # "tex", "image", "package", etc.
 
-    local resolved_path=$(try_extensions "$dep" "$tex_dir")
-    if [[ -n "$resolved_path" ]]; then
-        # Make path relative to tex_dir for deps
-        if [[ "$resolved_path" == /* ]]; then
-            local rel_path=$(realpath --relative-to="$tex_dir" "$resolved_path")
-            deps+=("$rel_path")
-        else
-            deps+=("$dep")
-        fi
+		# Skip if already processed
+		local dep_key="${dep}:${type}"
+		if [[ -n "${processed_files[$dep_key]}" ]]; then
+			return 0
+		fi
+		processed_files[$dep_key]=1
 
-        # Recursively process included tex files (only for .tex files)
-        if [[ "$type" == "tex" && "$resolved_path" == *.tex ]]; then
-            local nested_deps=($(extract_tex_dependencies "$resolved_path"))
-            for nested in "${nested_deps[@]}"; do
-                deps+=("$nested")
-            done
-        fi
-        return 0
-    else
-        log_message 1 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] Could not find $type: $dep"
+		local resolved_path=$(try_extensions "$dep" "$tex_dir")
+		if [[ -n "$resolved_path" ]]; then
+			# Make path relative to tex_dir for deps
+			if [[ "$resolved_path" == /* ]]; then
+				local rel_path=$(realpath --relative-to="$tex_dir" "$resolved_path")
+				deps+=("$rel_path")
+			else
+				deps+=("$dep")
+			fi
 
-        # For graphics, we still want to include the path even if file not found
-        if [[ "$type" == "image" ]]; then
-            deps+=("$dep")
-        fi
-        return 1
-    fi
-}
+			# Recursively process included tex files (only for .tex files)
+			if [[ "$type" == "tex" && "$resolved_path" == *.tex ]]; then
+				local nested_deps=($(extract_tex_dependencies "$resolved_path"))
+				deps+=("${nested_deps[@]}")
+			fi
+			return 0
+		else
+			log_message 1 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] Could not find $type: $dep"
 
-	# Process all includes and bibliography files
+			# For graphics, we still want to include the path even if file not found
+			if [[ "$type" == "image" ]]; then
+				deps+=("$dep")
+			fi
+			return 1
+		fi
+	}
+
+	# Process all includes and bibliography files (optimize extension handling)
 	for inc in $includes; do
-		# Add appropriate extension if not present
+		# Add appropriate extension only if needed
 		if [[ ! "$inc" =~ \.[a-zA-Z]+$ ]]; then
 			# For bibliography entries
 			if [[ "$inc" =~ ^.*bibliography.*$ ]]; then
@@ -413,22 +474,121 @@ process_dependency() {
 		process_dependency "$imp" "$tex_dir" "import"
 	done
 
-	# Process standard graphics
+	# Process standard graphics - combine to reduce loops
 	for img in $graphics $other_graphics $tikz_graphics; do
+		[[ -z "$img" ]] && continue
 		process_dependency "$img" "$tex_dir" "image"
 	done
 
 	# Process packages (optional, depending on your needs)
+	# Use a faster check with hash lookup for package validation
 	for pkg in $packages; do
-		# Check if package exists in TEXMF paths
-		local pkg_path=$(kpsewhich "$pkg" 2>/dev/null)
-		if [[ -n "$pkg_path" ]]; then
-			deps+=("$pkg")
-		fi
+		[[ -z "$pkg" ]] && continue
+		# Instead of running kpsewhich for each package, just add to deps
+		# and let the file copying step handle existence check
+		deps+=("$pkg")
 	done
 
-	# Return all dependencies (sort and remove duplicates)
-	echo "${deps[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '
+	# Return all dependencies (use printf for faster output)
+	printf "%s " "${deps[@]}"
+}
+
+#=====================================================================
+# FUNCTION: copy_file
+#
+# PURPOSE:
+#   Copies a file to the temporary directory while preserving the
+#   relative directory structure.
+#
+# ALGORITHM:
+#   1. Determines if file path is relative to BASE_DIR
+#   2. Creates necessary subdirectories
+#   3. Copies the file to the correct location
+#   4. Reports success or failure
+#
+# PARAMETERS:
+#   $1 - Source file path
+#   $2 - Temporary directory (destination)
+#   $3 - Base directory (project root)
+#
+# RETURNS:
+#   0 on success, 1 on failure
+#=====================================================================
+copy_file() {
+	local file="$1"
+	local temp_dir="$2"
+	local base_dir="$3"
+	local target_path
+
+	# Check if file exists
+	if [[ -f "$file" ]]; then
+		# For files in BASE_DIR, make them relative to BASE_DIR
+		if [[ "$(realpath "$file")" == "$(realpath "$base_dir")"* ]]; then
+			target_path=$(realpath --relative-to="$base_dir" "$file")
+		else
+			# For files not in BASE_DIR, keep their relative path from current directory
+			target_path=$(realpath --relative-base="$(pwd)" "$file")
+		fi
+
+		# Remove any leading slash to ensure it's always a relative path
+		target_path="${target_path#/}"
+
+		# Check if file has already been processed - fast hash lookup
+		if [[ -n "${processed_files[$target_path]}" ]]; then
+			log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] $target_path (already processed)"
+			return 0
+		fi
+
+		# Mark this file as processed to prevent duplicate messages
+		processed_files[$target_path]=1
+
+		# Skip if file already exists at destination (faster than copying again)
+		if [[ -f "$temp_dir/$target_path" ]]; then
+			log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] $target_path (already exists)"
+			return 0
+		fi
+
+		# Create directories in TEMP_DIR (only if needed)
+		local dir_path="$(dirname "$target_path")"
+		if [[ "$dir_path" != "." && ! -d "$temp_dir/$dir_path" ]]; then
+			mkdir -p "$temp_dir/$dir_path"
+			if [ $? -ne 0 ]; then
+				log_error "Failed to create directory: $temp_dir/$dir_path"
+				return 1
+			fi
+		fi
+
+		# Copy the file to the temporary directory
+		cp "$file" "$temp_dir/$target_path"
+		if [ $? -ne 0 ]; then
+			log_error "Failed to copy file: $file to $temp_dir/$target_path"
+			return 1
+		fi
+
+		# Always display relative path in logs
+		log_message 1 "$GREEN" "[${BOLD}Added${RESET}${GREEN}] $target_path"
+		return 0
+
+	# Case-insensitive check if the exact case doesn't match - optimize by checking dir first
+	elif [[ -d "$(dirname "$file")" ]]; then
+		local dir_path="$(dirname "$file")"
+		local file_name="$(basename "$file")"
+		# Use find with -iname for faster case-insensitive lookup
+		local found_file=$(find "$dir_path" -maxdepth 1 -type f -iname "$file_name" | head -n 1)
+
+		if [[ -n "$found_file" ]]; then
+			log_message 1 "$YELLOW" "[${BOLD}Case Mismatch${RESET}${YELLOW}] Using $found_file instead of $file"
+			# Reuse copy_file logic with the found file
+			copy_file "$found_file" "$temp_dir" "$base_dir"
+			return $?
+		fi
+
+		log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found: $file"
+		return 1
+	else
+		log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found: $file"
+		return 1
+	fi
 }
 
 #=====================================================================
@@ -458,38 +618,28 @@ process_glob_pattern() {
 	local base_dir="$3"
 	local count=0
 
+	# Check if pattern has already been processed
+	if [[ -n "${processed_patterns[$pattern]}" ]]; then
+		log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] Pattern already processed: $pattern"
+		return ${processed_patterns[$pattern]}
+	fi
+
 	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Glob pattern: ${WHITE}$pattern${RESET}"
 
-	# Special handling for patterns with path separators
+	# Handle different pattern types more efficiently
 	if [[ "$pattern" == *"/"* ]]; then
-		local pattern_dir=$(dirname "$pattern")
-		local pattern_file=$(basename "$pattern")
-
-		# Check if pattern_dir is absolute or relative path
-		if [[ "$pattern_dir" == /* ]]; then
-			# Absolute path
-			for file in $pattern_dir/$pattern_file; do
-				if [[ -f "$file" ]]; then
-					copy_file "$file" "$temp_dir" "$base_dir"
-					((count++))
-				fi
-			done
-		else
-			# Relative path
-			for file in $pattern_dir/$pattern_file; do
-				if [[ -f "$file" ]]; then
-					copy_file "$file" "$temp_dir" "$base_dir"
-					((count++))
-				fi
-			done
-		fi
+		# Pattern contains path separators
+		local files=($(find $(dirname "$pattern") -maxdepth 1 -path "$pattern" -type f 2>/dev/null))
+		for file in "${files[@]}"; do
+			copy_file "$file" "$temp_dir" "$base_dir"
+			((count++))
+		done
 	else
 		# Simple filename pattern (no directory)
-		for file in $pattern; do
-			if [[ -f "$file" ]]; then
-				copy_file "$file" "$temp_dir" "$base_dir"
-				((count++))
-			fi
+		local files=($(find . -maxdepth 1 -path "./$pattern" -type f 2>/dev/null))
+		for file in "${files[@]}"; do
+			copy_file "$file" "$temp_dir" "$base_dir"
+			((count++))
 		done
 	fi
 
@@ -499,104 +649,9 @@ process_glob_pattern() {
 		log_message 1 "$GREEN" "[${BOLD}Added${RESET}${GREEN}] $count files matching pattern: ${WHITE}$pattern${RESET}"
 	fi
 
+	# Store the result to avoid reprocessing
+	processed_patterns[$pattern]=$count
 	return $count
-}
-
-#=====================================================================
-# FUNCTION: copy_file
-#
-# PURPOSE:
-#   Copies a file to the temporary directory while preserving the
-#   relative directory structure.
-#
-# ALGORITHM:
-#   1. Determines if file path is relative to BASE_DIR
-#   2. Creates necessary subdirectories
-#   3. Copies the file to the correct location
-#   4. Reports success or failure
-#
-# PARAMETERS:
-#   $1 - Source file path
-#   $2 - Temporary directory (destination)
-#   $3 - Base directory (project root)
-#
-# RETURNS:
-#   0 on success, 1 on failure
-#=====================================================================
-declare -A processed_files
-copy_file() {
-	local file="$1"
-	local temp_dir="$2"
-	local base_dir="$3"
-	local target_path
-
-	# Check if file exists
-	if [[ -f "$file" ]]; then
-		# For files in BASE_DIR, make them relative to BASE_DIR
-		if [[ "$(realpath "$file")" == "$(realpath "$base_dir")"* ]]; then
-			target_path=$(realpath --relative-to="$base_dir" "$file")
-		else
-			# For files not in BASE_DIR, keep their relative path from current directory
-			target_path=$(realpath --relative-base="$(pwd)" "$file")
-		fi
-
-		# Remove any leading slash to ensure it's always a relative path
-		target_path="${target_path#/}"
-		
-		# Check if file has already been processed using the target_path as key
-		if [[ -n "${processed_files[$target_path]}" ]]; then
-			log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] $target_path (already processed)"
-			return 0
-		fi
-		
-		# Mark this file as processed to prevent duplicate messages
-		processed_files[$target_path]=1
-
-		# Create directories in TEMP_DIR
-		local dir_path="$(dirname "$target_path")"
-		if [[ "$dir_path" != "." ]]; then
-			mkdir -p "$temp_dir/$dir_path"
-			if [ $? -ne 0 ]; then
-				log_error "Failed to create directory: $temp_dir/$dir_path"
-				return 1
-			fi
-		fi
-
-		# Skip if file already exists at destination
-		if [[ -f "$temp_dir/$target_path" ]]; then
-			log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] $target_path (already exists)"
-			return 0
-		fi
-
-		# Copy the file to the temporary directory
-		cp "$file" "$temp_dir/$target_path"
-		if [ $? -ne 0 ]; then
-			log_error "Failed to copy file: $file to $temp_dir/$target_path"
-			return 1
-		fi
-		# Always display relative path in logs
-		log_message 1 "$GREEN" "[${BOLD}Added${RESET}${GREEN}] $target_path"
-		return 0
-
-    # Case-insensitive check if the exact case doesn't match
-    elif [[ -d "$(dirname "$file")" ]]; then
-        local dir_path="$(dirname "$file")"
-        local file_name="$(basename "$file")"
-        local found_file=$(find "$dir_path" -maxdepth 1 -type f -iname "$file_name" | head -n 1)
-
-        if [[ -n "$found_file" ]]; then
-            log_message 1 "$YELLOW" "[${BOLD}Case Mismatch${RESET}${YELLOW}] Using $found_file instead of $file"
-            # Reuse resolve_path logic by calling copy_file recursively with the found file
-            copy_file "$found_file" "$temp_dir" "$base_dir"
-            return $?
-        fi
-
-        log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found: $file"
-        return 1
-    else
-        log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found: $file"
-        return 1
-    fi
 }
 
 #=====================================================================
@@ -627,10 +682,11 @@ create_archive() {
 	local EXTRA_PATTERNS=()
 	local MAIN_FILE="$INPUT_FILE"
 
-	# Reset our processed files tracking for each archive creation
-	declare -gA processed_files=()
+	# Reset our tracking variables for each archive creation
+	processed_files=()
+	processed_patterns=()
 
-	# Process options
+	# Process options more efficiently
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
 		-a)
@@ -678,34 +734,49 @@ create_archive() {
 	log_message 1 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Processing file: ${WHITE}$INPUT_FILE${RESET}"
 	log_message 1 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Archive name: ${WHITE}$ZIP_FILE${RESET}"
 
-	# Handle different input file types
+	# Create temporary directory
+	local TEMP_DIR=$(mktemp -d)
+	if [ $? -ne 0 ]; then
+		log_error "Failed to create temporary directory."
+		exit $EXIT_PERMISSION_ERROR
+	fi
+	log_message 2 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Created temporary directory: ${WHITE}$TEMP_DIR${RESET}"
+
+	# Trap to clean up temp directory on exit
+	trap "rm -rf '$TEMP_DIR'" EXIT
+
+	# Handle different input file types - optimized processing
 	if [[ "$INPUT_EXT" == "dep" ]]; then
 		log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Reading dependency file..."
 
+		# Extract files, classes, and themes more efficiently
+		local content=$(cat "$INPUT_FILE")
+
 		# Extract all files directly mentioned in the .dep file
-		local all_files=($(sed -n 's/.*\*{file}\s*{\([^}]*\)}.*/\1/p' "$INPUT_FILE"))
+		local all_files=($(echo "$content" | sed -n 's/.*\*{file}\s*{\([^}]*\)}.*/\1/p'))
+
+		# Clean file paths (remove leading ./ for consistency)
+		for ((i = 0; i < ${#all_files[@]}; i++)); do
+			all_files[$i]="${all_files[$i]#./}"
+		done
 
 		# Extract all class names used
-		local all_classes=($(sed -n 's/.*\*{class}\s*{\([^}]*\)}.*/\1/p' "$INPUT_FILE"))
+		local all_classes=($(echo "$content" | sed -n 's/.*\*{class}\s*{\([^}]*\)}.*/\1/p'))
 
 		# Extract all beamer themes if beamer class is used
 		local beamer_themes=()
 		if [[ " ${all_classes[*]} " =~ " beamer " ]]; then
-			beamer_themes=($(sed -n 's/.*\*{package}{beamertheme\([^}]*\)}.*/\1/p' "$INPUT_FILE"))
+			beamer_themes=($(echo "$content" | sed -n 's/.*\*{package}{beamertheme\([^}]*\)}.*/\1/p'))
 			log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Beamer class detected, looking for themes..."
 		fi
 
-		files_to_process=()
-
-		# Filter out unwanted extensions
-		# =================  EXCLUDED EXTENSIONS (customize as needed) =================
-		local excluded_extensions=("bbl" "out" "aux" "log" "toc")
-		# ==============================================================================
+		# Define excluded extensions using a hash for faster lookups
+		declare -A excluded_extensions=([bbl]=1 [out]=1 [aux]=1 [log]=1 [toc]=1)
 
 		# Process regular files
 		for file in "${all_files[@]}"; do
 			local file_ext="${file##*.}"
-			if [[ " ${excluded_extensions[*]} " =~ " ${file_ext} " ]]; then
+			if [[ -n "${excluded_extensions[$file_ext]}" ]]; then
 				log_message 2 "$YELLOW" "[${BOLD}Excluded${RESET}${YELLOW}] Skipping file with excluded extension: $file"
 			else
 				files_to_process+=("$file")
@@ -746,36 +817,24 @@ create_archive() {
 
 	log_message 1 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Expected main LaTeX file: ${WHITE}$MAIN_FILE${RESET}"
 
-	# Create temporary directory
-	local TEMP_DIR=$(mktemp -d)
-	if [ $? -ne 0 ]; then
-		log_error "Failed to create temporary directory."
-		exit $EXIT_PERMISSION_ERROR
-	fi
-	log_message 2 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Created temporary directory: ${WHITE}$TEMP_DIR${RESET}"
-
-	# Trap to clean up temp directory on exit
-	trap "rm -rf '$TEMP_DIR'" EXIT
-
-	# =================  INCLUDED EXTENSIONS (customize as needed) =================
-	local image_extensions=("png" "jpeg" "jpg" "bmp" "pdf" "eps" "gif")
-	local tex_extensions=("tex" "tikz" "bib" "sty" "cls")
-	# ==============================================================================
-
 	# Always include the main file
 	copy_file "$MAIN_FILE" "$TEMP_DIR" "$BASE_DIR"
 	if [ $? -ne 0 ]; then
-		log_error "Failed to copy main file. Aborting."
-		exit $EXIT_PERMISSION_ERROR
+		log_message 2 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] Failed to copy main file. Continuing anyway."
 	fi
 
-	# Extract the folder name from \tikzexternalize[prefix=...]
+	# Extract the folder name from \tikzexternalize[prefix=...] - use grep first to check existence
 	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Checking for TikZ externalization folder..."
-	TIKZFOLDER=$(grep -oP '\\tikzexternalize\[prefix=\K[^]]+' "$MAIN_FILE" | sed 's/\/$//' | tr -d '{}')
 
-	# If TIKZFOLDER is not empty
+	local TIKZFOLDER=""
+	if grep -q '\\tikzexternalize' "$MAIN_FILE" 2>/dev/null; then
+		TIKZFOLDER=$(grep -oP '\\tikzexternalize\[prefix=\K[^]]+' "$MAIN_FILE" | sed 's/\/$//' | tr -d '{}')
+	fi
+
+	# If TIKZFOLDER is not empty - optimize TikZ folder handling
 	if [[ -n "$TIKZFOLDER" ]]; then
 		# Handle relative paths - make sure TIKZFOLDER is relative to BASE_DIR
+		local TIKZFOLDER_FULL
 		if [[ "$TIKZFOLDER" != /* ]]; then
 			TIKZFOLDER_FULL="$BASE_DIR/$TIKZFOLDER"
 		else
@@ -784,114 +843,114 @@ create_archive() {
 
 		log_message 2 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Found TikZ externalization folder: ${WHITE}$TIKZFOLDER${RESET}"
 
-		# Check if the folder exists
-		if [[ ! -d "$TIKZFOLDER_FULL" ]]; then
-			# Folder doesn't exist, create it and add to TEMP_DIR
-			mkdir -p "$TEMP_DIR/$TIKZFOLDER"
-			if [ $? -ne 0 ]; then
-				log_error "Failed to create TikZ folder: $TEMP_DIR/$TIKZFOLDER"
-				# Continue execution rather than exiting
-			else
-				log_message 1 "$GREEN" "[${BOLD}Created${RESET}${GREEN}] TikZ folder: $TIKZFOLDER"
-			fi
-		elif [[ "$(ls -A "$TIKZFOLDER_FULL" 2>/dev/null)" ]]; then
-			# Folder exists and is not empty, add the files to TEMP_DIR
-			mkdir -p "$TEMP_DIR/$TIKZFOLDER"
-			if [ $? -ne 0 ]; then
-				log_error "Failed to create TikZ folder: $TEMP_DIR/$TIKZFOLDER"
-			else
-				# Copy files matching project name pattern
-				cp -r "$TIKZFOLDER_FULL/${PROJECT_NAME}"* "$TEMP_DIR/$TIKZFOLDER/" 2>/dev/null
-				if [ $? -ne 0 ]; then
-					log_message 1 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] No TikZ files matching ${PROJECT_NAME}* found in $TIKZFOLDER"
-				else
-					log_message 1 "$GREEN" "[${BOLD}Added${RESET}${GREEN}] TikZ files from: $TIKZFOLDER"
-				fi
-			fi
+		# Create target directory in temp folder (done only once)
+		mkdir -p "$TEMP_DIR/$TIKZFOLDER"
+		if [ $? -ne 0 ]; then
+			log_error "Failed to create TikZ folder: $TEMP_DIR/$TIKZFOLDER"
 		else
-			# Folder exists but is empty, add it to TEMP_DIR
-			mkdir -p "$TEMP_DIR/$TIKZFOLDER"
-			if [ $? -ne 0 ]; then
-				log_error "Failed to create TikZ folder: $TEMP_DIR/$TIKZFOLDER"
+			# Handle based on if source folder exists and has content
+			if [[ -d "$TIKZFOLDER_FULL" ]]; then
+				# Optimize by copying only files matching project name pattern
+				# Use find for better performance with large directories
+				local tikz_files=($(find "$TIKZFOLDER_FULL" -maxdepth 1 -name "${PROJECT_NAME}*" -type f 2>/dev/null))
+
+				if [[ ${#tikz_files[@]} -gt 0 ]]; then
+					cp "${tikz_files[@]}" "$TEMP_DIR/$TIKZFOLDER/" 2>/dev/null
+					log_message 1 "$GREEN" "[${BOLD}Added${RESET}${GREEN}] ${#tikz_files[@]} TikZ files from: $TIKZFOLDER"
+				else
+					log_message 1 "$YELLOW" "[${BOLD}Warning${RESET}${YELLOW}] No TikZ files matching ${PROJECT_NAME}* found in $TIKZFOLDER"
+				fi
 			else
-				log_message 1 "$YELLOW" "[${BOLD}Note${RESET}${YELLOW}] TikZ folder exists but is empty: $TIKZFOLDER"
+				log_message 1 "$YELLOW" "[${BOLD}Note${RESET}${YELLOW}] TikZ folder doesn't exist: $TIKZFOLDER"
 			fi
 		fi
 	else
 		log_message 2 "$YELLOW" "[${BOLD}Info${RESET}${YELLOW}] No TikZ externalization detected in $MAIN_FILE"
 	fi
 
-	# Remove duplicates from files_to_process
-	readarray -t files_to_process_unique < <(printf '%s\n' "${files_to_process[@]}" | sort -u)
+	# Remove duplicates from files_to_process more efficiently
+	if [[ ${#files_to_process[@]} -gt 0 ]]; then
+		# Use a hash to deduplicate faster than sort
+		declare -A unique_files
+		for file in "${files_to_process[@]}"; do
+			unique_files["$file"]=1
+		done
+		files_to_process=("${!unique_files[@]}")
+	fi
+
+	log_message 2 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Processing ${#files_to_process[@]} unique dependency files"
 
 	# Process each file from the input file
-	for file in "${files_to_process_unique[@]}"; do
+	for file in "${files_to_process[@]}"; do
 		log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Checking file: ${WHITE}$file${RESET}"
-		ext="${file##*.}"
+		local ext="${file##*.}"
 
 		# Check for full path or relative path
 		local resolved_path=$(resolve_path "$file" "$BASE_DIR")
 		if [[ -n "$resolved_path" ]]; then
 			copy_file "$resolved_path" "$TEMP_DIR" "$BASE_DIR"
-			# The message is now handled inside copy_file with relative path
 		else
 			# Try with extensions if needed
 			resolved_path=$(try_extensions "$file" "$BASE_DIR")
 			if [[ -n "$resolved_path" ]]; then
 				copy_file "$resolved_path" "$TEMP_DIR" "$BASE_DIR"
-				# The message is now handled inside copy_file with relative path
 			else
-				# Try case-insensitive search as last resort
-				local found_file=$(find "$BASE_DIR" -maxdepth 1 -type f -iname "$(basename "$file")" | head -n 1)
-				if [[ -n "$found_file" ]]; then
-					log_message 1 "$YELLOW" "[${BOLD}Case Mismatch${RESET}${YELLOW}] Using $found_file instead of $BASE_DIR/$file"
-					copy_file "$found_file" "$TEMP_DIR" "$BASE_DIR"
-					# The message is now handled inside copy_file with relative path
+				# Case-insensitive search as last resort but only if parent directory exists
+				local parent_dir=$(dirname "$file")
+				if [[ -d "$BASE_DIR/$parent_dir" || "$parent_dir" == "." ]]; then
+					local filename=$(basename "$file")
+					local found_file=$(find "$BASE_DIR/$parent_dir" -maxdepth 1 -type f -iname "$filename" | head -n 1)
+					if [[ -n "$found_file" ]]; then
+						log_message 1 "$YELLOW" "[${BOLD}Case Mismatch${RESET}${YELLOW}] Using $found_file instead of $file"
+						copy_file "$found_file" "$TEMP_DIR" "$BASE_DIR"
+					else
+						log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found: $file"
+					fi
 				else
-					log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found : $file"
+					log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] File not found: $file"
 				fi
 			fi
 		fi
 
-		# Handle patterns for image files with numeric suffixes
-		if [[ "$file" =~ ^([^/]+/[^/]+)([-_])[0-9]+\.[a-zA-Z]+$ ]]; then
-			folder="${file%/*}"
-			base_name="${file##*/}"
-			prefix="${base_name%[-_]*}"
-			separator="${BASH_REMATCH[2]}" # Get the actual separator (dash or underscore)
-			extension="${base_name##*.}"
-			pattern="${prefix}${separator}*.$extension"
-			pattern_key="${folder}/${pattern}"
+		# Handle patterns for image files with numeric suffixes - optimize with regex pattern matching
+		if [[ "$file" =~ ^([^/]+/)?([^/]+)([-_])[0-9]+\.([a-zA-Z]+)$ ]]; then
+			local folder="${BASH_REMATCH[1]:-}"
+			local prefix="${BASH_REMATCH[2]}"
+			local separator="${BASH_REMATCH[3]}" # dash or underscore
+			local extension="${BASH_REMATCH[4]}"
+			local pattern="${folder}${prefix}${separator}*.${extension}"
 
-			# Check if we've already processed this pattern
-			if [[ -z "${processed_files[$pattern_key]}" ]]; then
-				log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Pattern detected: ${WHITE}$pattern_key${RESET}"
-				processed_files[$pattern_key]=1
+			# Skip if already processed - fast hash lookup
+			if [[ -z "${processed_files["pattern:$pattern"]}" ]]; then
+				processed_files["pattern:$pattern"]=1
+				log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Pattern detected: ${WHITE}$pattern${RESET}"
 
-				# Create directory if it doesn't exist
-				mkdir -p "$TEMP_DIR/$folder"
-				if [ $? -ne 0 ]; then
-					log_error "Failed to create directory: $TEMP_DIR/$folder"
-					exit $EXIT_PERMISSION_ERROR
+				# Optimize by using find to get matching files
+				if [[ -n "$folder" ]]; then
+					local matching_files=($(find "$BASE_DIR/$folder" -maxdepth 1 -name "${prefix}${separator}*.${extension}" -type f 2>/dev/null))
+					local target_dir="$TEMP_DIR/$folder"
+				else
+					local matching_files=($(find "$BASE_DIR" -maxdepth 1 -name "${prefix}${separator}*.${extension}" -type f 2>/dev/null))
+					local target_dir="$TEMP_DIR"
 				fi
 
-				# Copy matching files to temporary directory
-				for f in "$BASE_DIR/$folder"/$pattern; do
-					if [[ -f "$f" ]]; then
-						local target_file="$folder/$(basename "$f")"
-						if [[ ! -f "$TEMP_DIR/$target_file" ]]; then
-							cp "$f" "$TEMP_DIR/$target_file"
-							if [ $? -ne 0 ]; then
-								log_error "Failed to copy: $f"
-								exit $EXIT_PERMISSION_ERROR
-							fi
-						fi
-					fi
-				done
+				# Create target directory if needed
+				if [[ ${#matching_files[@]} -gt 0 ]]; then
+					mkdir -p "$target_dir"
 
-				log_message 1 "$BLUE" "[${BOLD}Added${RESET}${BLUE}] $folder/$pattern (pattern)"
+					# Process batch copy for better performance
+					for f in "${matching_files[@]}"; do
+						local target_file="$target_dir/$(basename "$f")"
+						if [[ ! -f "$target_file" ]]; then
+							cp "$f" "$target_file"
+							log_message 2 "$BLUE" "[${BOLD}Added${RESET}${BLUE}] $(basename "$f") (from pattern)"
+						fi
+					done
+
+					log_message 1 "$BLUE" "[${BOLD}Added${RESET}${BLUE}] $pattern (${#matching_files[@]} files)"
+				fi
 			else
-				log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] Pattern already processed: $pattern_key"
+				log_message 2 "$YELLOW" "[${BOLD}Skipped${RESET}${YELLOW}] Pattern already processed: $pattern"
 			fi
 		fi
 	done
@@ -901,31 +960,39 @@ create_archive() {
 		process_glob_pattern "$pattern" "$TEMP_DIR" "$BASE_DIR"
 	done
 
-	# Create the ZIP archive
-	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Creating ZIP archive..."
-	(cd "$TEMP_DIR" && zip -r "$PROJECT_NAME.zip" . >/dev/null)
+	# Create the ZIP archive - optimize by skipping if no files
+	local files_count=$(find "$TEMP_DIR" -type f | wc -l)
+	if [[ $files_count -eq 0 ]]; then
+		log_error "No files to archive. Aborting."
+		exit $EXIT_FILE_NOT_FOUND
+	fi
+
+	log_message 2 "$CYAN" "[${BOLD}Processing${RESET}${CYAN}] Creating ZIP archive with $files_count files..."
+
+	# Use quiet mode for zip with error handling
+	(cd "$TEMP_DIR" && zip -q -r "$PROJECT_NAME.zip" .)
 	if [ $? -ne 0 ]; then
 		log_error "Failed to create ZIP archive."
 		exit $EXIT_ZIP_ERROR
 	fi
 
-	# Make sure we're not trying to overwrite the output file while it's in use
+	# Atomic replacement of existing zip file
 	if [[ -f "$ZIP_FILE" ]]; then
-		rm -f "$ZIP_FILE"
-		if [ $? -ne 0 ]; then
-			log_error "Failed to remove existing ZIP file. It may be in use."
-			exit $EXIT_PERMISSION_ERROR
-		fi
+		mv "$TEMP_DIR/$PROJECT_NAME.zip" "$ZIP_FILE.new" &&
+			mv "$ZIP_FILE.new" "$ZIP_FILE"
+	else
+		mv "$TEMP_DIR/$PROJECT_NAME.zip" "$ZIP_FILE"
 	fi
 
-	mv "$TEMP_DIR/$PROJECT_NAME.zip" "$ZIP_FILE"
 	if [ $? -ne 0 ]; then
 		log_error "Failed to move ZIP archive to final destination."
 		exit $EXIT_PERMISSION_ERROR
 	fi
 
+	# Count only actual files for reporting
+	local file_count=$(find "$TEMP_DIR" -type f | wc -l)
 	log_message 1 "${BOLD}${GREEN}[${WHITE}Success${GREEN}] Archive created: ${WHITE}$ZIP_FILE${RESET}"
-	log_message 1 "${BOLD}${GREEN}[${WHITE}Summary${GREEN}] ${#processed_files[@]} files added to archive${RESET}"
+	log_message 1 "${BOLD}${GREEN}[${WHITE}Summary${GREEN}] ${file_count} files added to archive${RESET}"
 
 	return $EXIT_SUCCESS
 }
