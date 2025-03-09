@@ -2633,6 +2633,9 @@ fi
 if [ -d /usr/local/opt/coreutils/libexec/gnubin ]; then
 	pathprepend "/usr/local/opt/coreutils/libexec/gnubin"
 fi
+if [ -d /usr/local/opt/gnu-sed/libexec/gnubin ]; then
+pathprepend "/usr/local/opt/gnu-sed/libexec/gnubin"
+fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
