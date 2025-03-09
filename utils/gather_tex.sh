@@ -60,7 +60,6 @@ TIKZ_FOLDERS=("tikz" "tikz_in")
 # Default file extensions
 DEFAULT_BIB_EXT=".bib"
 DEFAULT_TEX_EXT=".tex"
-DEFAULT_TIKZ_EXT=".tikz"
 
 #=====================================================================
 # COLOR DEFINITIONS
@@ -395,22 +394,36 @@ extract_tex_dependencies() {
 	local content=$(grep -a -v '^\s*%' "$tex_file")
 
 	# Extract includes and inputs
+	LATEX_INCLUDES_STR="${LATEX_INCLUDES[*]}"
+	TIKZ_FOLDERS_STR="${TIKZ_FOLDERS[*]}"
 	local includes=""
-	if echo "$content" | grep -a -q -E '\\(input|include|includepdf|includeonly|bibliography|addbibresource)'; then
-		includes=$(echo "$content" |
-			perl -n -e 'while (/\\(input|include|includepdf|includeonly|bibliography|addbibresource)\{([^}]+)\}/g) {
-			$file = $2;
-            print "tikz/$file\n";
-            print "tikz_in/$file\n";
-            print "$file\n";
-        }')
+	if echo "$content" | grep -a -q -E "\\\\($(
+		IFS='|'
+		echo "${LATEX_INCLUDES[*]}"
+	))"; then
+		includes=$(echo "$content" | perl -n -e '
+    BEGIN {
+        @commands = split(/\s+/, "'"$LATEX_INCLUDES_STR"'");
+        @folders = split(/\s+/, "'"$TIKZ_FOLDERS_STR"'");
+        $pattern = join("|", map { $_ } @commands);  # Construct regex pattern without extra backslashes
+    }
+    while (/\\($pattern)\{([^}]+)\}/g) {
+        $file = $2;
+        foreach $folder (@folders) {
+            print "$folder/$file\n";
+        }
+        print "$file\n";
+    }')
 	fi
 
 	# Extract graphics
 	LATEX_GRAPHICS_STR="${LATEX_GRAPHICS[*]}"
 	GRAPHICS_FOLDERS_STR="${GRAPHICS_FOLDERS[*]}"
 	local graphics=""
-	if echo "$content" | grep -qE "$(printf '\\\\(%s)' "${LATEX_GRAPHICS[@]}" | paste -sd '|')"; then
+	if echo "$content" | grep -a -q -E "\\\\($(
+		IFS='|'
+		echo "${LATEX_GRAPHICS[*]}"
+	))"; then
 		graphics=$(echo "$content" | perl -n -e '
         BEGIN {
             @commands = split(/\s+/, "'"$LATEX_GRAPHICS_STR"'");
@@ -427,40 +440,78 @@ extract_tex_dependencies() {
 	fi
 
 	# Extract other graphics commands
+	LATEX_OTHER_GRAPHICS_STR="${LATEX_OTHER_GRAPHICS[*]}"
 	local other_graphics=""
-	if echo "$content" | grep -q -E '\\(pgfimage|overpic|includesvg|includestandalone)'; then
+	if echo "$content" | grep -a -q -E "\\\\($(
+		IFS='|'
+		echo "${LATEX_OTHER_GRAPHICS[*]}"
+	))"; then
 		other_graphics=$(echo "$content" |
-			perl -n -e 'while (/\\(pgfimage|overpic|includesvg|includestandalone)(?:\[[^\]]*\])?\{([^}]+)\}/g) { print "$2\n"; }')
+			perl -n -e '
+            BEGIN {
+                @commands = split(/\s+/, "'"$LATEX_OTHER_GRAPHICS_STR"'");
+                $pattern = join("|", map { "\\\\" . $_ } @commands);
+            }
+            while (/$pattern(?:\[[^\]]*\])?\{([^}]+)\}/g) {
+                print "$1\n";
+            }')
 	fi
 
 	# Extract TikZ external graphics
+	LATEX_TIKZ_STR="${LATEX_TIKZ[*]}"
+	TIKZ_FOLDERS_STR="${TIKZ_FOLDERS[*]}"
 	local tikz_graphics=""
-	if echo "$content" | grep -q '\.(tikz)'; then
+	if echo "$content" | grep -q '\.tikz'; then
 		tikz_graphics=$(echo "$content" |
-			perl -n -e 'while (/\\(input|include|includetikz)\{([^}]+\.(tikz))\}/g) {
-            $file = $2;
-            print "tikz/$file\n"; # Try pictures folder
-            print "tikz_in/$file\n";  # Try figures folder
-            print "$file\n";
-        }')
+			perl -n -e '
+            BEGIN {
+                @folders = split(/\s+/, "'"$TIKZ_FOLDERS_STR"'");
+                @commands = split(/\s+/, "'"$LATEX_TIKZ_STR"'");
+                $pattern = join("|", map { "\\\\" . $_ } @commands);
+            }
+            while (/$pattern\{([^}]+\.tikz)\}/g) {
+                $file = $1;
+                foreach $folder (@folders) {
+                    print "$folder/$file\n";
+                }
+                print "$file\n";
+            }')
 	fi
-
 	# Extract import/subimport packages - only if found
+	LATEX_IMPORTS_STR="${LATEX_IMPORTS[*]}"
 	local imports=""
-	if echo "$content" | grep -q -E '\\(import|subimport)'; then
+	if echo "$content" | grep -a -q -E "\\\\($(
+		IFS='|'
+		echo "${LATEX_IMPORTS[*]}"
+	))"; then
 		imports=$(echo "$content" |
-			perl -n -e 'while (/\\(import|subimport)\{([^}]+)\}\{([^}]+)\}/g) {
-                $dir = $2; $file = $3;
+			perl -n -e '
+            BEGIN {
+                @commands = split(/\s+/, "'"$LATEX_IMPORTS_STR"'");
+                $pattern = join("|", map { "\\\\" . $_ } @commands);
+            }
+            while (/$pattern\{([^}]+)\}\{([^}]+)\}/g) {
+                $dir = $1;
+                $file = $2;
                 $file .= ".tex" unless $file =~ /\.[a-zA-Z]+$/;
                 print "$dir/$file\n";
             }')
 	fi
 
 	# Extract LaTeX packages - only if \usepackage is present
+	LATEX_PACKAGE_STR="${LATEX_PACKAGE[*]}"
 	local packages=""
-	if echo "$content" | grep -q '\\usepackage'; then
+	if echo "$content" | grep -a -q -E "\\\\($(
+		IFS='|'
+		echo "${LATEX_PACKAGE[*]}"
+	))"; then
 		packages=$(echo "$content" |
-			perl -n -e 'while (/\\usepackage(?:\[[^\]]*\])?\{([^}]+)\}/g) {
+			perl -n -e '
+            BEGIN {
+                @commands = split(/\s+/, "'"$LATEX_PACKAGE_STR"'");
+                $pattern = join("|", map { "\\\\" . $_ } @commands);
+            }
+            while (/$pattern(?:\[[^\]]*\])?\{([^}]+)\}/g) {
                 foreach $pkg (split(/,/, $1)) {
                     $pkg =~ s/^\s+|\s+$//g; # Trim whitespace
                     print "$pkg.sty\n" unless $pkg =~ /^(standard|core)$/i;
