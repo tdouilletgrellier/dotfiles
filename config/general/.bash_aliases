@@ -2237,70 +2237,85 @@ function getnode() {
 	[[ -n "$partition" ]] && echo -e "  Partition: ${BRIGHT_YELLOW}${partition}${RESET}"
 	[[ -n "$job_name" ]] && echo -e "  Job Name: ${BRIGHT_YELLOW}${job_name}${RESET}"
 
-	# Define a function to run after allocation is granted
-	get_node_info() {
-		# Load color variables
-		local BRIGHT_CYAN="\033[1;36m"
-		local BRIGHT_GREEN="\033[1;32m"
-		local BRIGHT_YELLOW="\033[1;33m"
-		local BRIGHT_WHITE="\033[1;37m"
-		local RESET="\033[0m"
+	# Create a small helper script instead of using declare -f
+	local temp_script
+	temp_script=$(mktemp)
+	
+	# Write the job handler function to the temporary script
+	cat > "$temp_script" << 'EOF'
+#!/bin/bash
+# Function to handle job allocation information
+get_node_info() {
+	# Load color variables
+	local BRIGHT_CYAN="\033[1;36m"
+	local BRIGHT_GREEN="\033[1;32m"
+	local BRIGHT_YELLOW="\033[1;33m"
+	local BRIGHT_WHITE="\033[1;37m"
+	local RESET="\033[0m"
 
-		# Read auto_ssh and job_name from environment variables
-		local auto_ssh="${AUTO_SSH}"
-		local job_name="${JOB_NAME}"
+	# Read auto_ssh and job_name from environment variables
+	local auto_ssh="${AUTO_SSH}"
+	local job_name="${JOB_NAME}"
 
-		if [ -n "$SLURM_JOB_ID" ]; then
-			# Get node list using squeue, filtering by job ID
-			local node_info
-			node_info=$(squeue -j "$SLURM_JOB_ID" -o "%N" -h)
+	if [ -n "$SLURM_JOB_ID" ]; then
+		# Get node list using squeue, filtering by job ID
+		local node_info
+		node_info=$(squeue -j "$SLURM_JOB_ID" -o "%N" -h)
 
-			# Clean up any whitespace
-			local node_list
-			node_list=$(echo "$node_info" | tr -d ' \n')
+		# Clean up any whitespace
+		local node_list
+		node_list=$(echo "$node_info" | tr -d ' \n')
+
+		echo -e "${BRIGHT_GREEN}Success:${RESET} Job allocated successfully."
+		echo -e "  Job ID: ${BRIGHT_YELLOW}${SLURM_JOB_ID}${RESET}"
+		echo -e "  Allocated nodes: ${BRIGHT_YELLOW}${node_list}${RESET}"
+
+		# Automatically connect to the first node if the -s/--ssh option was provided
+		local first_node
+		first_node=$(echo "$node_list" | cut -d',' -f1)
+
+		if [ "$auto_ssh" -eq 1 ]; then
+			echo -e "${BRIGHT_CYAN}Auto-connecting to the first node...${RESET}"
+			ssh "$first_node"
+		fi
+	else
+		# If SLURM_JOB_ID is not set, try to find the job by name/user
+		local job_name_to_match="${job_name:-interact}"
+		local user_name=$(whoami)
+
+		# Get job info using squeue, filtering by job name and username
+		local job_info
+		job_info=$(squeue -n "$job_name_to_match" -u "$user_name" -o "%i|%N" -h | head -1)
+
+		if [ -n "$job_info" ]; then
+			local found_job_id=$(echo "$job_info" | cut -d'|' -f1)
+			local found_node_list=$(echo "$job_info" | cut -d'|' -f2 | tr -d ' \n')
 
 			echo -e "${BRIGHT_GREEN}Success:${RESET} Job allocated successfully."
-			echo -e "  Job ID: ${BRIGHT_YELLOW}${SLURM_JOB_ID}${RESET}"
-			echo -e "  Allocated nodes: ${BRIGHT_YELLOW}${node_list}${RESET}"
+			echo -e "  Job ID: ${BRIGHT_YELLOW}${found_job_id}${RESET}"
+			echo -e "  Allocated nodes: ${BRIGHT_YELLOW}${found_node_list}${RESET}"
 
 			# Automatically connect to the first node if the -s/--ssh option was provided
 			local first_node
-			first_node=$(echo "$node_list" | cut -d',' -f1)
+			first_node=$(echo "$found_node_list" | cut -d',' -f1)
 
 			if [ "$auto_ssh" -eq 1 ]; then
 				echo -e "${BRIGHT_CYAN}Auto-connecting to the first node...${RESET}"
 				ssh "$first_node"
 			fi
 		else
-			# If SLURM_JOB_ID is not set, try to find the job by name/user
-			local job_name_to_match="${job_name:-interact}"
-			local user_name=$(whoami)
-
-			# Get job info using squeue, filtering by job name and username
-			local job_info
-			job_info=$(squeue -n "$job_name_to_match" -u "$user_name" -o "%i|%N" -h | head -1)
-
-			if [ -n "$job_info" ]; then
-				local found_job_id=$(echo "$job_info" | cut -d'|' -f1)
-				local found_node_list=$(echo "$job_info" | cut -d'|' -f2 | tr -d ' \n')
-
-				echo -e "${BRIGHT_GREEN}Success:${RESET} Job allocated successfully."
-				echo -e "  Job ID: ${BRIGHT_YELLOW}${found_job_id}${RESET}"
-				echo -e "  Allocated nodes: ${BRIGHT_YELLOW}${found_node_list}${RESET}"
-
-				# Automatically connect to the first node if the -s/--ssh option was provided
-				local first_node
-				first_node=$(echo "$found_node_list" | cut -d',' -f1)
-
-				if [ "$auto_ssh" -eq 1 ]; then
-					echo -e "${BRIGHT_CYAN}Auto-connecting to the first node...${RESET}"
-					ssh "$first_node"
-				fi
-			else
-				echo -e "${BRIGHT_YELLOW}Warning:${RESET} Unable to determine job information."
-			fi
+			echo -e "${BRIGHT_YELLOW}Warning:${RESET} Unable to determine job information."
 		fi
-	}
+	fi
+}
+
+# Run the node info function and then open a shell
+get_node_info
+exec bash
+EOF
+
+	# Make the script executable
+	chmod +x "$temp_script"
 
 	# Set the environment variables for job_name and auto_ssh
 	export JOB_NAME="$job_name"
@@ -2311,10 +2326,14 @@ function getnode() {
 	[[ -n "$partition" ]] && salloc_cmd+=(--partition="$partition")
 	[[ -n "$job_name" ]] && salloc_cmd+=(--job-name="$job_name")
 
-	# Run salloc with the get_node_info function as the command to execute in the allocation
-	"${salloc_cmd[@]}" bash -c "$(declare -f get_node_info); get_node_info; exec bash"
+	# Run salloc with the script as the command
+	"${salloc_cmd[@]}" "$temp_script"
 
 	local status=$?
+	
+	# Clean up the temporary script
+	rm -f "$temp_script"
+	
 	if [ $status -ne 0 ]; then
 		echo -e "${BRIGHT_RED}Error:${RESET} Job allocation failed. Please check SLURM settings."
 		return $status
@@ -2439,43 +2458,160 @@ function sc() {
 #-------------------------------------------------------------
 # squeue wrapper
 function sq() {
-	if ! hascommand --strict squeue; then
-		echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}squeue${RESET} command is not installed or not in the PATH."
-		return 1
-	fi
-	# Help function
-	show_help() {
-		echo -e "${BRIGHT_WHITE}sq:${RESET} Enhanced SLURM queue display"
-		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-		echo -e "  ${BRIGHT_CYAN}sq${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
-		echo -e "${BRIGHT_WHITE}Options:${RESET}"
-		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}       Show this help message"
-		echo -e "  ${BRIGHT_GREEN}-f, --full${RESET}        Show full job details"
-	}
-
-	# Default format
-	format="%.10i %.9P %.12j %.8T %.9L %.6M %.4D %.4C %.18R"
-
-	# Parse options
-	while [[ "$1" == -* ]]; do
-		case "$1" in
-		--help | -h)
-			show_help
-			return
-			;;
-		--full | -f)
-			format="%.10i %.9P %.16q %.12j %.8T %.9L %.6M %.4D %.4C %.18R %.12B %.40Z"
-			;;
-		*)
-			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
-			return 1
-			;;
-		esac
-		shift
-	done
-
-	# Run squeue and process the output
-	squeue --me --format="$format"
+    if ! hascommand --strict squeue; then
+        echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}squeue${RESET} command is not installed or not in the PATH."
+        return 1
+    fi
+    # Help function
+    show_help() {
+        echo -e "${BRIGHT_WHITE}sq:${RESET} Enhanced SLURM queue display"
+        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+        echo -e "  ${BRIGHT_CYAN}sq${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+        echo -e "${BRIGHT_WHITE}Options:${RESET}"
+        echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}       Show this help message"
+        echo -e "  ${BRIGHT_GREEN}-f, --full${RESET}        Show full job details"
+    }
+    
+    # Default format
+    local format="%.10i %.9P %.12j %.8T %.9L %.6M %.4D %.4C %.18R"
+    local is_full=false
+    
+    # Parse options
+    while [[ "$1" == -* ]]; do
+        case "$1" in
+        --help | -h)
+            show_help
+            return
+            ;;
+        --full | -f)
+            format="%.10i %.9P %.16q %.12j %.8T %.9L %.6M %.4D %.4C %.18R %.12B %.40Z"
+            is_full=true
+            ;;
+        *)
+            echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+            return 1
+            ;;
+        esac
+        shift
+    done
+    
+    # The key approach: run squeue with the -o (--Format) option
+    # This preserves exact column widths and alignment according to format specifiers
+    if $is_full; then
+        squeue --me -o "${format}" | \
+        perl -pe '
+            # Header row
+            if ($. == 1) {
+                $_ = "'${BRIGHT_WHITE}'$_'${RESET}'";
+                next;
+            }
+            
+            # Pattern matching with specific column widths to preserve exact alignment
+            
+            # JOBID (first 10 chars)
+            s/^(.{10})/'${BRIGHT_CYAN}'$1'${RESET}'/;
+            
+            # PARTITION (next 10 chars including space)
+            s/^(.{10})(.{10})/$1${BRIGHT_MAGENTA}$2${RESET}/;
+            
+            # QOS (next 17 chars including space)
+            s/^(.{20})(.{17})/$1${BRIGHT_BLUE}$2${RESET}/;
+            
+            # NAME (next 13 chars including space)
+            s/^(.{37})(.{13})/$1$2/;
+            
+            # STATE (next 9 chars including space)
+            if (/ RUNNING /) {
+                s/( RUNNING )/${BRIGHT_GREEN}$1${RESET}/;
+            } elsif (/ PENDING /) {
+                s/( PENDING )/${BRIGHT_YELLOW}$1${RESET}/;
+            } elsif (/ COMPLETED /) {
+                s/( COMPLETED )/${BRIGHT_BLUE}$1${RESET}/;
+            } elsif (/ FAILED /) {
+                s/( FAILED )/${BRIGHT_RED}$1${RESET}/;
+            } elsif (/ CANCELLED /) {
+                s/( CANCELLED )/${BRIGHT_MAGENTA}$1${RESET}/;
+            } elsif (/ TIMEOUT /) {
+                s/( TIMEOUT )/${BRIGHT_RED}$1${RESET}/;
+            } elsif (/ PREEMPTED /) {
+                s/( PREEMPTED )/${BRIGHT_YELLOW}$1${RESET}/;
+            } elsif (/ SUSPENDED /) {
+                s/( SUSPENDED )/${BRIGHT_YELLOW}$1${RESET}/;
+            }
+            
+            # TIME_LEFT (next 10 chars including space)
+            s/^(.{59})(.{10})/$1${BRIGHT_YELLOW}$2${RESET}/;
+            
+            # TIME (next 7 chars including space)
+            s/^(.{69})(.{7})/$1${BRIGHT_BLUE}$2${RESET}/;
+            
+            # NODES (next 5 chars including space)
+            s/^(.{76})(.{5})/$1${BRIGHT_GREEN}$2${RESET}/;
+            
+            # CPUS (next 5 chars including space)
+            s/^(.{81})(.{5})/$1${BRIGHT_CYAN}$2${RESET}/;
+            
+            # NODELIST - leave uncolored
+            
+            # TRES_PER_NODE (if visible)
+            if (length($_) > 106) {
+                s/^(.{106})(.{13})/$1${BRIGHT_MAGENTA}$2${RESET}/;
+            }
+        '
+    else
+        squeue --me -o "${format}" | \
+        perl -pe '
+            # Header row
+            if ($. == 1) {
+                $_ = "'${BRIGHT_WHITE}'$_'${RESET}'";
+                next;
+            }
+            
+            # Pattern matching with specific column widths to preserve exact alignment
+            
+            # JOBID (first 10 chars)
+            s/^(.{10})/'${BRIGHT_CYAN}'$1'${RESET}'/;
+            
+            # PARTITION (next 10 chars including space)
+            s/^(.{10})(.{10})/$1${BRIGHT_MAGENTA}$2${RESET}/;
+            
+            # NAME (next 13 chars including space)
+            s/^(.{20})(.{13})/$1$2/;
+            
+            # STATE (next 9 chars including space)
+            if (/ RUNNING /) {
+                s/( RUNNING )/${BRIGHT_GREEN}$1${RESET}/;
+            } elsif (/ PENDING /) {
+                s/( PENDING )/${BRIGHT_YELLOW}$1${RESET}/;
+            } elsif (/ COMPLETED /) {
+                s/( COMPLETED )/${BRIGHT_BLUE}$1${RESET}/;
+            } elsif (/ FAILED /) {
+                s/( FAILED )/${BRIGHT_RED}$1${RESET}/;
+            } elsif (/ CANCELLED /) {
+                s/( CANCELLED )/${BRIGHT_MAGENTA}$1${RESET}/;
+            } elsif (/ TIMEOUT /) {
+                s/( TIMEOUT )/${BRIGHT_RED}$1${RESET}/;
+            } elsif (/ PREEMPTED /) {
+                s/( PREEMPTED )/${BRIGHT_YELLOW}$1${RESET}/;
+            } elsif (/ SUSPENDED /) {
+                s/( SUSPENDED )/${BRIGHT_YELLOW}$1${RESET}/;
+            }
+            
+            # TIME_LEFT (next 10 chars including space)
+            s/^(.{42})(.{10})/$1${BRIGHT_YELLOW}$2${RESET}/;
+            
+            # TIME (next 7 chars including space)
+            s/^(.{52})(.{7})/$1${BRIGHT_BLUE}$2${RESET}/;
+            
+            # NODES (next 5 chars including space)
+            s/^(.{59})(.{5})/$1${BRIGHT_GREEN}$2${RESET}/;
+            
+            # CPUS (next 5 chars including space)
+            s/^(.{64})(.{5})/$1${BRIGHT_CYAN}$2${RESET}/;
+            
+            # NODELIST - leave uncolored
+        '
+    fi
 }
 #-------------------------------------------------------------
 
