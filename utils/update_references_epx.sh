@@ -139,7 +139,7 @@ show_colored_diff() {
 
 	# Find and highlight the position of the value in the line
 	local highlighted_line="${line//$old_value/${BRIGHT_RED}${old_value}${RESET}}"
-	local preview_line="${line//$old_value/${BRIGHT_GREEN}${new_value}${RESET}}"
+	local preview_line="${line//$old_value/${BRIGHT_YELLOW}${new_value}${RESET}}"
 
 	echo -e "${BOLD}${WHITE}Before:${RESET} $highlighted_line"
 	echo -e "${BOLD}${WHITE}After: ${RESET} $preview_line"
@@ -164,14 +164,18 @@ validate_number() {
 compare_numbers() {
 	local num1="$1"
 	local num2="$2"
-	local tolerance=1e-10 # Adjust based on your precision needs
+	local tolerance=1e-10
 
-	# Use bc for more precise comparison of floating point numbers in any format
-	# bc automatically handles both standard and scientific notation
-	if (($(echo "define abs(x) { if (x<0) return (-x); return (x); }; abs($num1 - $num2) < $tolerance" | bc -l))); then
-		return 0 # Numbers are essentially equal within tolerance
+	# Calculate absolute difference first
+	local diff=$(echo "if($num1 < $num2) x = $num2 - $num1; else x = $num1 - $num2; x" | bc -l)
+
+	# Then compare with tolerance
+	local result=$(echo "$diff < $tolerance" | bc -l)
+
+	if [ "$result" = "1" ]; then
+		return 0 # Numbers are equal within tolerance
 	fi
-	return 1 # Numbers are different beyond tolerance
+	return 1 # Numbers are different
 }
 
 #=====================================================================
@@ -341,15 +345,15 @@ update_epx_ref_values() {
 	log_info "Processing log file: ${BRIGHT_YELLOW}$input_log${RESET}"
 
 	# Extract REF and RES values using configurable patterns
-	while IFS= read -r line; do
+	while IFS= read -r line || [ -n "$line" ]; do
 		((line_count++))
 
 		log_debug "Reading line ${BRIGHT_YELLOW}$line_count${RESET}: ${line:0:50}..."
 
-		if [[ $line =~ $RESULT_IDENTIFIER ]]; then
+		if [[ $line =~ ${RESULT_IDENTIFIER} ]]; then
 			((match_count++))
-			ref_value=$(echo "$line" | sed -r "s/.*${REF_PATTERN}\s*([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)/\1/")
-			res_value=$(echo "$line" | sed -r "s/.*${RES_PATTERN}\s*([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)/\1/")
+			ref_value=$(echo "$line" | sed -r "s/.*${REF_PATTERN}\s*([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s+.*/\1/")
+			res_value=$(echo "$line" | sed -r "s/.*${RES_PATTERN}\s*([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s+.*/\1/")
 
 			if [ -z "$ref_value" ] || [ -z "$res_value" ]; then
 				log_warning "Failed to extract values from line $line_count"
@@ -367,7 +371,7 @@ update_epx_ref_values() {
 			fi
 
 			if [ $VERBOSITY -ge $VERBOSITY_VERBOSE ]; then
-				log_message $VERBOSITY_VERBOSE "${BRIGHT_BLUE}" "Found match: ${REF_PATTERN}${BRIGHT_YELLOW}$ref_value${RESET} ${RES_PATTERN}${BRIGHT_GREEN}$res_value${RESET}"
+				log_message $VERBOSITY_VERBOSE "${BRIGHT_BLUE}" "Found match: ${RESET}${UNDERLINE}${REF_PATTERN}${RESET} ${BRIGHT_YELLOW}$ref_value${RESET} ${UNDERLINE}${RES_PATTERN}${RESET} ${BRIGHT_YELLOW}$res_value${RESET}"
 			fi
 
 			# Check if the replacement is necessary (values are different)
@@ -378,61 +382,92 @@ update_epx_ref_values() {
 
 			# Find occurrences in replacement file
 			if grep -q "$ref_value" "$replace_file"; then
+
 				# Display original log line
-				echo -e "\n${BOLD}${WHITE}Original log line:${RESET}"
-				echo -e "${BRIGHT_CYAN}$line${RESET}"
+				echo -e "\n${BOLD}${WHITE}Found a match :${RESET}"
+				local highlighted_line="${line//$ref_value/${BRIGHT_RED}${ref_value}${RESET}}"
+				highlighted_line="${highlighted_line//$res_value/${BRIGHT_YELLOW}${res_value}${RESET}}"
+				highlighted_line="${highlighted_line//$REF_PATTERN/${UNDERLINE}${REF_PATTERN}${RESET}}"
+				highlighted_line="${highlighted_line//$RES_PATTERN/${UNDERLINE}${RES_PATTERN}${RESET}}"
+				highlighted_line="${highlighted_line//$RESULT_IDENTIFIER/${BRIGHT_BLUE}${RESULT_IDENTIFIER}${RESET}}"
+				echo -e "$highlighted_line"
 
-				# Show the colored diff for each found line
-				echo -e "\n${BOLD}${WHITE}Change preview:${RESET}"
-				while read -r found_line_num found_line; do
-					found_line_num=${found_line_num%%:*} # Extract line number
-					echo -e "${BRIGHT_YELLOW}Line $found_line_num:${RESET}"
-					show_colored_diff "$ref_value" "$res_value" "$found_line"
-					echo ""
-				done < <(grep -n "$ref_value" "$replace_file")
-
-				# Display the lines that will be modified
-				echo -e "\n${BOLD}${WHITE}Lines to be modified in ${BRIGHT_YELLOW}$replace_file${BOLD}${WHITE}:${RESET}"
-				grep --color=always -n "$ref_value" "$replace_file"
+				# Total occurences
+				local total_occurrences=$(grep -o "$ref_value" "$replace_file" | wc -l)
 
 				# Ask for confirmation unless auto-confirm is set
 				if [ $dry_run -eq 1 ]; then
-					echo -e "\n${BRIGHT_CYAN}Would replace:${RESET} ${BRIGHT_YELLOW}$ref_value${RESET} with ${BRIGHT_GREEN}$res_value${RESET} (Dry run)"
+
+					# Display the lines that will be modified
+					echo -e "\n${BRIGHT_YELLOW}$total_occurrences${RESET} ${BOLD}${WHITE}lines to be modified in ${BRIGHT_YELLOW}$replace_file${BOLD}${WHITE}:${RESET}"
+					grep --color=always -n "$ref_value" "$replace_file"
+
+					echo -e "\n${BRIGHT_CYAN}Would process each occurrence individually (Dry run)${RESET}"
+					
 				elif [ $auto_confirm -eq 1 ]; then
+
 					# Count occurrences before replacement
 					local occurrences=$(grep -o "$ref_value" "$replace_file" | wc -l)
 					sed -i "s/$ref_value/$res_value/g" "$replace_file"
 					((replacement_count += occurrences))
 					echo -e "\n${BRIGHT_CYAN}Automatically replaced:${RESET} ${BRIGHT_YELLOW}$ref_value${RESET} with ${BRIGHT_GREEN}$res_value${RESET} ($occurrences occurrences)"
+
 				else
-					echo -e "\n${BOLD}${WHITE}Replace${RESET} ${BRIGHT_YELLOW}$ref_value${RESET} with ${BRIGHT_GREEN}$res_value${RESET}? (y/n/a/q)"
-					echo -e "  y = yes, n = no, a = yes to all, q = quit"
-					read -r answer
-					case "$answer" in
-					[Yy]*)
-						# Count occurrences before replacement
-						local occurrences=$(grep -o "$ref_value" "$replace_file" | wc -l)
-						sed -i "s/$ref_value/$res_value/g" "$replace_file"
-						((replacement_count += occurrences))
-						log_info "Replaced: ${BRIGHT_YELLOW}$ref_value${RESET} with ${BRIGHT_GREEN}$res_value${RESET} ($occurrences occurrences)"
-						;;
-					[Aa]*)
-						auto_confirm=1
-						local occurrences=$(grep -o "$ref_value" "$replace_file" | wc -l)
-						sed -i "s/$ref_value/$res_value/g" "$replace_file"
-						((replacement_count += occurrences))
-						log_info "Replaced: ${BRIGHT_YELLOW}$ref_value${RESET} with ${BRIGHT_GREEN}$res_value${RESET} ($occurrences occurrences)"
-						log_warning "Auto-confirm enabled for remaining replacements."
-						;;
-					[Qq]*)
-						log_warning "Operation cancelled by user."
-						break
-						;;
-					*)
-						((skipped_count++))
-						log_warning "Skipped: $ref_value"
-						;;
-					esac
+
+					# Process each occurrence individually
+					local current_occurrence=0
+					while read -r found_line_num found_line; do
+						((current_occurrence++))             # Occurences counter
+						found_line_num=${found_line_num%%:*} # Extract line number
+
+						echo -e "\n${BOLD}${WHITE}Occurrence ${BRIGHT_YELLOW}$current_occurrence/$total_occurrences${RESET} at line ${BRIGHT_YELLOW}$found_line_num${RESET}:${RESET}"
+						show_colored_diff "$ref_value" "$res_value" "$found_line"
+
+						# Remainung occurences
+						local remaining=$((total_occurrences - current_occurrence + 1))
+
+						# Confirmation
+						echo -e "\n${BOLD}${WHITE}Replace this occurrence ?${RESET} (y/n/a/s/q)"
+						echo -e "  y = yes (replace ${BRIGHT_YELLOW}1${RESET} occurrence), n = no, a = yes to all (replaces all ${BRIGHT_YELLOW}$total_occurrences${RESET} occurrences),"
+						echo -e "  s = yes to all for this value (replaces remaining ${BRIGHT_YELLOW}$remaining${RESET} occurrences), q = quit"
+						read -r answer </dev/tty
+
+						case "$answer" in
+						[Yy]*)
+							# Replace only this occurrence
+							# We need line number and context to ensure we only replace at this position
+							sed -i "${found_line_num}s/$ref_value/$res_value/" "$replace_file"
+							((replacement_count++))
+							log_info "Replaced occurrence at line ${BRIGHT_YELLOW}$found_line_num${RESET}"
+							;;
+						[Aa]*)
+							auto_confirm=1
+							# Replace all remaining occurrences globally
+							local occurrences=$(grep -o "$ref_value" "$replace_file" | wc -l)
+							sed -i "s/$ref_value/$res_value/g" "$replace_file"
+							((replacement_count += occurrences))
+							log_info "Replaced all: ${BRIGHT_YELLOW}$ref_value${RESET} with ${BRIGHT_GREEN}$res_value${RESET} ($occurrences occurrences)"
+							log_warning "Auto-confirm enabled for remaining replacements."
+							break
+							;;
+						[Ss]*)
+							# Replace all occurrences of this specific value
+							local occurrences=$(grep -o "$ref_value" "$replace_file" | wc -l)
+							sed -i "s/$ref_value/$res_value/g" "$replace_file"
+							((replacement_count += occurrences))
+							log_info "Replaced all occurrences of: ${BRIGHT_YELLOW}$ref_value${RESET} with ${BRIGHT_GREEN}$res_value${RESET} ($occurrences occurrences)"
+							break
+							;;
+						[Qq]*)
+							log_warning "Operation cancelled by user."
+							return $EXIT_SUCCESS
+							;;
+						*)
+							((skipped_count++))
+							log_warning "Skipped occurrence at line ${BRIGHT_YELLOW}$found_line_num${RESET}"
+							;;
+						esac
+					done < <(grep -n "$ref_value" "$replace_file")
 				fi
 			else
 				log_message $VERBOSITY_VERBOSE "${BRIGHT_YELLOW}" "No occurrences found for: $ref_value"
