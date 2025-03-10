@@ -40,13 +40,13 @@ VERBOSITY=1
 DEFAULT_IMAGE_EXT_FOR_ANIMATEGRAPHICS="png"
 
 # Valid extensions to look for
-VALID_EXTENSIONS=(tex pdf png jpg jpeg eps svg tikz bib sty cls)
+VALID_EXTENSIONS=(tex pdf png jpg jpeg eps svg tikz bib sty cls bst)
 
 # Excluded extensions to look for
 EXCLUDED_EXTENSIONS=(bbl out aux log toc)
 
 # LaTeX keywords by category
-LATEX_INCLUDES=("input" "include" "includeonly" "bibliography" "addbibresource" "includepdf" "includetikz")
+LATEX_INCLUDES=("input" "include" "includeonly" "bibliography" "addbibresource" "includepdf" "includetikz" "bibliographystyle")
 LATEX_GRAPHICS=("includegraphics")
 LATEX_OTHER_GRAPHICS=("pgfimage" "overpic" "includesvg" "includestandalone")
 LATEX_IMPORTS=("import" "subimport")
@@ -59,6 +59,7 @@ TIKZ_FOLDERS=("tikz" "tikz_in")
 
 # Default file extensions
 DEFAULT_BIB_EXT=".bib"
+DEFAULT_BIBSTYLE_EXT=".bst"
 DEFAULT_TEX_EXT=".tex"
 
 # Recognized separators to catch multiple PNGs image_xxx.png or image-xxx.png
@@ -66,6 +67,7 @@ MULTIPLE_FILES_SEPARATORS="_-" # Default "_" and "-"
 
 # Probable bibliography files patterns
 BIB_PATTERNS=("biblio" "reference")
+BIBSTYLE_PATTERNS=("bibstyle")
 
 #=====================================================================
 # COLOR DEFINITIONS
@@ -576,9 +578,12 @@ extract_tex_dependencies() {
 		if [[ ! "$inc" =~ \.[a-zA-Z]+$ ]]; then
 			# For bibliography entries
 			IFS="|"
-			PATTERN_STRING="${BIB_PATTERNS[*]}"
-			if [[ "$inc" =~ ^.*(${PATTERN_STRING}).*$ ]]; then
+			BIB_PATTERN_STRING="${BIB_PATTERNS[*]}"
+			BIBSTYLE_PATTERN_STRING="${BIBSTYLE_PATTERNS[*]}"
+			if [[ "$inc" =~ ^.*(${BIB_PATTERN_STRING}).*$ ]]; then
 				inc="${inc}${DEFAULT_BIB_EXT}"
+			elif [[ "$inc" =~ ^.*(${BIBSTYLE_PATTERN_STRING}).*$ ]]; then				
+				inc="${inc}${DEFAULT_BIBSTYLE_EXT}"
 			else
 				inc="${inc}${DEFAULT_TEX_EXT}"
 			fi
