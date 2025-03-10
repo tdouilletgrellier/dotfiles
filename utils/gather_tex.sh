@@ -994,7 +994,8 @@ create_archive() {
 		for file in "${files_to_process[@]}"; do
 			unique_files["$file"]=1
 		done
-		files_to_process=("${!unique_files[@]}")
+		files_to_process=($(printf "%s\n" "${!unique_files[@]}" | sort))
+
 	fi
 
 	log_message 2 "$MAGENTA" "[${BOLD}Info${RESET}${MAGENTA}] Processing ${#files_to_process[@]} unique dependency files"
