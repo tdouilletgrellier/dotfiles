@@ -62,7 +62,10 @@ DEFAULT_BIB_EXT=".bib"
 DEFAULT_TEX_EXT=".tex"
 
 # Recognized separators to catch multiple PNGs image_xxx.png or image-xxx.png
-MULTIPLE_FILES_SEPARATORS="_-"  # Default "_" and "-"
+MULTIPLE_FILES_SEPARATORS="_-" # Default "_" and "-"
+
+# Probable bibliography files patterns
+BIB_PATTERNS=("biblio" "reference")
 
 #=====================================================================
 # COLOR DEFINITIONS
@@ -572,11 +575,14 @@ extract_tex_dependencies() {
 		# Add appropriate extension only if needed
 		if [[ ! "$inc" =~ \.[a-zA-Z]+$ ]]; then
 			# For bibliography entries
-			if [[ "$inc" =~ ^.*bibliography.*$ ]]; then
+			IFS="|"
+			PATTERN_STRING="${BIB_PATTERNS[*]}"
+			if [[ "$inc" =~ ^.*(${PATTERN_STRING}).*$ ]]; then
 				inc="${inc}${DEFAULT_BIB_EXT}"
 			else
 				inc="${inc}${DEFAULT_TEX_EXT}"
 			fi
+			IFS=" "
 		fi
 
 		process_dependency "$inc" "$tex_dir" "tex"
@@ -1021,7 +1027,7 @@ create_archive() {
 		fi
 
 		# Handle patterns for image files with numeric suffixes - optimize with regex pattern matching
-		if [[ "$file" =~ ^(.*/)?([^/]+)([${MULTIPLE_FILES_SEPARATORS}])[0-9]+\.([a-zA-Z]+)$ ]]; then	
+		if [[ "$file" =~ ^(.*/)?([^/]+)([${MULTIPLE_FILES_SEPARATORS}])[0-9]+\.([a-zA-Z]+)$ ]]; then
 			local folder="${BASH_REMATCH[1]:-}"
 			local prefix="${BASH_REMATCH[2]}"
 			local separator="${BASH_REMATCH[3]}" # dash or underscore
