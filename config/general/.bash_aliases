@@ -2240,9 +2240,9 @@ function getnode() {
 	# Create a small helper script instead of using declare -f
 	local temp_script
 	temp_script=$(mktemp)
-	
+
 	# Write the job handler function to the temporary script
-	cat > "$temp_script" << 'EOF'
+	cat >"$temp_script" <<'EOF'
 #!/bin/bash
 # Function to handle job allocation information
 get_node_info() {
@@ -2330,10 +2330,10 @@ EOF
 	"${salloc_cmd[@]}" "$temp_script"
 
 	local status=$?
-	
+
 	# Clean up the temporary script
 	rm -f "$temp_script"
-	
+
 	if [ $status -ne 0 ]; then
 		echo -e "${BRIGHT_RED}Error:${RESET} Job allocation failed. Please check SLURM settings."
 		return $status
@@ -2458,117 +2458,159 @@ function sc() {
 #-------------------------------------------------------------
 # squeue wrapper
 function sq() {
-    if ! hascommand --strict squeue; then
-        echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}squeue${RESET} command is not installed or not in the PATH."
-        return 1
-    fi
-    
-    # Help function
-    show_help() {
-        echo -e "${BRIGHT_WHITE}sq:${RESET} Enhanced SLURM queue display"
-        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}sq${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
-        echo -e "${BRIGHT_WHITE}Options:${RESET}"
-        echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}       Show this help message"
-        echo -e "  ${BRIGHT_GREEN}-f, --full${RESET}        Show full job details"
-    }
+	if ! hascommand --strict squeue; then
+		echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}squeue${RESET} command is not installed or not in the PATH."
+		return 1
+	fi
 
-    # Define color variables
-    C_RESET="${RESET}"
-    C_JOBID="${BRIGHT_CYAN}"
-    C_PARTITION="${BRIGHT_MAGENTA}"
-    C_QOS="${BRIGHT_WHITE}"
-    C_NAME="${BRIGHT_YELLOW}"
-    C_STATE="${BRIGHT_GREEN}"
-    C_TIME_LEFT="${BRIGHT_BLUE}"
-    C_TIME="${BRIGHT_RED}"
-    C_NODES="${BRIGHT_WHITE}"
-    C_CPUS="${BRIGHT_CYAN}"
-    C_NODELIST="${BRIGHT_GREEN}"
-    C_EXEC_HOST="${BRIGHT_YELLOW}"
-    C_WORK_DIR="${BRIGHT_BLUE}"
-    C_HEADER="${BRIGHT_WHITE}"
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}sq:${RESET} Enhanced SLURM queue display"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}sq${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}       Show this help message"
+		echo -e "  ${BRIGHT_GREEN}-f, --full${RESET}        Show full job details"
+	}
 
-    # Field width parameters
-    WIDTH_JOBID=10
-    WIDTH_PARTITION=9
-    WIDTH_QOS=16
-    WIDTH_NAME=12
-    WIDTH_STATE=8
-    WIDTH_TIME_LEFT=9
-    WIDTH_TIME=6
-    WIDTH_NODES=4
-    WIDTH_CPUS=4
-    WIDTH_NODELIST=18
-    WIDTH_EXEC_HOST=12
-    WIDTH_WORK_DIR=40
+	# Define color variables (easy to modify)
+	C_JOBID="${CYAN}"
+	C_PARTITION="${MAGENTA}"
+	C_QOS="${GREEN}"
+	C_NAME="${YELLOW}"
+	C_TIME_LEFT="${BLUE}"
+	C_TIME="${RED}"
+	C_NODES="${MAGENTA}"
+	C_CPUS="${GREEN}"
+	C_NODELIST="${YELLOW}"
+	C_EXEC_HOST="${BLUE}"
+	C_WORK_DIR="${RED}"
+	C_HEADER="${BRIGHT_WHITE}"
 
-    # Track if we're using full format
-    is_full=0
+	# Define state colors
+	C_STATE_PENDING="${YELLOW}"
+	C_STATE_RUNNING="${GREEN}"
+	C_STATE_SUSPENDED="${YELLOW}"
+	C_STATE_COMPLETING="${BLUE}"
+	C_STATE_COMPLETED="${BLUE}"
+	C_STATE_DEFAULT="${RED}"
 
-    # Default format
-    format="%${WIDTH_JOBID}i %${WIDTH_PARTITION}P %${WIDTH_NAME}j %${WIDTH_STATE}T %${WIDTH_TIME_LEFT}L %${WIDTH_TIME}M %${WIDTH_NODES}D %${WIDTH_CPUS}C %${WIDTH_NODELIST}R"
-    num_fields=9  # Number of expected fields in default format
+	# Field width parameters
+	WIDTH_JOBID=10
+	WIDTH_PARTITION=9
+	WIDTH_QOS=16
+	WIDTH_NAME=12
+	WIDTH_STATE=8
+	WIDTH_TIME_LEFT=9
+	WIDTH_TIME=6
+	WIDTH_NODES=4
+	WIDTH_CPUS=4
+	WIDTH_NODELIST=18
+	WIDTH_EXEC_HOST=12
+	WIDTH_WORK_DIR=40
 
-    # Parse options
-    while [[ "$1" == -* ]]; do
-        case "$1" in
-        --help | -h)
-            show_help
-            return
-            ;;
-        --full | -f)
-            format="%${WIDTH_JOBID}i %${WIDTH_PARTITION}P %${WIDTH_QOS}q %${WIDTH_NAME}j %${WIDTH_STATE}T %${WIDTH_TIME_LEFT}L %${WIDTH_TIME}M %${WIDTH_NODES}D %${WIDTH_CPUS}C %${WIDTH_NODELIST}R %${WIDTH_EXEC_HOST}B %${WIDTH_WORK_DIR}Z"
-            is_full=1
-            num_fields=11  # Adjust for full format
-            ;;
-        *)
-            echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
-            return 1
-            ;;
-        esac
-        shift
-    done
+	# Track if we're using full format
+	is_full=0
 
-    # Run squeue and process with awk for proper alignment
-    squeue --me --format="$format" | awk \
-        -v C_RESET="$C_RESET" -v C_HEADER="$C_HEADER" \
-        -v C_JOBID="$C_JOBID" -v C_PARTITION="$C_PARTITION" -v C_QOS="$C_QOS" -v C_NAME="$C_NAME" \
-        -v C_STATE="$C_STATE" -v C_TIME_LEFT="$C_TIME_LEFT" -v C_TIME="$C_TIME" -v C_NODES="$C_NODES" \
-        -v C_CPUS="$C_CPUS" -v C_NODELIST="$C_NODELIST" -v C_EXEC_HOST="$C_EXEC_HOST" -v C_WORK_DIR="$C_WORK_DIR" \
-        -v WIDTH_JOBID="$WIDTH_JOBID" -v WIDTH_PARTITION="$WIDTH_PARTITION" -v WIDTH_QOS="$WIDTH_QOS" \
-        -v WIDTH_NAME="$WIDTH_NAME" -v WIDTH_STATE="$WIDTH_STATE" -v WIDTH_TIME_LEFT="$WIDTH_TIME_LEFT" \
-        -v WIDTH_TIME="$WIDTH_TIME" -v WIDTH_NODES="$WIDTH_NODES" -v WIDTH_CPUS="$WIDTH_CPUS" \
-        -v WIDTH_NODELIST="$WIDTH_NODELIST" -v WIDTH_EXEC_HOST="$WIDTH_EXEC_HOST" -v WIDTH_WORK_DIR="$WIDTH_WORK_DIR" \
-        -v num_fields="$num_fields" '
+	# Default format
+	format="%${WIDTH_JOBID}i %${WIDTH_PARTITION}P %${WIDTH_NAME}j %${WIDTH_STATE}T %${WIDTH_TIME_LEFT}L %${WIDTH_TIME}M %${WIDTH_NODES}D %${WIDTH_CPUS}C %${WIDTH_NODELIST}R"
+
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		--help | -h)
+			show_help
+			return
+			;;
+		--full | -f)
+			format="%${WIDTH_JOBID}i %${WIDTH_PARTITION}P %${WIDTH_QOS}q %${WIDTH_NAME}j %${WIDTH_STATE}T %${WIDTH_TIME_LEFT}L %${WIDTH_TIME}M %${WIDTH_NODES}D %${WIDTH_CPUS}C %${WIDTH_NODELIST}R %${WIDTH_EXEC_HOST}B %${WIDTH_WORK_DIR}Z"
+			is_full=1
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
+			return 1
+			;;
+		esac
+		shift
+	done
+
+	# Field width parameters
+	POS_JOBID=1
+	POS_PARTITION=2
+	if [[ "$is_full" -eq 1 ]]; then
+		POS_QOS=3
+		POS_NAME=4
+		POS_STATE=5
+		POS_TIME_LEFT=6
+		POS_TIME=7
+		POS_NODES=8
+		POS_CPUS=9
+		POS_NODELIST=10
+		POS_EXEC_HOST=11
+		POS_WORK_DIR=12
+	else
+		POS_QOS=0
+		POS_NAME=3
+		POS_STATE=4
+		POS_TIME_LEFT=5
+		POS_TIME=6
+		POS_NODES=7
+		POS_CPUS=8
+		POS_NODELIST=9
+		POS_EXEC_HOST=0
+		POS_WORK_DIR=0
+	fi
+
+	# Run squeue and process with awk for proper alignment
+	squeue --me --format="$format" | awk \
+		-v C_RESET="$RESET" -v C_HEADER="$C_HEADER" \
+		-v C_JOBID="$C_JOBID" -v C_PARTITION="$C_PARTITION" -v C_QOS="$C_QOS" -v C_NAME="$C_NAME" \
+		-v C_TIME_LEFT="$C_TIME_LEFT" -v C_TIME="$C_TIME" -v C_NODES="$C_NODES" \
+		-v C_CPUS="$C_CPUS" -v C_NODELIST="$C_NODELIST" -v C_EXEC_HOST="$C_EXEC_HOST" -v C_WORK_DIR="$C_WORK_DIR" \
+		-v C_STATE_PENDING="$C_STATE_PENDING" -v C_STATE_RUNNING="$C_STATE_RUNNING" \
+		-v C_STATE_SUSPENDED="$C_STATE_SUSPENDED" -v C_STATE_COMPLETING="$C_STATE_COMPLETING" \
+		-v C_STATE_COMPLETED="$C_STATE_COMPLETED" -v C_STATE_DEFAULT="$C_STATE_DEFAULT" \
+		-v WIDTH_JOBID="$WIDTH_JOBID" -v WIDTH_PARTITION="$WIDTH_PARTITION" -v WIDTH_QOS="$WIDTH_QOS" \
+		-v WIDTH_NAME="$WIDTH_NAME" -v WIDTH_STATE="$WIDTH_STATE" -v WIDTH_TIME_LEFT="$WIDTH_TIME_LEFT" \
+		-v WIDTH_TIME="$WIDTH_TIME" -v WIDTH_NODES="$WIDTH_NODES" -v WIDTH_CPUS="$WIDTH_CPUS" \
+		-v WIDTH_NODELIST="$WIDTH_NODELIST" -v WIDTH_EXEC_HOST="$WIDTH_EXEC_HOST" -v WIDTH_WORK_DIR="$WIDTH_WORK_DIR" \
+		-v is_full="$is_full" -v POS_JOBID="$POS_JOBID" -v POS_PARTITION="$POS_PARTITION" -v POS_QOS="$POS_QOS" \
+		-v POS_NAME="$POS_NAME" -v POS_STATE="$POS_STATE" -v POS_TIME_LEFT="$POS_TIME_LEFT" -v POS_TIME="$POS_TIME" \
+		-v POS_NODES="$POS_NODES" -v POS_CPUS="$POS_CPUS" -v POS_NODELIST="$POS_NODELIST" -v POS_EXEC_HOST="$POS_EXEC_HOST" \
+		-v POS_WORK_DIR="$POS_WORK_DIR" '
     BEGIN {
         FS=" ";
         OFS=" ";
     }
     NR == 1 {
-        # Print header with colors
         print C_HEADER $0 C_RESET;
         next;
     }
     {
-        # Use split to extract fields dynamically
         n = split($0, fields, " ");
+        state = fields[POS_STATE];
+        state_color = C_STATE_DEFAULT;
 
-        # Construct output while maintaining colors
-        printf C_JOBID "%-" WIDTH_JOBID "s" C_RESET " ", fields[1];
-        printf C_PARTITION "%-" WIDTH_PARTITION "s" C_RESET " ", fields[2];
-        if (num_fields == 11) printf C_QOS "%-" WIDTH_QOS "s" C_RESET " ", fields[3];
-        printf C_NAME "%-" WIDTH_NAME "s" C_RESET " ", fields[4];
-        printf C_STATE "%-" WIDTH_STATE "s" C_RESET " ", fields[5];
-        printf C_TIME_LEFT "%-" WIDTH_TIME_LEFT "s" C_RESET " ", fields[6];
-        printf C_TIME "%-" WIDTH_TIME "s" C_RESET " ", fields[7];
-        printf C_NODES "%-" WIDTH_NODES "s" C_RESET " ", fields[8];
-        printf C_CPUS "%-" WIDTH_CPUS "s" C_RESET " ", fields[9];
-        printf C_NODELIST "%-" WIDTH_NODELIST "s" C_RESET " ", fields[10];
+        if (state == "PENDING") state_color = C_STATE_PENDING;
+        else if (state == "RUNNING") state_color = C_STATE_RUNNING;
+        else if (state == "SUSPENDED") state_color = C_STATE_SUSPENDED;
+        else if (state == "COMPLETING") state_color = C_STATE_COMPLETING;
+        else if (state == "COMPLETED") state_color = C_STATE_COMPLETED;
 
-        if (num_fields == 11) {
-            printf C_EXEC_HOST "%-" WIDTH_EXEC_HOST "s" C_RESET " ", fields[11];
-            printf C_WORK_DIR "%-" WIDTH_WORK_DIR "s" C_RESET "\n", fields[12];
+        printf C_JOBID "%-" WIDTH_JOBID "s" C_RESET " ", fields[POS_JOBID];
+        printf C_PARTITION "%-" WIDTH_PARTITION "s" C_RESET " ", fields[POS_PARTITION];
+        if (is_full == 1) printf C_QOS "%-" WIDTH_QOS "s" C_RESET " ", fields[POS_QOS];
+        printf C_NAME "%-" WIDTH_NAME "s" C_RESET " ", fields[POS_NAME];
+        printf state_color "%-" WIDTH_STATE "s" C_RESET " ", state;
+        printf C_TIME_LEFT "%-" WIDTH_TIME_LEFT "s" C_RESET " ", fields[POS_TIME_LEFT];
+        printf C_TIME "%-" WIDTH_TIME "s" C_RESET " ", fields[POS_TIME];
+        printf C_NODES "%-" WIDTH_NODES "s" C_RESET " ", fields[POS_NODES];
+        printf C_CPUS "%-" WIDTH_CPUS "s" C_RESET " ", fields[POS_CPUS];
+        printf C_NODELIST "%-" WIDTH_NODELIST "s" C_RESET " ", fields[POS_NODELIST];
+
+        if (is_full == 1) {
+            printf C_EXEC_HOST "%-" WIDTH_EXEC_HOST "s" C_RESET " ", fields[POS_EXEC_HOST];
+            printf C_WORK_DIR "%-" WIDTH_WORK_DIR "s" C_RESET "\n", fields[POS_WORK_DIR];
         } else {
             printf "\n";
         }
