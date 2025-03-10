@@ -61,6 +61,9 @@ TIKZ_FOLDERS=("tikz" "tikz_in")
 DEFAULT_BIB_EXT=".bib"
 DEFAULT_TEX_EXT=".tex"
 
+# Recognized separators to catch multiple PNGs image_xxx.png or image-xxx.png
+MULTIPLE_FILES_SEPARATORS="_-"  # Default "_" and "-"
+
 #=====================================================================
 # COLOR DEFINITIONS
 # These colors are used for console output to make information easier
@@ -1018,7 +1021,7 @@ create_archive() {
 		fi
 
 		# Handle patterns for image files with numeric suffixes - optimize with regex pattern matching
-		if [[ "$file" =~ ^([^/]+/)?([^/]+)([-_])[0-9]+\.([a-zA-Z]+)$ ]]; then
+		if [[ "$file" =~ ^(.*/)?([^/]+)([${MULTIPLE_FILES_SEPARATORS}])[0-9]+\.([a-zA-Z]+)$ ]]; then	
 			local folder="${BASH_REMATCH[1]:-}"
 			local prefix="${BASH_REMATCH[2]}"
 			local separator="${BASH_REMATCH[3]}" # dash or underscore
