@@ -2462,6 +2462,7 @@ function sq() {
         echo -e "${BRIGHT_RED}Error:${RESET} SLURM's ${BRIGHT_YELLOW}squeue${RESET} command is not installed or not in the PATH."
         return 1
     fi
+    
     # Help function
     show_help() {
         echo -e "${BRIGHT_WHITE}sq:${RESET} Enhanced SLURM queue display"
@@ -2471,11 +2472,44 @@ function sq() {
         echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}       Show this help message"
         echo -e "  ${BRIGHT_GREEN}-f, --full${RESET}        Show full job details"
     }
-    
+
+    # Define color variables
+    C_RESET="${RESET}"
+    C_JOBID="${BRIGHT_CYAN}"
+    C_PARTITION="${BRIGHT_MAGENTA}"
+    C_QOS="${BRIGHT_WHITE}"
+    C_NAME="${BRIGHT_YELLOW}"
+    C_STATE="${BRIGHT_GREEN}"
+    C_TIME_LEFT="${BRIGHT_BLUE}"
+    C_TIME="${BRIGHT_RED}"
+    C_NODES="${BRIGHT_WHITE}"
+    C_CPUS="${BRIGHT_CYAN}"
+    C_NODELIST="${BRIGHT_GREEN}"
+    C_EXEC_HOST="${BRIGHT_YELLOW}"
+    C_WORK_DIR="${BRIGHT_BLUE}"
+    C_HEADER="${BRIGHT_WHITE}"
+
+    # Field width parameters
+    WIDTH_JOBID=10
+    WIDTH_PARTITION=9
+    WIDTH_QOS=16
+    WIDTH_NAME=12
+    WIDTH_STATE=8
+    WIDTH_TIME_LEFT=9
+    WIDTH_TIME=6
+    WIDTH_NODES=4
+    WIDTH_CPUS=4
+    WIDTH_NODELIST=18
+    WIDTH_EXEC_HOST=12
+    WIDTH_WORK_DIR=40
+
+    # Track if we're using full format
+    is_full=0
+
     # Default format
-    local format="%.10i %.9P %.12j %.8T %.9L %.6M %.4D %.4C %.18R"
-    local is_full=false
-    
+    format="%${WIDTH_JOBID}i %${WIDTH_PARTITION}P %${WIDTH_NAME}j %${WIDTH_STATE}T %${WIDTH_TIME_LEFT}L %${WIDTH_TIME}M %${WIDTH_NODES}D %${WIDTH_CPUS}C %${WIDTH_NODELIST}R"
+    num_fields=9  # Number of expected fields in default format
+
     # Parse options
     while [[ "$1" == -* ]]; do
         case "$1" in
@@ -2484,8 +2518,9 @@ function sq() {
             return
             ;;
         --full | -f)
-            format="%.10i %.9P %.16q %.12j %.8T %.9L %.6M %.4D %.4C %.18R %.12B %.40Z"
-            is_full=true
+            format="%${WIDTH_JOBID}i %${WIDTH_PARTITION}P %${WIDTH_QOS}q %${WIDTH_NAME}j %${WIDTH_STATE}T %${WIDTH_TIME_LEFT}L %${WIDTH_TIME}M %${WIDTH_NODES}D %${WIDTH_CPUS}C %${WIDTH_NODELIST}R %${WIDTH_EXEC_HOST}B %${WIDTH_WORK_DIR}Z"
+            is_full=1
+            num_fields=11  # Adjust for full format
             ;;
         *)
             echo -e "${BRIGHT_RED}Error:${RESET} Unknown option: $1"
@@ -2494,124 +2529,50 @@ function sq() {
         esac
         shift
     done
-    
-    # The key approach: run squeue with the -o (--Format) option
-    # This preserves exact column widths and alignment according to format specifiers
-    if $is_full; then
-        squeue --me -o "${format}" | \
-        perl -pe '
-            # Header row
-            if ($. == 1) {
-                $_ = "'${BRIGHT_WHITE}'$_'${RESET}'";
-                next;
-            }
-            
-            # Pattern matching with specific column widths to preserve exact alignment
-            
-            # JOBID (first 10 chars)
-            s/^(.{10})/'${BRIGHT_CYAN}'$1'${RESET}'/;
-            
-            # PARTITION (next 10 chars including space)
-            s/^(.{10})(.{10})/$1${BRIGHT_MAGENTA}$2${RESET}/;
-            
-            # QOS (next 17 chars including space)
-            s/^(.{20})(.{17})/$1${BRIGHT_BLUE}$2${RESET}/;
-            
-            # NAME (next 13 chars including space)
-            s/^(.{37})(.{13})/$1$2/;
-            
-            # STATE (next 9 chars including space)
-            if (/ RUNNING /) {
-                s/( RUNNING )/${BRIGHT_GREEN}$1${RESET}/;
-            } elsif (/ PENDING /) {
-                s/( PENDING )/${BRIGHT_YELLOW}$1${RESET}/;
-            } elsif (/ COMPLETED /) {
-                s/( COMPLETED )/${BRIGHT_BLUE}$1${RESET}/;
-            } elsif (/ FAILED /) {
-                s/( FAILED )/${BRIGHT_RED}$1${RESET}/;
-            } elsif (/ CANCELLED /) {
-                s/( CANCELLED )/${BRIGHT_MAGENTA}$1${RESET}/;
-            } elsif (/ TIMEOUT /) {
-                s/( TIMEOUT )/${BRIGHT_RED}$1${RESET}/;
-            } elsif (/ PREEMPTED /) {
-                s/( PREEMPTED )/${BRIGHT_YELLOW}$1${RESET}/;
-            } elsif (/ SUSPENDED /) {
-                s/( SUSPENDED )/${BRIGHT_YELLOW}$1${RESET}/;
-            }
-            
-            # TIME_LEFT (next 10 chars including space)
-            s/^(.{59})(.{10})/$1${BRIGHT_YELLOW}$2${RESET}/;
-            
-            # TIME (next 7 chars including space)
-            s/^(.{69})(.{7})/$1${BRIGHT_BLUE}$2${RESET}/;
-            
-            # NODES (next 5 chars including space)
-            s/^(.{76})(.{5})/$1${BRIGHT_GREEN}$2${RESET}/;
-            
-            # CPUS (next 5 chars including space)
-            s/^(.{81})(.{5})/$1${BRIGHT_CYAN}$2${RESET}/;
-            
-            # NODELIST - leave uncolored
-            
-            # TRES_PER_NODE (if visible)
-            if (length($_) > 106) {
-                s/^(.{106})(.{13})/$1${BRIGHT_MAGENTA}$2${RESET}/;
-            }
-        '
-    else
-        squeue --me -o "${format}" | \
-        perl -pe '
-            # Header row
-            if ($. == 1) {
-                $_ = "'${BRIGHT_WHITE}'$_'${RESET}'";
-                next;
-            }
-            
-            # Pattern matching with specific column widths to preserve exact alignment
-            
-            # JOBID (first 10 chars)
-            s/^(.{10})/'${BRIGHT_CYAN}'$1'${RESET}'/;
-            
-            # PARTITION (next 10 chars including space)
-            s/^(.{10})(.{10})/$1${BRIGHT_MAGENTA}$2${RESET}/;
-            
-            # NAME (next 13 chars including space)
-            s/^(.{20})(.{13})/$1$2/;
-            
-            # STATE (next 9 chars including space)
-            if (/ RUNNING /) {
-                s/( RUNNING )/${BRIGHT_GREEN}$1${RESET}/;
-            } elsif (/ PENDING /) {
-                s/( PENDING )/${BRIGHT_YELLOW}$1${RESET}/;
-            } elsif (/ COMPLETED /) {
-                s/( COMPLETED )/${BRIGHT_BLUE}$1${RESET}/;
-            } elsif (/ FAILED /) {
-                s/( FAILED )/${BRIGHT_RED}$1${RESET}/;
-            } elsif (/ CANCELLED /) {
-                s/( CANCELLED )/${BRIGHT_MAGENTA}$1${RESET}/;
-            } elsif (/ TIMEOUT /) {
-                s/( TIMEOUT )/${BRIGHT_RED}$1${RESET}/;
-            } elsif (/ PREEMPTED /) {
-                s/( PREEMPTED )/${BRIGHT_YELLOW}$1${RESET}/;
-            } elsif (/ SUSPENDED /) {
-                s/( SUSPENDED )/${BRIGHT_YELLOW}$1${RESET}/;
-            }
-            
-            # TIME_LEFT (next 10 chars including space)
-            s/^(.{42})(.{10})/$1${BRIGHT_YELLOW}$2${RESET}/;
-            
-            # TIME (next 7 chars including space)
-            s/^(.{52})(.{7})/$1${BRIGHT_BLUE}$2${RESET}/;
-            
-            # NODES (next 5 chars including space)
-            s/^(.{59})(.{5})/$1${BRIGHT_GREEN}$2${RESET}/;
-            
-            # CPUS (next 5 chars including space)
-            s/^(.{64})(.{5})/$1${BRIGHT_CYAN}$2${RESET}/;
-            
-            # NODELIST - leave uncolored
-        '
-    fi
+
+    # Run squeue and process with awk for proper alignment
+    squeue --me --format="$format" | awk \
+        -v C_RESET="$C_RESET" -v C_HEADER="$C_HEADER" \
+        -v C_JOBID="$C_JOBID" -v C_PARTITION="$C_PARTITION" -v C_QOS="$C_QOS" -v C_NAME="$C_NAME" \
+        -v C_STATE="$C_STATE" -v C_TIME_LEFT="$C_TIME_LEFT" -v C_TIME="$C_TIME" -v C_NODES="$C_NODES" \
+        -v C_CPUS="$C_CPUS" -v C_NODELIST="$C_NODELIST" -v C_EXEC_HOST="$C_EXEC_HOST" -v C_WORK_DIR="$C_WORK_DIR" \
+        -v WIDTH_JOBID="$WIDTH_JOBID" -v WIDTH_PARTITION="$WIDTH_PARTITION" -v WIDTH_QOS="$WIDTH_QOS" \
+        -v WIDTH_NAME="$WIDTH_NAME" -v WIDTH_STATE="$WIDTH_STATE" -v WIDTH_TIME_LEFT="$WIDTH_TIME_LEFT" \
+        -v WIDTH_TIME="$WIDTH_TIME" -v WIDTH_NODES="$WIDTH_NODES" -v WIDTH_CPUS="$WIDTH_CPUS" \
+        -v WIDTH_NODELIST="$WIDTH_NODELIST" -v WIDTH_EXEC_HOST="$WIDTH_EXEC_HOST" -v WIDTH_WORK_DIR="$WIDTH_WORK_DIR" \
+        -v num_fields="$num_fields" '
+    BEGIN {
+        FS=" ";
+        OFS=" ";
+    }
+    NR == 1 {
+        # Print header with colors
+        print C_HEADER $0 C_RESET;
+        next;
+    }
+    {
+        # Use split to extract fields dynamically
+        n = split($0, fields, " ");
+
+        # Construct output while maintaining colors
+        printf C_JOBID "%-" WIDTH_JOBID "s" C_RESET " ", fields[1];
+        printf C_PARTITION "%-" WIDTH_PARTITION "s" C_RESET " ", fields[2];
+        if (num_fields == 11) printf C_QOS "%-" WIDTH_QOS "s" C_RESET " ", fields[3];
+        printf C_NAME "%-" WIDTH_NAME "s" C_RESET " ", fields[4];
+        printf C_STATE "%-" WIDTH_STATE "s" C_RESET " ", fields[5];
+        printf C_TIME_LEFT "%-" WIDTH_TIME_LEFT "s" C_RESET " ", fields[6];
+        printf C_TIME "%-" WIDTH_TIME "s" C_RESET " ", fields[7];
+        printf C_NODES "%-" WIDTH_NODES "s" C_RESET " ", fields[8];
+        printf C_CPUS "%-" WIDTH_CPUS "s" C_RESET " ", fields[9];
+        printf C_NODELIST "%-" WIDTH_NODELIST "s" C_RESET " ", fields[10];
+
+        if (num_fields == 11) {
+            printf C_EXEC_HOST "%-" WIDTH_EXEC_HOST "s" C_RESET " ", fields[11];
+            printf C_WORK_DIR "%-" WIDTH_WORK_DIR "s" C_RESET "\n", fields[12];
+        } else {
+            printf "\n";
+        }
+    }'
 }
 #-------------------------------------------------------------
 
