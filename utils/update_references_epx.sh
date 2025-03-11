@@ -354,17 +354,17 @@ update_epx_ref_values() {
 			res_value=$(echo "$line" | sed -r "s/.*${RES_PATTERN}\s*([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s+.*/\1/")
 
 			if [ -z "$ref_value" ] || [ -z "$res_value" ]; then
-				log_warning "Failed to extract values from line $line_count"
+				log_debug "Failed to extract values from line $line_count"
 				continue
 			fi
 			# Validate extracted values are proper numbers
 			if ! validate_number "$ref_value"; then
-				log_warning "Invalid reference value format: '$ref_value' at line $line_count"
+				log_debug "Invalid reference value format: '$ref_value' at line $line_count"
 				continue
 			fi
 
 			if ! validate_number "$res_value"; then
-				log_warning "Invalid result value format: '$res_value' at line $line_count"
+				log_debug "Invalid result value format: '$res_value' at line $line_count"
 				continue
 			fi
 
@@ -378,6 +378,8 @@ update_epx_ref_values() {
 			if grep -q "$ref_value" "$replace_file"; then
 
 				# Display original log line
+				echo -e ""
+				echo -e "${BRIGHT_WHITE}# ------------------------------------------------------------------${RESET}"
 				echo -e "\n${BOLD}${WHITE}Found a match :${RESET}"
 				local highlighted_line="${line//$ref_value/${BRIGHT_RED}${ref_value}${RESET}}"
 				highlighted_line="${highlighted_line//$res_value/${BRIGHT_YELLOW}${res_value}${RESET}}"
