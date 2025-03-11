@@ -162,20 +162,18 @@ validate_number() {
 
 # Compare numbers considering both scientific and standard notation
 compare_numbers() {
-	local num1="$1"
-	local num2="$2"
-	local tolerance=1e-10
-
-	# Calculate absolute difference first
-	local diff=$(echo "if($num1 < $num2) x = $num2 - $num1; else x = $num1 - $num2; x" | bc -l)
-
-	# Then compare with tolerance
-	local result=$(echo "$diff < $tolerance" | bc -l)
-
-	if [ "$result" = "1" ]; then
-		return 0 # Numbers are equal within tolerance
-	fi
-	return 1 # Numbers are different
+    local num1="$1"
+    local num2="$2"
+    local tolerance=1e-10
+    
+    # Use awk instead of bc for more reliable floating point math
+    local result=$(awk -v n1="$num1" -v n2="$num2" -v t="$tolerance" 'BEGIN {if (sqrt((n1-n2)^2) < t) print 1; else print 0}')
+    
+    if [ "$result" = "1" ]; then
+        return 0 # Numbers are equal within tolerance
+    else
+        return 1 # Numbers are different
+    fi
 }
 
 #=====================================================================
@@ -368,10 +366,6 @@ update_epx_ref_values() {
 			if ! validate_number "$res_value"; then
 				log_warning "Invalid result value format: '$res_value' at line $line_count"
 				continue
-			fi
-
-			if [ $VERBOSITY -ge $VERBOSITY_VERBOSE ]; then
-				log_message $VERBOSITY_VERBOSE "${BRIGHT_BLUE}" "Found match: ${RESET}${UNDERLINE}${REF_PATTERN}${RESET} ${BRIGHT_YELLOW}$ref_value${RESET} ${UNDERLINE}${RES_PATTERN}${RESET} ${BRIGHT_YELLOW}$res_value${RESET}"
 			fi
 
 			# Check if the replacement is necessary (values are different)
