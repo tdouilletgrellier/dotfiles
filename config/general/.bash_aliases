@@ -2637,9 +2637,7 @@ complete -F _gitbranch_autocomplete gitbranch
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-# Change the Git branch - If no branch is specified as an argument, then
-# the user is prompted to select from a list the available branches
-# Syntax: gitbranch [optional_branch_name]
+# Change the git branch
 function gitbranch() {
 
 # Help function for gitbranch
@@ -2714,7 +2712,7 @@ show_help() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-# find files recursively with glob patterns
+# Find files recursively with glob patterns
 function findfile() {
 
 	# Help function
