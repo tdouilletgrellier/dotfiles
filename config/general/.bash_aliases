@@ -2621,16 +2621,16 @@ function sq() {
 #-------------------------------------------------------------
 # Git branch auto-completion setup
 _gitbranch_autocomplete() {
-    local cur=${COMP_WORDS[COMP_CWORD]}
-    local branches=$(git branch --format='%(refname:short)' 2>/dev/null)
-    
-    # Add remote branches if they exist
-    if git remote -v 2>/dev/null | grep -q 'origin'; then
-        remote_branches=$(git ls-remote --refs --heads origin 2>/dev/null | awk '{sub("refs/heads/", ""); print $2}')
-        branches="$branches $remote_branches"
-    fi
-    
-    COMPREPLY=($(compgen -W "$branches" -- "$cur"))
+	local cur=${COMP_WORDS[COMP_CWORD]}
+	local branches=$(git branch --format='%(refname:short)' 2>/dev/null)
+
+	# Add remote branches if they exist
+	if git remote -v 2>/dev/null | grep -q 'origin'; then
+		remote_branches=$(git ls-remote --refs --heads origin 2>/dev/null | awk '{sub("refs/heads/", ""); print $2}')
+		branches="$branches $remote_branches"
+	fi
+
+	COMPREPLY=($(compgen -W "$branches" -- "$cur"))
 }
 # Register the auto-completion function
 complete -F _gitbranch_autocomplete gitbranch
@@ -2641,53 +2641,192 @@ complete -F _gitbranch_autocomplete gitbranch
 # the user is prompted to select from a list the available branches
 # Syntax: gitbranch [optional_branch_name]
 function gitbranch() {
-    # Check if the current directory is a Git repository
-    if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-        # No arguments passed
-        if [[ $# -eq 0 ]]; then
-            # Check if there is a remote server
-            if git remote -v | grep -q 'origin'; then
-                # Prompt the user for action
-                if ask "${BRIGHT_WHITE}Download ${BRIGHT_YELLOW}remote${BRIGHT_WHITE} branch names?${BRIGHT_RED} Could be slow for large repos.${RESET}" N; then
-                    # Fetch latest remote branches; handle errors
-                    git fetch origin 2>/dev/null || { 
-                        echo -e "${BRIGHT_RED}Error: Could not fetch from remote${RESET}"
-                        return 1
-                    }
-                    
-                    # Get remote branches, sorted by commit date
-                    REMOTE_BRANCHES=$(git for-each-ref --sort=-committerdate refs/remotes/origin/ --format='%(refname:short)' | sed 's|origin/||')
-                    
-                    if [[ -z "$REMOTE_BRANCHES" ]]; then
-                        echo -e "${BRIGHT_RED}Error: No remote branches found${RESET}"
-                        return 1
-                    fi
-                    
-                    # Use createmenu for selection
-                    local selected_branch=$(echo "$REMOTE_BRANCHES" | createmenu)
-                    
-                    # Check if the branch exists locally before checkout
-                    if git show-ref --verify --quiet refs/heads/"$selected_branch"; then
-                        git checkout "$selected_branch"
-                    else
-                        git checkout -b "$selected_branch" origin/"$selected_branch"
-                    fi
-                else
-                    # Use local branches for selection via createmenu
-                    git checkout "$(git branch --sort=-committerdate | cut -c 3- | createmenu)"
-                fi
-            else
-                # No remote server, use local branches only
-                git checkout "$(git branch --sort=-committerdate | cut -c 3- | createmenu)"
-            fi
-        else
-            # Argument passed, just switch to that branch
-            git checkout "${@}"
-        fi
-    else
-        # Not a Git repo
-        echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}Current directory is not a Git repository${RESET}"
-    fi
+
+# Help function for gitbranch
+show_help() {
+	echo -e "${BRIGHT_WHITE}gitbranch:${RESET} Interactive Git branch switching utility"
+	echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+	echo -e "  ${BRIGHT_CYAN}gitbranch${RESET} ${BRIGHT_YELLOW}[branch_name]${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+	echo -e "${BRIGHT_WHITE}Options:${RESET}"
+	echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}   Show this help message"
+	echo -e "${BRIGHT_WHITE}Behavior:${RESET}"
+	echo -e "  ${BRIGHT_BLUE}• No arguments:${RESET} Interactive menu to select a branch"
+	echo -e "  ${BRIGHT_BLUE}• With argument:${RESET} Directly switch to specified branch"
+	echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+	echo -e "  ${BRIGHT_CYAN}gitbranch${RESET}                ${BRIGHT_BLUE}# Interactive branch selection${RESET}"
+	echo -e "  ${BRIGHT_CYAN}gitbranch${RESET} ${BRIGHT_GREEN}feature/login${RESET}   ${BRIGHT_BLUE}# Switch to feature/login branch${RESET}"
+}
+
+	# Display help if requested
+	if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+		show_help
+		return 0
+	fi
+
+	# Check if the current directory is a Git repository
+	if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+		# No arguments passed
+		if [[ $# -eq 0 ]]; then
+			# Check if there is a remote server
+			if git remote -v | grep -q 'origin'; then
+				# Prompt the user for action
+				if ask "${BRIGHT_WHITE}Download ${BRIGHT_YELLOW}remote${BRIGHT_WHITE} branch names?${BRIGHT_RED} Could be slow for large repos.${RESET}" N; then
+					# Fetch latest remote branches; handle errors
+					git fetch origin 2>/dev/null || {
+						echo -e "${BRIGHT_RED}Error: Could not fetch from remote${RESET}"
+						return 1
+					}
+
+					# Get remote branches, sorted by commit date
+					REMOTE_BRANCHES=$(git for-each-ref --sort=-committerdate refs/remotes/origin/ --format='%(refname:short)' | sed 's|origin/||')
+
+					if [[ -z "$REMOTE_BRANCHES" ]]; then
+						echo -e "${BRIGHT_RED}Error: No remote branches found${RESET}"
+						return 1
+					fi
+
+					# Use createmenu for selection
+					local selected_branch=$(echo "$REMOTE_BRANCHES" | createmenu)
+
+					# Check if the branch exists locally before checkout
+					if git show-ref --verify --quiet refs/heads/"$selected_branch"; then
+						git checkout "$selected_branch"
+					else
+						git checkout -b "$selected_branch" origin/"$selected_branch"
+					fi
+				else
+					# Use local branches for selection via createmenu
+					git checkout "$(git branch --sort=-committerdate | cut -c 3- | createmenu)"
+				fi
+			else
+				# No remote server, use local branches only
+				git checkout "$(git branch --sort=-committerdate | cut -c 3- | createmenu)"
+			fi
+		else
+			# Argument passed, just switch to that branch
+			git checkout "${@}"
+		fi
+	else
+		# Not a Git repo
+		echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}Current directory is not a Git repository${RESET}"
+	fi
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# find files recursively with glob patterns
+function findfile() {
+
+	# Help function
+	show_help() {
+		echo -e "${BRIGHT_WHITE}findfile:${RESET} Searches for filenames recursively"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findfile${RESET} ${BRIGHT_YELLOW}[options]${RESET} ${BRIGHT_GREEN}pattern${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-s, --sudo${RESET}   Use sudo for searching"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}   Show this help message"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findfile${RESET} ${BRIGHT_GREEN}'*.cpp'${RESET}           ${BRIGHT_BLUE}# Find all .cpp files${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findfile${RESET} ${BRIGHT_GREEN}\"*post*.h\"${RESET}        ${BRIGHT_BLUE}# Find .h files with 'post' in name${RESET}"
+		echo -e "  ${BRIGHT_CYAN}findfile${RESET} ${BRIGHT_YELLOW}-s${RESET} ${BRIGHT_GREEN}'conf*'${RESET}          ${BRIGHT_BLUE}# Find with sudo${RESET}"
+	}
+
+	# Initialize the sudo prefix for running commands with elevated permissions
+	local SUDO_PREFIX=""
+	local PATTERN=""
+
+	# Process options
+	while [[ "$#" -gt 0 ]]; do
+		case "$1" in
+		--sudo | -s)
+			SUDO_PREFIX="sudo "
+			shift
+			;;
+		--help | -h)
+			# Show help and exit
+			show_help
+			return 0
+			;;
+		-*)
+			echo -e "${BRIGHT_RED}Error:${RESET} Unknown option $1"
+			echo -e "Use ${BRIGHT_CYAN}findfile --help${RESET} for usage information"
+			return 1
+			;;
+		*)
+			# Set pattern
+			PATTERN="$1"
+			shift
+			# If there are more arguments, show error
+			if [[ "$#" -gt 0 ]]; then
+				echo -e "${BRIGHT_RED}Error:${RESET} Too many arguments"
+				echo -e "Use ${BRIGHT_CYAN}findfile --help${RESET} for usage information"
+				return 1
+			fi
+			;;
+		esac
+	done
+
+	# Check if pattern is specified
+	if [[ -z "$PATTERN" ]]; then
+		show_help
+		return 0
+	fi
+
+	# Use fdfind if installed, else use fd or find as fallback
+	if hascommand --strict fdfind; then
+		# Construct command
+		local FD_CMD="${SUDO_PREFIX}fdfind --type file --ignore-case --no-ignore --hidden --glob"
+
+		# Count files and display results
+		local COUNT=$(${SUDO_PREFIX}fdfind --type file --ignore-case --no-ignore --hidden --glob "$PATTERN" . | wc -l)
+
+		# Execute the command
+		eval "$FD_CMD \"$PATTERN\" ."
+
+		# Display count
+		echo -e "${BRIGHT_WHITE}$COUNT files found${RESET}"
+
+	elif hascommand --strict fd; then
+		# Construct command
+		local FD_CMD="${SUDO_PREFIX}fd --type file --ignore-case --no-ignore --hidden --glob"
+
+		# Count files and display results
+		local COUNT=$(${SUDO_PREFIX}fd --type file --ignore-case --no-ignore --hidden --glob "$PATTERN" . | wc -l)
+
+		# Execute the command
+		eval "$FD_CMD \"$PATTERN\" ."
+
+		# Display count
+		echo -e "${BRIGHT_WHITE}$COUNT files found${RESET}"
+
+	else # Use find command as a last resort
+		# Construct find command
+		local FIND_CMD="${SUDO_PREFIX}find . -type f"
+
+		# Add name pattern
+		if [[ "$PATTERN" == *\** || "$PATTERN" == *\?* || "$PATTERN" == *\[* ]]; then
+			# Pattern already has glob characters
+			FIND_CMD+=" -iname \"$PATTERN\""
+		else
+			# No glob characters, add wildcards for substring matching
+			FIND_CMD+=" -iname \"*$PATTERN*\""
+		fi
+
+		# Add follow symlinks
+		FIND_CMD+=" -follow 2>/dev/null"
+
+		# Count files and display results
+		local COUNT=$(eval "$FIND_CMD" | wc -l)
+
+		# Execute the command
+		eval "$FIND_CMD"
+
+		# Display count
+		echo -e "${BRIGHT_WHITE}$COUNT files found${RESET}"
+	fi
+
+	# Return success
+	return 0
 }
 #-------------------------------------------------------------
 
