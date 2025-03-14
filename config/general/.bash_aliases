@@ -2619,6 +2619,79 @@ function sq() {
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
+# Git branch auto-completion setup
+_gitbranch_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local branches=$(git branch --format='%(refname:short)' 2>/dev/null)
+    
+    # Add remote branches if they exist
+    if git remote -v 2>/dev/null | grep -q 'origin'; then
+        remote_branches=$(git ls-remote --refs --heads origin 2>/dev/null | awk '{sub("refs/heads/", ""); print $2}')
+        branches="$branches $remote_branches"
+    fi
+    
+    COMPREPLY=($(compgen -W "$branches" -- "$cur"))
+}
+# Register the auto-completion function
+complete -F _gitbranch_autocomplete gitbranch
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Change the Git branch - If no branch is specified as an argument, then
+# the user is prompted to select from a list the available branches
+# Syntax: gitbranch [optional_branch_name]
+function gitbranch() {
+    # Check if the current directory is a Git repository
+    if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        # No arguments passed
+        if [[ $# -eq 0 ]]; then
+            # Check if there is a remote server
+            if git remote -v | grep -q 'origin'; then
+                # Prompt the user for action
+                if ask "${BRIGHT_WHITE}Download ${BRIGHT_YELLOW}remote${BRIGHT_WHITE} branch names?${BRIGHT_RED} Could be slow for large repos.${RESET}" N; then
+                    # Fetch latest remote branches; handle errors
+                    git fetch origin 2>/dev/null || { 
+                        echo -e "${BRIGHT_RED}Error: Could not fetch from remote${RESET}"
+                        return 1
+                    }
+                    
+                    # Get remote branches, sorted by commit date
+                    REMOTE_BRANCHES=$(git for-each-ref --sort=-committerdate refs/remotes/origin/ --format='%(refname:short)' | sed 's|origin/||')
+                    
+                    if [[ -z "$REMOTE_BRANCHES" ]]; then
+                        echo -e "${BRIGHT_RED}Error: No remote branches found${RESET}"
+                        return 1
+                    fi
+                    
+                    # Use createmenu for selection
+                    local selected_branch=$(echo "$REMOTE_BRANCHES" | createmenu)
+                    
+                    # Check if the branch exists locally before checkout
+                    if git show-ref --verify --quiet refs/heads/"$selected_branch"; then
+                        git checkout "$selected_branch"
+                    else
+                        git checkout -b "$selected_branch" origin/"$selected_branch"
+                    fi
+                else
+                    # Use local branches for selection via createmenu
+                    git checkout "$(git branch --sort=-committerdate | cut -c 3- | createmenu)"
+                fi
+            else
+                # No remote server, use local branches only
+                git checkout "$(git branch --sort=-committerdate | cut -c 3- | createmenu)"
+            fi
+        else
+            # Argument passed, just switch to that branch
+            git checkout "${@}"
+        fi
+    else
+        # Not a Git repo
+        echo -e "${BRIGHT_RED}ERROR: ${BRIGHT_CYAN}Current directory is not a Git repository${RESET}"
+    fi
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
 #  _____ __________
 # |  ___|__  /  ___|
 # | |_    / /| |_
