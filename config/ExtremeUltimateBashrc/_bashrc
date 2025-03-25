@@ -3335,6 +3335,17 @@ if hascommand --strict cmatrix; then
 	alias matrix='cmatrix -b'
 fi
 
+# Wrap text breaking at whitespace only
+# use -w or --width=WIDTH to set line width (default 80)
+if hascommand --strict fold; then
+	alias wrap='fold --spaces'
+fi
+
+# Fix spacing and reformat text while preserving paragraphs
+if hascommand --strict fmt; then
+	alias unwrap='fmt'
+fi
+
 #######################################################
 ### FILE SYSTEMS
 #######################################################
@@ -7230,8 +7241,44 @@ function convert2mdtag() {
 # It is good practice to remove execute permissions from data files to enhance
 # security, as files masquerading as these types could potentially be malicious
 function fixinvalidexecutepermissions() {
-	# Use current directory as default, or use provided directory
-	local target_directory="${1:-.}"
+	# Parse arguments to check for help flag
+	local target_directory
+	local show_help=false
+
+	# Process parameters
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+			-h|--help)
+				show_help=true
+				shift
+				;;
+			*)
+				# First non-flag argument is treated as target directory
+				if [[ -z "$target_directory" ]]; then
+					target_directory="$1"
+				fi
+				shift
+				;;
+		esac
+	done
+
+	# Show help if requested
+	if $show_help; then
+		echo -e "${BRIGHT_WHITE}fixinvalidexecutepermissions${RESET}:"
+		echo -e "Removes execute permissions from non-executable file types to enhance security"
+		echo
+		echo -e "${BRIGHT_WHITE}Usage:${RESET} ${BRIGHT_CYAN}fixinvalidexecutepermissions${RESET} ${BRIGHT_GREEN}[OPTIONAL_DIRECTORY]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET} ${BRIGHT_YELLOW}-h, --help${RESET} Show this help message and exit"
+		echo -e "${BRIGHT_WHITE}Arguments:${RESET} ${BRIGHT_GREEN}OPTIONAL_DIRECTORY${RESET} Directory to process (defaults to current directory)"
+		echo
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}fixinvalidexecutepermissions${RESET}             # Process current directory"
+		echo -e "  ${BRIGHT_CYAN}fixinvalidexecutepermissions${RESET} ${BRIGHT_GREEN}~/Documents${RESET} # Process specific directory"
+		return 0
+	fi
+
+	# Use current directory as default if no directory specified
+	target_directory="${target_directory:-.}"
 
 	# Check if the user can execute sudo commands
 	if ! sudo -v; then
@@ -7241,6 +7288,11 @@ function fixinvalidexecutepermissions() {
 
 	# Confirmation prompt using the provided ask function
 	if ask "${BRIGHT_MAGENTA}Do you want to remove invalid execute permissions in directory: ${BRIGHT_CYAN}$target_directory${RESET}" Y; then
+		# Ask about including Git directories
+		local include_git=false
+		if ask "${BRIGHT_MAGENTA}Include Git directories for execute permissions cleanup?${RESET} ${BRIGHT_YELLOW}(Not recommended)${RESET}" N; then
+			include_git=true
+		fi
 
 		# Document and Text Files
 		local -a doc_extensions=(
@@ -7389,9 +7441,21 @@ function fixinvalidexecutepermissions() {
 		# Remove the last '-o' (logical OR) to prevent syntax error
 		unset 'find_args[${#find_args[@]}-1]'
 
-		# Execute the find command with sudo to handle permission issues
-		sudo find "$target_directory" -type f \( "${find_args[@]}" \) -exec chmod a-x {} +
-		echo -e "${BRIGHT_GREEN}✓${RESET} Execute permissions have been removed from non-executable files"
+		# Construct find command based on whether to include Git directories
+		if $include_git; then
+			# Include Git directories in the search
+			sudo find "$target_directory" \
+				-type f \( "${find_args[@]}" \) \
+				-exec chmod a-x {} +
+			echo -e "${BRIGHT_GREEN}✓${RESET} Execute permissions have been removed from non-executable files ${BRIGHT_YELLOW}(including Git directories)${RESET}"
+		else
+			# Exclude Git directories from the search using prune
+			sudo find "$target_directory" \
+				-type d -name ".git" -prune -o \
+				-type f \( "${find_args[@]}" \) \
+				-exec chmod a-x {} +
+			echo -e "${BRIGHT_GREEN}✓${RESET} Execute permissions have been removed from non-executable files ${BRIGHT_BLUE}(Git directories excluded)${RESET}"
+		fi
 	else
 		return 1
 	fi
