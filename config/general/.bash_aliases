@@ -2640,20 +2640,20 @@ complete -F _gitbranch_autocomplete gitbranch
 # Change the git branch
 function gitbranch() {
 
-# Help function for gitbranch
-show_help() {
-	echo -e "${BRIGHT_WHITE}gitbranch:${RESET} Interactive Git branch switching utility"
-	echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-	echo -e "  ${BRIGHT_CYAN}gitbranch${RESET} ${BRIGHT_YELLOW}[branch_name]${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
-	echo -e "${BRIGHT_WHITE}Options:${RESET}"
-	echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}   Show this help message"
-	echo -e "${BRIGHT_WHITE}Behavior:${RESET}"
-	echo -e "  ${BRIGHT_BLUE}• No arguments:${RESET} Interactive menu to select a branch"
-	echo -e "  ${BRIGHT_BLUE}• With argument:${RESET} Directly switch to specified branch"
-	echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-	echo -e "  ${BRIGHT_CYAN}gitbranch${RESET}                ${BRIGHT_BLUE}# Interactive branch selection${RESET}"
-	echo -e "  ${BRIGHT_CYAN}gitbranch${RESET} ${BRIGHT_GREEN}feature/login${RESET}   ${BRIGHT_BLUE}# Switch to feature/login branch${RESET}"
-}
+	# Help function for gitbranch
+	show_help() {
+		echo -e "${BRIGHT_WHITE}gitbranch:${RESET} Interactive Git branch switching utility"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}gitbranch${RESET} ${BRIGHT_YELLOW}[branch_name]${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}-h, --help${RESET}   Show this help message"
+		echo -e "${BRIGHT_WHITE}Behavior:${RESET}"
+		echo -e "  ${BRIGHT_BLUE}• No arguments:${RESET} Interactive menu to select a branch"
+		echo -e "  ${BRIGHT_BLUE}• With argument:${RESET} Directly switch to specified branch"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}gitbranch${RESET}                ${BRIGHT_BLUE}# Interactive branch selection${RESET}"
+		echo -e "  ${BRIGHT_CYAN}gitbranch${RESET} ${BRIGHT_GREEN}feature/login${RESET}   ${BRIGHT_BLUE}# Switch to feature/login branch${RESET}"
+	}
 
 	# Display help if requested
 	if [[ "$1" == "-h" || "$1" == "--help" ]]; then
@@ -2825,6 +2825,53 @@ function findfile() {
 
 	# Return success
 	return 0
+}
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Function to sanitize the terminal
+function reset_term() {
+	# Signal handling
+	trap 'echo -e "\n${BRIGHT_RED}Operation interrupted.${RESET}"; return 1' INT TERM
+
+	# Display help
+	if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+		echo -e "${BRIGHT_WHITE}reset_term:${RESET} Resets and sanitizes the terminal."
+		echo -e "Ensures the terminal behaves normally by performing a hard reset."
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}reset_term${RESET} ${BRIGHT_YELLOW}[options]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}           Show this help message"
+		return 0
+	fi
+
+	# Start timing
+	local start_time=$(date +%s.%N)
+
+	# Check if we're in a real terminal
+	if [[ ! -t 1 ]]; then
+		echo -e "${BRIGHT_YELLOW}Warning: Not running in a standard terminal.${RESET}"
+	fi
+
+	# Perform basic terminal sanitization
+	echo -e "${BRIGHT_CYAN}Resetting terminal settings...${RESET}"
+	stty sane
+
+	# Perform hard reset
+	echo -e "${BRIGHT_YELLOW}Performing a full terminal reset...${RESET}"
+	reset
+
+	# Reset cursor
+	echo -e "\033[?25h" # Show cursor
+	echo -e "\033[0 q"  # Reset cursor style
+
+	# Calculate and show timing
+	local end_time=$(date +%s.%N)
+	local duration=$(echo "$end_time - $start_time" | bc)
+	echo -e "${BRIGHT_CYAN}Terminal sanitization completed in ${BRIGHT_WHITE}${duration}${BRIGHT_CYAN} seconds.${RESET}"
+
+	# Reset the trap
+	trap - INT TERM
 }
 #-------------------------------------------------------------
 
