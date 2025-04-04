@@ -2878,96 +2878,134 @@ function reset_term() {
 #-------------------------------------------------------------
 # git update token
 function ggut() {
-    local token username repo_url domain git_provider=""
-    local silence_output=0 skip_test=0 force=0
-    local credentials_path=~/.git-credentials
+	local token username repo_url domain git_provider=""
+	local silence_output=0 skip_test=0 force=0
+	local credentials_path=~/.git-credentials
 
-    show_help() {
-        echo -e "${BRIGHT_WHITE}ggut:${RESET} Update Git repository credentials/tokens for remote access"
-        echo -e "${BRIGHT_WHITE}Usage:${RESET}"
-        echo -e "  ${BRIGHT_CYAN}ggut${RESET} ${BRIGHT_YELLOW}[options]${RESET} ${BRIGHT_GREEN}<token> <username> [repo_url]${RESET}"
-        echo -e "${BRIGHT_WHITE}Options:${RESET}"
-        echo -e "  ${BRIGHT_GREEN}-s, --silent${RESET}            Silence non-essential output"
-        echo -e "  ${BRIGHT_GREEN}-t, --skip-test${RESET}         Skip testing the connection"
-        echo -e "  ${BRIGHT_GREEN}-p, --provider <name>${RESET}   Force Git provider (github, gitlab, bitbucket, azure)"
-        echo -e "  ${BRIGHT_GREEN}-f, --force${RESET}             Force update without confirmation"
-        echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}              Show this help message"
-        echo -e "${BRIGHT_WHITE}Arguments:${RESET}"
-        echo -e "  ${BRIGHT_GREEN}<token>${RESET}                Access token for the Git service"
-        echo -e "  ${BRIGHT_GREEN}<username>${RESET}             Username for the Git service"
-        echo -e "  ${BRIGHT_GREEN}[repo_url]${RESET}             Repository URL (optional if run inside a git repo)"
-        echo -e "${BRIGHT_WHITE}Examples:${RESET}"
-        echo -e "  ${BRIGHT_YELLOW}ggut${RESET} ghp_1234abcd myusername"
-        echo -e "  ${BRIGHT_YELLOW}ggut${RESET} -p gitlab glpat-1234abcd gitlab-username"
-        return 1
-    }
+	show_help() {
+		echo -e "${BRIGHT_WHITE}ggut:${RESET} Update Git repository credentials/tokens for remote access"
+		echo -e "${BRIGHT_WHITE}Usage:${RESET}"
+		echo -e "  ${BRIGHT_CYAN}ggut${RESET} ${BRIGHT_YELLOW}[options]${RESET} ${BRIGHT_GREEN}<token> <username> [repo_url]${RESET}"
+		echo -e "${BRIGHT_WHITE}Options:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}-s, --silent${RESET}            Silence non-essential output"
+		echo -e "  ${BRIGHT_GREEN}-t, --skip-test${RESET}         Skip testing the connection"
+		echo -e "  ${BRIGHT_GREEN}-p, --provider <name>${RESET}   Force Git provider (github, gitlab, bitbucket, azure)"
+		echo -e "  ${BRIGHT_GREEN}-f, --force${RESET}             Force update without confirmation"
+		echo -e "  ${BRIGHT_GREEN}-h, --help${RESET}              Show this help message"
+		echo -e "${BRIGHT_WHITE}Arguments:${RESET}"
+		echo -e "  ${BRIGHT_GREEN}<token>${RESET}                Access token for the Git service"
+		echo -e "  ${BRIGHT_GREEN}<username>${RESET}             Username for the Git service"
+		echo -e "  ${BRIGHT_GREEN}[repo_url]${RESET}             Repository URL (optional if run inside a git repo)"
+		echo -e "${BRIGHT_WHITE}Examples:${RESET}"
+		echo -e "  ${BRIGHT_YELLOW}ggut${RESET} ghp_1234abcd myusername"
+		echo -e "  ${BRIGHT_YELLOW}ggut${RESET} -p gitlab glpat-1234abcd gitlab-username"
+		return 1
+	}
 
-    log() { [ "$silence_output" -eq 0 ] && echo -e "$1"; }
+	log() { [ "$silence_output" -eq 0 ] && echo -e "$1"; }
 
-    check_git() {
-        hascommand --strict git || { echo -e "${BRIGHT_RED}Error: Git is not installed.${RESET}"; return 1; }
-    }
+	check_git() {
+		hascommand --strict git || {
+			echo -e "${BRIGHT_RED}Error: Git is not installed.${RESET}"
+			return 1
+		}
+	}
 
-    get_repo_url() {
-        [ -z "$repo_url" ] && repo_url=$(git config --get remote.origin.url)
-        repo_url=${repo_url/https:\/\/[^@]*@/https:\/\/} # Remove credentials if present
-        [ -z "$repo_url" ] && { echo -e "${BRIGHT_RED}Error: No repo URL found.${RESET}"; return 1; }
-        log "${BRIGHT_YELLOW}Using repository URL:${RESET} $repo_url"
-    }
+	get_repo_url() {
+		[ -z "$repo_url" ] && repo_url=$(git config --get remote.origin.url)
+		repo_url=${repo_url/https:\/\/[^@]*@/https:\/\/} # Remove credentials if present
+		[ -z "$repo_url" ] && {
+			echo -e "${BRIGHT_RED}Error: No repo URL found.${RESET}"
+			return 1
+		}
+		log "${BRIGHT_YELLOW}Using repository URL:${RESET} $repo_url"
+	}
 
-    detect_provider() {
-        [[ "$repo_url" == *github.com* ]] && git_provider="github"
-        [[ "$repo_url" == *gitlab.com* ]] && git_provider="gitlab"
-        [[ "$repo_url" == *bitbucket.org* ]] && git_provider="bitbucket"
-        [[ "$repo_url" == *dev.azure.com* ]] && git_provider="azure"
-        [ -z "$git_provider" ] && git_provider="generic"
-        log "${BRIGHT_YELLOW}Detected Git provider:${RESET} $git_provider"
-    }
+	detect_provider() {
+		[[ "$repo_url" == *github.com* ]] && git_provider="github"
+		[[ "$repo_url" == *gitlab.com* ]] && git_provider="gitlab"
+		[[ "$repo_url" == *bitbucket.org* ]] && git_provider="bitbucket"
+		[[ "$repo_url" == *dev.azure.com* ]] && git_provider="azure"
+		[ -z "$git_provider" ] && git_provider="generic"
+		log "${BRIGHT_YELLOW}Detected Git provider:${RESET} $git_provider"
+	}
 
-    store_credentials() {
-        log "${BRIGHT_CYAN}Storing credentials...${RESET}"
-        git credential reject "$repo_url" 2>/dev/null
-        echo "url=$repo_url\nusername=$username\npassword=$token" | git credential approve
-    }
+	update_git_remote_url() {
+		local proto host path
+		proto=$(echo "$repo_url" | sed -E 's#(https?)://.*#\1#')
+		host=$(echo "$repo_url" | sed -E 's#https?://([^/]+)/.*#\1#')
+		path=$(echo "$repo_url" | sed -E 's#https?://[^/]+/(.*)#\1#')
+		local new_url="$proto://$username:$token@$host/$path"
+		git remote set-url origin "$new_url"
+		log "${BRIGHT_CYAN}Remote URL updated:${RESET} $new_url"
+	}
 
-    test_connection() {
-        [ "$skip_test" -eq 1 ] && return
-        log "${BRIGHT_CYAN}Testing connection...${RESET}"
-        git fetch origin &>/dev/null && log "${BRIGHT_GREEN}Credentials updated successfully!${RESET}" || {
-            echo -e "${BRIGHT_RED}Failed to connect. Check token permissions.${RESET}"
-            return 1
-        }
-    }
+	store_credentials() {
+		if ! git config --global credential.helper | grep -q store; then
+			git config --global credential.helper store
+			log "${BRIGHT_CYAN}Enabled credential helper:${RESET} store"
+		fi
+		log "${BRIGHT_CYAN}Storing credentials...${RESET}"
+		git credential reject "$repo_url" 2>/dev/null
+		echo "url=$repo_url\nusername=$username\npassword=$token" | git credential approve
+	}
 
-    # Parse options
-    while [[ "$1" == -* ]]; do
-        case "$1" in
-            -s|--silent) silence_output=1 ;;
-            -t|--skip-test) skip_test=1 ;;
-            -p|--provider) git_provider="$2"; shift ;;
-            -f|--force) force=1 ;;
-            -h|--help) show_help; return 0 ;;
-            *) echo -e "${BRIGHT_RED}Error: Unknown option $1${RESET}"; return 1 ;;
-        esac
-        shift
-    done
+	test_connection() {
+		[ "$skip_test" -eq 1 ] && return
+		log "${BRIGHT_CYAN}Testing connection...${RESET}"
+		git fetch origin &>/dev/null && log "${BRIGHT_GREEN}Credentials updated successfully!${RESET}" || {
+			echo -e "${BRIGHT_RED}Failed to connect. Check token permissions.${RESET}"
+			return 1
+		}
+	}
 
-    # Validate arguments
-    token="$1"; username="$2"; repo_url="$3"
-    [ -z "$token" ] || [ -z "$username" ] && { show_help; return 1; }
-    [ -z "$repo_url" ] && get_repo_url
-    check_git || return 1
-    detect_provider
+	# Parse options
+	while [[ "$1" == -* ]]; do
+		case "$1" in
+		-s | --silent) silence_output=1 ;;
+		-t | --skip-test) skip_test=1 ;;
+		-p | --provider)
+			git_provider="$2"
+			shift
+			;;
+		-f | --force) force=1 ;;
+		-h | --help)
+			show_help
+			return 0
+			;;
+		*)
+			echo -e "${BRIGHT_RED}Error: Unknown option $1${RESET}"
+			return 1
+			;;
+		esac
+		shift
+	done
 
-    # Confirm before updating
-    if [ "$force" -eq 0 ]; then
-        echo -e "${BRIGHT_YELLOW}Update credentials for $git_provider ($repo_url)? [y/N] ${RESET}"
-        read -r confirm && [[ ! $confirm =~ ^[Yy]$ ]] && { echo -e "${BRIGHT_RED}Cancelled.${RESET}"; return 1; }
-    fi
+	# Validate arguments
+	token="$1"
+	username="$2"
+	repo_url="$3"
+	[ -z "$token" ] || [ -z "$username" ] && {
+		show_help
+		return 1
+	}
+	[ -z "$repo_url" ] && get_repo_url
+	check_git || return 1
+	detect_provider
 
-    # Store credentials and test
-    store_credentials
-    test_connection
+	# Confirm before updating
+	if [ "$force" -eq 0 ]; then
+		echo -e "${BRIGHT_YELLOW}Update credentials for $git_provider ($repo_url)? [y/N] ${RESET}"
+		read -r confirm && [[ ! $confirm =~ ^[Yy]$ ]] && {
+			echo -e "${BRIGHT_RED}Cancelled.${RESET}"
+			return 1
+		}
+	fi
+
+	# Store credentials and test
+	store_credentials
+	update_git_remote_url
+	test_connection
 }
 #-------------------------------------------------------------
 
@@ -3107,30 +3145,6 @@ fi
 #-------------------------------------------------------------
 
 #-------------------------------------------------------------
-#  ____   _  _____ _   _
-# |  _ \ / \|_   _| | | |
-# | |_) / _ \ | | | |_| |
-# |  __/ ___ \| | |  _  |
-# |_| /_/   \_\_| |_| |_|
-#
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-# Path prepend
-pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmux/"
-# For Mac
-if [ -d /usr/local/opt/grep/libexec/gnubin ]; then
-	pathprepend "/usr/local/opt/grep/libexec/gnubin"
-fi
-if [ -d /usr/local/opt/coreutils/libexec/gnubin ]; then
-	pathprepend "/usr/local/opt/coreutils/libexec/gnubin"
-fi
-if [ -d /usr/local/opt/gnu-sed/libexec/gnubin ]; then
-	pathprepend "/usr/local/opt/gnu-sed/libexec/gnubin"
-fi
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
 #  _______  ______   ___  ____ _____ ____
 # | ____\ \/ /  _ \ / _ \|  _ \_   _/ ___|
 # |  _|  \  /| |_) | | | | |_) || | \___ \
@@ -3241,6 +3255,30 @@ if [ ! -n "$SSH_CLIENT" ]; then
 		alias icat="kitten icat"
 		alias hg="kitten hyperlinked-grep --smart-case --no-ignore --hidden --pretty"
 	fi
+fi
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+#  ____   _  _____ _   _
+# |  _ \ / \|_   _| | | |
+# | |_) / _ \ | | | |_| |
+# |  __/ ___ \| | |  _  |
+# |_| /_/   \_\_| |_| |_|
+#
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# Path prepend
+pathprepend "/opt/nvim/bin/" "${HOME}/CASTEM2022/bin" "/opt/cmake/bin" "/opt/tmux/"
+# For Mac
+if [ -d /usr/local/opt/grep/libexec/gnubin ]; then
+	pathprepend "/usr/local/opt/grep/libexec/gnubin"
+fi
+if [ -d /usr/local/opt/coreutils/libexec/gnubin ]; then
+	pathprepend "/usr/local/opt/coreutils/libexec/gnubin"
+fi
+if [ -d /usr/local/opt/gnu-sed/libexec/gnubin ]; then
+	pathprepend "/usr/local/opt/gnu-sed/libexec/gnubin"
 fi
 #-------------------------------------------------------------
 
